@@ -67,7 +67,7 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
 
   const chip = (active: boolean) =>
     `rounded-full border px-3 py-1.5 text-sm transition ${active ? "border-cyan-400 bg-cyan-400/10 text-cyan-200" : "border-slate-700 text-slate-300 hover:border-slate-500"}`;
-  const box = "mono overflow-x-auto whitespace-pre rounded-xl border border-slate-700 bg-slate-950/70 p-4 text-[13px] leading-relaxed text-slate-200";
+  const box = "mono max-w-full overflow-x-auto whitespace-pre rounded-xl border border-slate-700 bg-slate-950/70 p-4 text-[13px] leading-relaxed text-slate-200";
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
@@ -111,15 +111,15 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
             key={`${card.id}-${flipped}`}
             onClick={() => setFlipped((f) => !f)}
             aria-label={flipped ? "Showing answer. Tap to show the question" : "Showing question. Tap to reveal the answer"}
-            className={`a-rise flex min-h-[18rem] w-full flex-col rounded-2xl border p-5 text-left shadow-[0_0_40px_-20px_#22d3ee] sm:p-7 ${flipped ? "border-violet-400/60 bg-violet-400/5" : "border-slate-700/80 bg-slate-900/70"}`}
+            className={`a-rise flex min-h-[18rem] w-full min-w-0 max-w-full flex-col rounded-2xl border p-5 text-left shadow-[0_0_40px_-20px_#22d3ee] sm:p-7 ${flipped ? "border-violet-400/60 bg-violet-400/5" : "border-slate-700/80 bg-slate-900/70"}`}
           >
             <div className="mb-4 flex flex-wrap gap-2 text-xs">
               <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-cyan-300">{TOPICS.find((t) => t.id === card.topic)!.title} · {card.tag}</span>
               <span className="rounded-full bg-violet-400/10 px-3 py-1 text-violet-300">{flipped ? (isCommand ? "Command" : "Answer") : (isCommand ? "Task" : "Question")}</span>
             </div>
-            <div className="flex flex-1 items-center">
+            <div className="flex min-w-0 flex-1 items-center">
               {flipped ? (
-                isCommand ? <pre className={`${box} w-full`}>{card.back}</pre> : <p className="whitespace-pre-line text-base leading-relaxed">{card.back}</p>
+                isCommand ? <pre className={`${box} w-full min-w-0`}>{card.back}</pre> : <p className="whitespace-pre-line text-base leading-relaxed">{card.back}</p>
               ) : (
                 <p className="w-full text-center text-lg font-medium leading-relaxed">{card.front}</p>
               )}

@@ -110,7 +110,7 @@ function Practice({ topic, onExit }: { topic: Topic; onExit: () => void }) {
 
   const done = phase === "done";
   const canSubmit = input !== "";
-  const box = "mono overflow-x-auto whitespace-pre rounded-xl border border-slate-700 bg-slate-950/70 p-3 text-[13px] leading-relaxed text-slate-200";
+  const box = "mono max-w-full overflow-x-auto whitespace-pre rounded-xl border border-slate-700 bg-slate-950/70 p-3 text-[13px] leading-relaxed text-slate-200";
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
@@ -122,7 +122,7 @@ function Practice({ topic, onExit }: { topic: Topic; onExit: () => void }) {
         </div>
       </div>
 
-      <article key={q.id} className={`a-rise relative rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4 shadow-[0_0_40px_-20px_#22d3ee] sm:p-6 ${phase === "retry" ? "a-shake" : ""}`}>
+      <article key={q.id} className={`a-rise relative min-w-0 max-w-full rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4 shadow-[0_0_40px_-20px_#22d3ee] sm:p-6 ${phase === "retry" ? "a-shake" : ""}`}>
         <div className="mb-3 flex flex-wrap gap-2 text-xs">
           <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-cyan-300">{meta.title} · {q.tag}</span>
           <span className="rounded-full bg-violet-400/10 px-3 py-1 text-violet-300">{modeLabel(q)}</span>
@@ -133,12 +133,12 @@ function Practice({ topic, onExit }: { topic: Topic; onExit: () => void }) {
         {q.table && <pre className={`${box} mb-3`} aria-label="Sample table">{q.table}</pre>}
         {q.show && <pre className={`${box} mb-3`} aria-label="Code">{q.show}</pre>}
 
-        <fieldset disabled={done} className="space-y-2">
+        <fieldset disabled={done} className="min-w-0 max-w-full space-y-2">
           <legend className="sr-only">Choose one answer</legend>
           {q.options.map((o) => (
-            <label key={o} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm ${input === o ? "border-cyan-400 bg-cyan-400/10" : "border-slate-700"}`}>
+            <label key={o} className={`flex w-full min-w-0 max-w-full cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm ${input === o ? "border-cyan-400 bg-cyan-400/10" : "border-slate-700"}`}>
               <input type="radio" name="opt" className="mt-1 shrink-0" checked={input === o} onChange={() => setInput(o)} />
-              <span className={q.code ? "mono min-w-0 overflow-x-auto whitespace-pre text-[13px] leading-relaxed" : ""}>{o}</span>
+              <span className={q.code ? "mono min-w-0 flex-1 overflow-x-auto whitespace-pre text-[12px] leading-relaxed sm:text-[13px]" : "min-w-0 flex-1 break-words"}>{o}</span>
             </label>
           ))}
         </fieldset>

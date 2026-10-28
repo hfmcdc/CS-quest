@@ -10,6 +10,7 @@ body {
   background-attachment: fixed;
   min-height: 100vh;
 }
+fieldset { min-width: 0; }
 .mono { font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; }
 :focus-visible { outline: 2px solid #22d3ee; outline-offset: 2px; }
 
