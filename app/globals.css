@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body { background: #07090f; color: #e6e9f2; }
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-image: radial-gradient(60rem 30rem at 10% -10%, rgba(34,211,238,.12), transparent),
+                    radial-gradient(50rem 30rem at 110% 0%, rgba(167,139,250,.12), transparent);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+.mono { font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; }
+:focus-visible { outline: 2px solid #22d3ee; outline-offset: 2px; }
+
+@keyframes pop { 0% { transform: scale(.6); opacity: 0 } 60% { transform: scale(1.15); opacity: 1 } 100% { transform: scale(1) } }
+@keyframes shake { 0%,100% { transform: translateX(0) } 20%,60% { transform: translateX(-6px) } 40%,80% { transform: translateX(6px) } }
+@keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+@keyframes burst { from { opacity: 1; transform: translate(0,0) scale(1) } to { opacity: 0; transform: translate(var(--x), var(--y)) scale(.3) } }
+@keyframes fill { from { width: 0 } to { width: 100% } }
+.a-pop { animation: pop .45s ease-out }
+.a-shake { animation: shake .4s ease-in-out }
+.a-rise { animation: rise .3s ease-out }
+.spark { position: absolute; left: 1.25rem; top: 50%; width: 8px; height: 8px; border-radius: 9999px; background: #22d3ee; animation: burst .8s ease-out forwards; pointer-events: none }
+.bar { animation: fill 1.6s ease-in-out forwards }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
