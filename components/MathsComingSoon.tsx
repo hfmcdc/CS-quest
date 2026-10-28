@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 // 5:00 PM IST on 29 Oct 2026. Change this one line to move the launch time.
 const LAUNCH = new Date("2026-10-29T17:00:00+05:30").getTime();
@@ -86,6 +87,7 @@ export default function MathsComingSoon() {
       <a href={IG_URL} target="_blank" rel="noopener noreferrer" className="text-sm text-slate-400 hover:text-cyan-300">
         Follow @mr.mallu_gg for the launch
       </a>
+      <Link href="/" className="text-sm text-slate-400 underline hover:text-cyan-300">Switch subject</Link>
     </main>
   );
 }

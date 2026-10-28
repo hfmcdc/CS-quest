@@ -1,5 +1,5 @@
-import CSQuest from "@/components/CSQuest";
+import SubjectPicker from "@/components/SubjectPicker";
 
 export default function Page() {
-  return <CSQuest />;
+  return <SubjectPicker />;
 }

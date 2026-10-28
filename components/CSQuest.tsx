@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { BANK, MODE_LABEL, TOPICS } from "@/lib/questions";
 import { evaluate } from "@/lib/checker";
 import type { Outcome, Question, Topic } from "@/lib/types";
@@ -223,7 +224,7 @@ export default function CSQuest() {
           <span className="text-sm font-semibold text-violet-300">Revise</span>
         </button>
       </section>
-      <footer className="mt-12 flex flex-col items-center gap-3"><ComingSoon /><Instagram /></footer>
+      <footer className="mt-12 flex flex-col items-center gap-3"><ComingSoon /><Link href="/" className="text-sm text-slate-400 underline hover:text-cyan-300">Switch subject</Link><Instagram /></footer>
     </main>
     </>
   );
