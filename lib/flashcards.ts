@@ -122,6 +122,66 @@ export const FLASHCARDS: Flashcard[] = [
   sc(21, "DDL", "Add a primary key to an existing table.", "ALTER TABLE STUDENT\nADD PRIMARY KEY (RollNo);"),
   sc(22, "DDL", "Delete the table STUDENT completely.", "DROP TABLE STUDENT;"),
 
+  // ---- UPDATE ----
+  sc(23, "UPDATE", "Change both Class and Marks of RollNo 4 in one command.", "UPDATE STUDENT\nSET Class = 'XII', Marks = 70\nWHERE RollNo = 4;"),
+  sc(24, "UPDATE", "Give 5 extra marks to ALL students.", "UPDATE STUDENT\nSET Marks = Marks + 5;\n-- no WHERE, so every row changes"),
+  sc(25, "UPDATE", "Set Marks to 0 wherever it is NULL.", "UPDATE STUDENT\nSET Marks = 0\nWHERE Marks IS NULL;"),
+  sc(26, "UPDATE", "Change the class to XII for students with RollNo 2, 4 or 5.", "UPDATE STUDENT\nSET Class = 'XII'\nWHERE RollNo IN (2, 4, 5);"),
+  sc(27, "UPDATE", "Increase Marks by 10% for students having Marks below 50.", "UPDATE STUDENT\nSET Marks = Marks * 1.10\nWHERE Marks < 50;"),
+
+  // ---- ALTER TABLE ----
+  sc(28, "ALTER", "Add a column Phone with NOT NULL constraint.", "ALTER TABLE STUDENT\nADD Phone CHAR(10) NOT NULL;"),
+  sc(29, "ALTER", "Add a column City with a default value.", "ALTER TABLE STUDENT\nADD City VARCHAR(20) DEFAULT 'Kochi';"),
+  sc(30, "ALTER", "Add a column City right after the column Name.", "ALTER TABLE STUDENT\nADD City VARCHAR(20) AFTER Name;"),
+  sc(31, "ALTER", "Add a column Grade as the FIRST column of the table.", "ALTER TABLE STUDENT\nADD Grade CHAR(1) FIRST;"),
+  sc(32, "ALTER", "Change the datatype of Marks to DECIMAL(5,2).", "ALTER TABLE STUDENT\nMODIFY Marks DECIMAL(5, 2);"),
+  sc(33, "ALTER", "Make the column Name NOT NULL using MODIFY.", "ALTER TABLE STUDENT\nMODIFY Name VARCHAR(20) NOT NULL;"),
+  sc(34, "ALTER", "Rename the column Name to StudentName (CHANGE).", "ALTER TABLE STUDENT\nCHANGE Name StudentName VARCHAR(30);\n-- CHANGE old_name new_name datatype"),
+  sc(35, "ALTER", "Rename the table STUDENT to PUPIL.", "ALTER TABLE STUDENT\nRENAME TO PUPIL;\n-- or: RENAME TABLE STUDENT TO PUPIL;"),
+  sc(36, "ALTER", "Remove the primary key of STUDENT.", "ALTER TABLE STUDENT\nDROP PRIMARY KEY;"),
+  sc(37, "ALTER", "Add a foreign key RollNo in FEES that refers to STUDENT.", "ALTER TABLE FEES\nADD FOREIGN KEY (RollNo)\nREFERENCES STUDENT (RollNo);"),
+  sc(38, "ALTER", "Set a default value of 0 for the column Marks.", "ALTER TABLE STUDENT\nALTER Marks SET DEFAULT 0;"),
+  sc(39, "ALTER", "Add a UNIQUE constraint on the column Phone.", "ALTER TABLE STUDENT\nADD UNIQUE (Phone);"),
+  sc(40, "ALTER", "Add two columns in a single ALTER command.", "ALTER TABLE STUDENT\nADD City VARCHAR(20),\nADD Phone CHAR(10);"),
+
+  // ---- CREATE / INSERT / DELETE ----
+  sc(41, "CREATE", "Create a table using NOT NULL, UNIQUE, DEFAULT and CHECK constraints.", "CREATE TABLE EMP (\n    EmpId INT PRIMARY KEY,\n    Name VARCHAR(20) NOT NULL,\n    Email VARCHAR(30) UNIQUE,\n    Salary INT DEFAULT 20000,\n    Age INT CHECK (Age >= 18)\n);"),
+  sc(42, "CREATE", "Create the table FEES where RollNo is a foreign key of STUDENT.", "CREATE TABLE FEES (\n    RollNo INT,\n    Fee INT,\n    FOREIGN KEY (RollNo)\n        REFERENCES STUDENT (RollNo)\n);"),
+  sc(43, "INSERT", "Insert a row giving values only for RollNo, Name and Class.", "INSERT INTO STUDENT (RollNo, Name, Class)\nVALUES (7, 'Neha', 'XII');"),
+  sc(44, "INSERT", "Insert two rows in one command.", "INSERT INTO STUDENT VALUES\n(8, 'Joel', 'XII', 74),\n(9, 'Sana', 'XI', 68);"),
+  sc(45, "DELETE", "Delete all students who scored below 40.", "DELETE FROM STUDENT\nWHERE Marks < 40;"),
+  sc(46, "DELETE", "Delete ALL rows but keep the table.", "DELETE FROM STUDENT;\n-- or: TRUNCATE TABLE STUDENT;"),
+  sc(47, "DROP", "Delete the whole database named school.", "DROP DATABASE school;"),
+  sc(48, "Database", "Show all databases / the CREATE statement of a table.", "SHOW DATABASES;\nSHOW CREATE TABLE STUDENT;"),
+
+  // ---- SELECT variations ----
+  sc(49, "SELECT", "Display Name and Marks with a heading (alias) 'Score'.", "SELECT Name, Marks AS Score\nFROM STUDENT;"),
+  sc(50, "SELECT", "Display Name and Marks increased by 5 as NewMarks.", "SELECT Name, Marks + 5 AS NewMarks\nFROM STUDENT;"),
+  sc(51, "SELECT", "Display names whose second letter is 'a'.", "SELECT Name FROM STUDENT\nWHERE Name LIKE '_a%';"),
+  sc(52, "SELECT", "Display names that do NOT end with 'a'.", "SELECT Name FROM STUDENT\nWHERE Name NOT LIKE '%a';"),
+  sc(53, "SELECT", "Display students not in class XI or XII.", "SELECT * FROM STUDENT\nWHERE Class NOT IN ('XI', 'XII');"),
+  sc(54, "SELECT", "Display class XII students with Marks above 80 OR class XI students with Marks above 60.", "SELECT * FROM STUDENT\nWHERE (Class = 'XII' AND Marks > 80)\n   OR (Class = 'XI' AND Marks > 60);"),
+  sc(55, "SELECT", "Sort by Class ascending, then by Marks descending.", "SELECT * FROM STUDENT\nORDER BY Class ASC, Marks DESC;"),
+  sc(56, "SELECT", "Display only the top 3 students by Marks.", "SELECT * FROM STUDENT\nORDER BY Marks DESC\nLIMIT 3;"),
+  sc(57, "SELECT", "Count how many different classes exist.", "SELECT COUNT(DISTINCT Class)\nFROM STUDENT;"),
+  sc(58, "SELECT", "Find the total and average Marks of class XII only.", "SELECT SUM(Marks), AVG(Marks)\nFROM STUDENT\nWHERE Class = 'XII';"),
+  sc(59, "GROUP BY", "Show the highest Marks of each class, highest class-wise first.", "SELECT Class, MAX(Marks)\nFROM STUDENT\nGROUP BY Class\nORDER BY MAX(Marks) DESC;"),
+  sc(60, "GROUP BY", "Show the average Marks of each class, only for students above 60 marks and only classes with average above 75.", "SELECT Class, AVG(Marks)\nFROM STUDENT\nWHERE Marks > 60\nGROUP BY Class\nHAVING AVG(Marks) > 75;"),
+
+  // ---- JOINS (tables STUDENT and FEES(RollNo, Fee)) ----
+  sc(61, "Join", "Cartesian product of STUDENT and FEES.", "SELECT * FROM STUDENT, FEES;\n-- every row of STUDENT paired with every row of FEES"),
+  sc(62, "Join", "Equi-join of STUDENT and FEES on RollNo (WHERE style).", "SELECT * FROM STUDENT, FEES\nWHERE STUDENT.RollNo = FEES.RollNo;"),
+  sc(63, "Join", "Join STUDENT and FEES on RollNo using JOIN ... ON.", "SELECT S.Name, F.Fee\nFROM STUDENT S JOIN FEES F\nON S.RollNo = F.RollNo;"),
+  sc(64, "Join", "Natural join of STUDENT and FEES.", "SELECT * FROM STUDENT\nNATURAL JOIN FEES;\n-- joins on the common column (RollNo), which appears once"),
+
+  // ---- FUNCTIONS ----
+  sc(65, "String fn", "Show names in capital letters and their length.", "SELECT UPPER(Name), LENGTH(Name)\nFROM STUDENT;\n-- LOWER(Name) gives small letters"),
+  sc(66, "String fn", "Show the first 2 letters and last 2 letters of Name.", "SELECT LEFT(Name, 2), RIGHT(Name, 2)\nFROM STUDENT;"),
+  sc(67, "String fn", "Extract 3 characters of Name starting from position 2.", "SELECT MID(Name, 2, 3)\nFROM STUDENT;\n-- SUBSTR(Name, 2, 3) works the same"),
+  sc(68, "String fn", "Find the position of 'a' in Name / remove spaces around text.", "SELECT INSTR(Name, 'a'), TRIM('  hi  ')\nFROM STUDENT;\n-- LTRIM() and RTRIM() trim one side only"),
+  sc(69, "Math fn", "Round 45.678 to 1 decimal, find 2 to the power 3, and 17 mod 5.", "SELECT ROUND(45.678, 1), POWER(2, 3), MOD(17, 5);\n-- results: 45.7, 8, 2"),
+  sc(70, "Date fn", "Show today's date, current date-time, and year, month and day name of a date.", "SELECT CURDATE(), NOW();\nSELECT YEAR('2026-10-28'), MONTH('2026-10-28'), DAYNAME('2026-10-28');"),
+
   // ---------- Python-SQL Interface: COMMANDS ----------
   pc(1, "Setup", "Import the MySQL connector.", "import mysql.connector"),
   pc(2, "Setup", "Connect to a MySQL database.", "con = mysql.connector.connect(\n    host=\"localhost\",\n    user=\"root\",\n    passwd=\"your_password\",\n    database=\"school\"\n)"),
