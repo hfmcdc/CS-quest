@@ -7,6 +7,9 @@ All questions are now **multiple choice (MCQ)**. ✍️ Write-your-own-program q
 Next.js 14 + TypeScript + Tailwind CSS. No backend, no database, no storage: refreshing the page resets everything.
 Syllabus: Binary Files, CSV Files, MySQL table questions, Python–SQL interface.
 
+## Flashcards
+A **Flashcards** option on the dashboard offers revision decks for **Theory** and **Commands** across all topics (`lib/flashcards.ts`). Flip a card, mark *Got it* / *Review again*, and re-study the missed ones. Add cards with the `ft/fc/st/sc/pt/pc` helpers.
+
 ## Prerequisites
 Node.js 18.18+ (or 20+), npm, Git, a GitHub account and a Vercel account.
 

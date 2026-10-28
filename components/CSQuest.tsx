@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { BANK, MODE_LABEL, TOPICS } from "@/lib/questions";
 import { evaluate } from "@/lib/checker";
 import type { Outcome, Question, Topic } from "@/lib/types";
+import Flashcards from "@/components/Flashcards";
 
 const IG_URL = "https://www.instagram.com/mr.mallu_gg/";
 
@@ -189,8 +190,9 @@ function Practice({ topic, onExit }: { topic: Topic; onExit: () => void }) {
 }
 
 export default function CSQuest() {
-  const [screen, setScreen] = useState<"loading" | "home" | Topic>("loading");
+  const [screen, setScreen] = useState<"loading" | "home" | "flash" | Topic>("loading");
   if (screen === "loading") return <><BetaBanner /><Loader onDone={() => setScreen("home")} /></>;
+  if (screen === "flash") return <><BetaBanner /><Flashcards onExit={() => setScreen("home")} /></>;
   if (screen !== "home") return <><BetaBanner /><Practice key={screen} topic={screen} onExit={() => setScreen("home")} /></>;
   return (
     <>
@@ -210,6 +212,16 @@ export default function CSQuest() {
             <span className="text-sm font-semibold text-cyan-300">Start practice</span>
           </button>
         ))}
+      </section>
+      <section className="mt-4" aria-label="Flashcards">
+        <button onClick={() => setScreen("flash")} className="group flex w-full items-center gap-4 rounded-2xl border border-slate-700/80 bg-gradient-to-r from-violet-500/10 to-cyan-500/10 p-5 text-left transition hover:-translate-y-1 hover:border-violet-400 hover:shadow-[0_0_40px_-15px_#a78bfa]">
+          <span className="text-3xl" aria-hidden="true">🃏</span>
+          <span className="flex-1">
+            <span className="block text-lg font-semibold">Flashcards</span>
+            <span className="block text-sm text-slate-400">Quick revision of <b className="text-slate-200">theory</b> and <b className="text-slate-200">commands</b> for all three topics.</span>
+          </span>
+          <span className="text-sm font-semibold text-violet-300">Revise</span>
+        </button>
       </section>
       <footer className="mt-12 flex flex-col items-center gap-3"><ComingSoon /><Instagram /></footer>
     </main>
