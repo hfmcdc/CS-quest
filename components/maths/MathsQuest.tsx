@@ -4,12 +4,14 @@ import { useState } from "react";
 import { MATH_TOPICS, topicMeta } from "@/lib/maths/topics";
 import { EXAMPLES } from "@/lib/maths/examples";
 import { topicCounts } from "@/lib/maths/session";
+import { MATH_CARDS } from "@/lib/maths/flashcards";
 import type { MathTopicId } from "@/lib/maths/types";
 import PracticeView from "@/components/maths/PracticeView";
 import { LearnView, RevisionView } from "@/components/maths/StudyViews";
+import MathFlashcards from "@/components/maths/MathFlashcards";
 
 type ModeId = "revision" | "learn" | "practice" | "challenge";
-type Screen = { name: "home" } | { name: "topic"; topic: MathTopicId; mode: ModeId };
+type Screen = { name: "home" } | { name: "topic"; topic: MathTopicId; mode: ModeId } | { name: "cards"; topic: MathTopicId | "all" };
 
 const MODES: { id: ModeId; label: string; icon: string; blurb: string }[] = [
   { id: "revision", label: "Quick Revision", icon: "📘", blurb: "Formulas, key conditions and common mistakes" },
@@ -18,16 +20,23 @@ const MODES: { id: ModeId; label: string; icon: string; blurb: string }[] = [
   { id: "challenge", label: "Challenge", icon: "🔥", blurb: "Harder exam-style problems from the same syllabus" },
 ];
 
+const cardCount = (id: MathTopicId) => MATH_CARDS.filter((c) => c.topic === id).length;
+
 export default function MathsQuest({ onExit }: { onExit: () => void }) {
   const [screen, setScreen] = useState<Screen>({ name: "home" });
 
   const navBtn = "rounded-lg border border-slate-700 px-3 py-2 text-sm hover:border-emerald-400";
+
+  if (screen.name === "cards") {
+    return <MathFlashcards key={screen.topic} initial={screen.topic} onBack={() => setScreen({ name: "home" })} onMain={onExit} />;
+  }
 
   if (screen.name === "home") {
     return (
       <main className="mx-auto max-w-5xl px-4 py-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
           <button onClick={onExit} className={navBtn}>← Main dashboard</button>
+          <button onClick={() => setScreen({ name: "cards", topic: "all" })} className="rounded-lg border border-emerald-400/60 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-200 hover:bg-emerald-400/20"><span aria-hidden="true">🃏 </span>Formula Flashcards</button>
         </div>
         <header className="mb-6">
           <h1 className="mono text-3xl font-bold text-emerald-300 sm:text-4xl"><span aria-hidden="true">∑ </span>Maths Quest</h1>
@@ -51,6 +60,7 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
                   <li><span aria-hidden="true">🧭 </span>{EXAMPLES[t.id].length} worked examples</li>
                   <li><span aria-hidden="true">🎯 </span>{c.practice} questions + {c.variations} random variations</li>
                   <li><span aria-hidden="true">🔥 </span>{c.challenge} challenge</li>
+                  <li><span aria-hidden="true">🃏 </span>{cardCount(t.id)} flashcards</li>
                 </ul>
                 <div className="mt-auto flex flex-wrap items-center gap-2">
                   <button onClick={() => setScreen({ name: "topic", topic: t.id, mode: "practice" })} className="rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 hover:brightness-110">
@@ -59,6 +69,7 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
                   <button onClick={() => setScreen({ name: "topic", topic: t.id, mode: "revision" })} className="rounded-xl border border-slate-600 px-3 py-3 text-sm hover:border-emerald-400">Revise</button>
                   <button onClick={() => setScreen({ name: "topic", topic: t.id, mode: "learn" })} className="rounded-xl border border-slate-600 px-3 py-3 text-sm hover:border-emerald-400">Examples</button>
                   <button onClick={() => setScreen({ name: "topic", topic: t.id, mode: "challenge" })} className="rounded-xl border border-slate-600 px-3 py-3 text-sm hover:border-emerald-400">Challenge</button>
+                  <button onClick={() => setScreen({ name: "cards", topic: t.id })} className="rounded-xl border border-slate-600 px-3 py-3 text-sm hover:border-emerald-400">Flashcards</button>
                 </div>
               </article>
             );
@@ -87,7 +98,7 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
         <h1 className="text-xl font-bold text-emerald-300 sm:text-2xl"><span aria-hidden="true">{meta.icon} </span>{meta.title}</h1>
       </header>
 
-      <nav aria-label="Study mode" className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <nav aria-label="Study mode" className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
         {MODES.map((m) => (
           <button
             key={m.id}
@@ -98,6 +109,12 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
             <span aria-hidden="true">{m.icon} </span>{m.label}
           </button>
         ))}
+        <button
+          onClick={() => setScreen({ name: "cards", topic })}
+          className="rounded-xl border border-slate-700 px-3 py-2.5 text-left text-sm text-slate-300 transition hover:border-slate-500"
+        >
+          <span aria-hidden="true">🃏 </span>Flashcards
+        </button>
       </nav>
       <p className="mb-4 text-xs text-slate-500">{current.blurb}</p>
 

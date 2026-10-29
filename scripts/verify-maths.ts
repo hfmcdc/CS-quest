@@ -9,6 +9,8 @@ import { GENERATORS } from "../lib/maths/generators";
 import { REVISION } from "../lib/maths/revision";
 import { EXAMPLES } from "../lib/maths/examples";
 import { MATH_TOPICS } from "../lib/maths/topics";
+import { MATH_CARDS, PV_ROWS } from "../lib/maths/flashcards";
+import { piTex } from "../lib/maths/generators";
 import { checkAnswer } from "../lib/maths/checker";
 import { compile, parseExpr } from "../lib/maths/expr";
 import { mathProblems } from "../components/maths/MathText";
@@ -320,9 +322,43 @@ for (const g of GENERATORS) {
   }
 }
 
+
+// ---------------------------------------------------------------- 7. flashcards
+{
+  const cardIds = new Set<string>();
+  for (const c of MATH_CARDS) {
+    ok(!cardIds.has(c.id), `duplicate card id ${c.id}`);
+    cardIds.add(c.id);
+    ok(c.front.length > 0 && c.back.length > 0, `${c.id} empty card`);
+    lint(`${c.id} front`, c.front);
+    lint(`${c.id} back`, c.back);
+  }
+  for (const topic of MATH_TOPICS) ok(MATH_CARDS.filter((c) => c.topic === topic.id).length >= 10, `${topic.id}: fewer than 10 flashcards`);
+  // principal values: forward function recovers the argument, and the value lies in the principal branch
+  const fwd: Record<string, (v: number) => number> = { sin: Math.sin, cos: Math.cos, tan: Math.tan, cot: (v) => 1 / Math.tan(v), sec: (v) => 1 / Math.cos(v), csc: (v) => 1 / Math.sin(v) };
+  const P = Math.PI;
+  const inRange: Record<string, (v: number) => boolean> = {
+    sin: (v) => v >= -P / 2 - 1e-9 && v <= P / 2 + 1e-9,
+    cos: (v) => v >= -1e-9 && v <= P + 1e-9,
+    tan: (v) => v > -P / 2 && v < P / 2,
+    cot: (v) => v > 0 && v < P,
+    sec: (v) => v >= -1e-9 && v <= P + 1e-9 && Math.abs(v - P / 2) > 1e-9,
+    csc: (v) => v >= -P / 2 - 1e-9 && v <= P / 2 + 1e-9 && Math.abs(v) > 1e-9,
+  };
+  ok(PV_ROWS.length === 48, "principal-value table too small");
+  for (const r of PV_ROWS) {
+    ok(near(fwd[r.fn](r.value), r.arg, 1e-9), `PV ${r.fn}(${r.tex}) forward check`);
+    ok(inRange[r.fn](r.value), `PV ${r.fn}(${r.tex}) outside principal branch`);
+    const twelfths = (r.value / P) * 12;
+    ok(Math.abs(twelfths - Math.round(twelfths)) < 1e-9, `PV ${r.fn}(${r.tex}) is not a multiple of pi/12`);
+    ok(piTex(r.value).length > 0, `PV ${r.fn}(${r.tex}) cannot be written`);
+  }
+}
+
 // ---------------------------------------------------------------- 6. scope guard: no out-of-syllabus phrases in content
 const banned = [/(?<!in)definite integral/i, /partial fraction/i, /integration by parts/i, /\bplane\b/i, /\\int_/, /area under/i, /rolle/i, /mean value/i, /rate of change/i, /tangent and normal/i, /approximation/i, /triple product/i];
 const everything: string[] = [];
+MATH_CARDS.forEach((c) => everything.push(c.front, c.back));
 QUESTIONS.forEach((q) => everything.push(q.text, q.answer, q.hint, ...q.steps));
 for (const topic of MATH_TOPICS) {
   REVISION[topic.id].forEach((s) => everything.push(s.title, ...s.items.map((i) => i.body)));

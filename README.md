@@ -11,7 +11,7 @@ Syllabus: Binary Files, CSV Files, MySQL table questions, Python–SQL interface
 A **Flashcards** option on the dashboard offers revision decks for **Theory** and **Commands** across all topics (`lib/flashcards.ts`). Flip a card, mark *Got it* / *Review again*, and re-study the missed ones. Add cards with the `ft/fc/st/sc/pt/pc` helpers.
 
 ## Maths Quest
-Choose **Maths** from the home page to open Class XII practice for the Second Mid-Term portions: Inverse Trigonometric Functions, Vector Algebra, Three-Dimensional Geometry, Applications of Derivatives (**maxima and minima only**) and Integrals (**up to Exercise 7.4**). Each topic has four modes: **Quick Revision**, **Learn with Examples**, **Practice** (adaptive) and **Challenge**. Computer Science is available at `/computer`; Maths is available at `/maths`.
+Choose **Maths** from the home page to open Class XII practice for the Second Mid-Term portions: Inverse Trigonometric Functions, Vector Algebra, Three-Dimensional Geometry, Applications of Derivatives (**maxima and minima only**) and Integrals (**up to Exercise 7.4**). Each topic has four modes: **Quick Revision**, **Learn with Examples**, **Practice** (adaptive) and **Challenge**, plus **Maths Flashcards** (111 cards of formulas, conditions and principal values; `lib/maths/flashcards.ts`). Computer Science is available at `/computer`; Maths is available at `/maths`.
 
 - Code lives in `lib/maths/` and `components/maths/`; the subject picker is in `components/SubjectPicker.tsx`.
 - Maths is shown with a small built-in renderer (`components/maths/MathText.tsx`), so **no new dependency** was added. Write maths in questions as `$inline$` or `$$display$$` LaTeX.
