@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import { BANK, MODE_LABEL, TOPICS } from "@/lib/questions";
 import { evaluate } from "@/lib/checker";
 import type { Outcome, Question, Topic } from "@/lib/types";
@@ -40,7 +41,8 @@ function Loader({ onDone }: { onDone: () => void }) {
   }, [onDone]);
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-      <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">CS Quest</h1>
+      <Logo size={72} />
+      <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">Quest MC</h1>
       <p className="text-slate-400" role="status">Loading your Class XII practice arena…</p>
       <div className="h-1.5 w-56 overflow-hidden rounded-full bg-slate-800"><div className="bar h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-400" /></div>
       <div className="flex flex-col items-center gap-3">
@@ -200,7 +202,7 @@ export default function CSQuest() {
     <BetaBanner />
     <main className="mx-auto max-w-5xl px-4 py-10">
       <header className="mb-8">
-        <h1 className="mono text-3xl font-bold text-cyan-300 sm:text-4xl">CS Quest</h1>
+        <h1 className="mono flex items-center gap-3 text-3xl font-bold text-cyan-300 sm:text-4xl"><Logo size={40} />Quest MC</h1>
         <p className="mt-2 max-w-xl text-slate-400">Practice for the CBSE Class XII Second Mid-Term Computer Science exam with MCQs. Pick an area and start.</p>
       </header>
       <section className="grid gap-4 md:grid-cols-3" aria-label="Practice areas">

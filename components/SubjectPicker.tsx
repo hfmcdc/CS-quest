@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 const SUBJECTS = [
   { href: "/computer", glyph: "</>", title: "Computer Science", note: "Binary files, CSV, MySQL, Python-SQL. Live now.", cta: "Start practice", live: true },
@@ -9,7 +10,8 @@ export default function SubjectPicker() {
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-8 px-5 py-12">
       <div className="text-center">
-        <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">Quest</h1>
+        <div className="flex justify-center"><Logo size={72} /></div>
+        <h1 className="mono mt-4 text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">Quest MC</h1>
         <p className="mt-3 text-slate-400">CBSE Class XII practice. Which subject today?</p>
       </div>
 

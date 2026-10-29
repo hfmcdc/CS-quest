@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 // 5:00 PM IST on 29 Oct 2026. Change this one line to move the launch time.
 const LAUNCH = new Date("2026-10-29T17:00:00+05:30").getTime();
@@ -59,8 +60,9 @@ export default function MathsComingSoon() {
             Coming soon
           </span>
 
+          <Logo size={56} />
           <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300">Maths Quest</h1>
-          <p className="max-w-[16rem] text-slate-300">CBSE Class XII Maths practice, built like CS Quest.</p>
+          <p className="max-w-[16rem] text-slate-300">CBSE Class XII Maths practice, from Quest MC.</p>
 
           {live ? (
             <p role="status" className="a-pop rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 font-semibold text-emerald-200">

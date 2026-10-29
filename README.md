@@ -1,4 +1,4 @@
-# CS Quest — CBSE Class XII Computer Science practice
+# Quest MC (CS Quest) — CBSE Class XII Computer Science practice
 
 > ⚠️ **Beta version.** Found a bug? DM me on Instagram: **[@mr.mallu_gg](https://www.instagram.com/mr.mallu_gg/)**
 
