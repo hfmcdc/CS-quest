@@ -65,8 +65,8 @@ export default function MathsComingSoon() {
           <p className="max-w-[16rem] text-slate-300">CBSE Class XII Maths practice, from Quest MC.</p>
 
           {live ? (
-            <p role="status" className="a-pop rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 font-semibold text-emerald-200">
-              Maths Quest is live. Refresh the page to start.
+            <p role="status" className="a-pop rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 font-semibold text-amber-200">
+              Sorry! Maths questions aren’t ready yet. They’re coming soon—please check back.
             </p>
           ) : (
             <div className="flex flex-col items-center gap-2">

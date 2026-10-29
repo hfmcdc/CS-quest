@@ -3,7 +3,7 @@ import MathsComingSoon from "@/components/MathsComingSoon";
 
 export const metadata: Metadata = {
   title: "Quest MC | Maths coming soon",
-  description: "CBSE Class XII Maths practice launches at 5:00 PM IST.",
+  description: "CBSE Class XII Maths practice is coming soon.",
 };
 
 export default function Page() {
