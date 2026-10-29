@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import Logo from "@/components/Logo";
 import { BANK, MODE_LABEL, TOPICS } from "@/lib/questions";
 import { evaluate } from "@/lib/checker";
 import type { Outcome, Question, Topic } from "@/lib/types";
 import Flashcards from "@/components/Flashcards";
+import MathsQuest from "@/components/maths/MathsQuest";
 
 const IG_URL = "https://www.instagram.com/mr.mallu_gg/";
 
@@ -41,8 +40,7 @@ function Loader({ onDone }: { onDone: () => void }) {
   }, [onDone]);
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-      <Logo size={72} />
-      <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">Quest MC</h1>
+      <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">CS Quest</h1>
       <p className="text-slate-400" role="status">Loading your Class XII practice arena…</p>
       <div className="h-1.5 w-56 overflow-hidden rounded-full bg-slate-800"><div className="bar h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-400" /></div>
       <div className="flex flex-col items-center gap-3">
@@ -193,18 +191,30 @@ function Practice({ topic, onExit }: { topic: Topic; onExit: () => void }) {
 }
 
 export default function CSQuest() {
-  const [screen, setScreen] = useState<"loading" | "home" | "flash" | Topic>("loading");
+  const [screen, setScreen] = useState<"loading" | "home" | "flash" | "maths" | Topic>("loading");
   if (screen === "loading") return <><BetaBanner /><Loader onDone={() => setScreen("home")} /></>;
   if (screen === "flash") return <><BetaBanner /><Flashcards onExit={() => setScreen("home")} /></>;
+  if (screen === "maths") return <><BetaBanner /><MathsQuest onExit={() => setScreen("home")} /></>;
   if (screen !== "home") return <><BetaBanner /><Practice key={screen} topic={screen} onExit={() => setScreen("home")} /></>;
   return (
     <>
     <BetaBanner />
     <main className="mx-auto max-w-5xl px-4 py-10">
       <header className="mb-8">
-        <h1 className="mono flex items-center gap-3 text-3xl font-bold text-cyan-300 sm:text-4xl"><Logo size={40} />Quest MC</h1>
+        <h1 className="mono text-3xl font-bold text-cyan-300 sm:text-4xl">CS Quest</h1>
         <p className="mt-2 max-w-xl text-slate-400">Practice for the CBSE Class XII Second Mid-Term Computer Science exam with MCQs. Pick an area and start.</p>
       </header>
+      <section aria-label="Maths Quest" className="mb-8">
+        <button onClick={() => setScreen("maths")} className="group flex w-full items-center gap-4 rounded-2xl border border-emerald-400/40 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 p-5 text-left transition hover:-translate-y-1 hover:border-emerald-400 hover:shadow-[0_0_40px_-15px_#34d399]">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-3xl" aria-hidden="true">∑</span>
+          <span className="flex-1">
+            <span className="block text-lg font-semibold text-emerald-200">Maths Quest</span>
+            <span className="block text-sm text-slate-400">Class XII Maths: <b className="text-slate-200">Inverse Trigonometric Functions, Vector Algebra, 3D Geometry, Maxima &amp; Minima</b> and <b className="text-slate-200">Integrals</b>. Revision, worked examples, practice and challenges.</span>
+          </span>
+          <span className="text-sm font-semibold text-emerald-300">Start</span>
+        </button>
+      </section>
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Computer Science</h2>
       <section className="grid gap-4 md:grid-cols-3" aria-label="Practice areas">
         {TOPICS.map((t) => (
           <button key={t.id} onClick={() => setScreen(t.id)} className="group rounded-2xl border border-slate-700/80 bg-gradient-to-b from-slate-900 to-slate-900/40 p-5 text-left transition hover:-translate-y-1 hover:border-cyan-400 hover:shadow-[0_0_40px_-15px_#22d3ee]">
@@ -226,7 +236,7 @@ export default function CSQuest() {
           <span className="text-sm font-semibold text-violet-300">Revise</span>
         </button>
       </section>
-      <footer className="mt-12 flex flex-col items-center gap-3"><ComingSoon /><Link href="/" className="text-sm text-slate-400 underline hover:text-cyan-300">Switch subject</Link><Instagram /></footer>
+      <footer className="mt-12 flex flex-col items-center gap-3"><ComingSoon /><Instagram /></footer>
     </main>
     </>
   );
