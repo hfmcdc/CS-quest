@@ -21,9 +21,6 @@ Choose **Maths** from the home page to open Class XII practice for the Second Mi
 - `npm run verify:maths` runs the content, renderer, checker, generator and adaptive-flow self-checks (it fetches `tsx` with `npx`; nothing is added to `package.json` dependencies).
 - Scope note: coverage follows standard NCERT/CBSE topics for these chapters. Questions are original practice questions, **not** copied from textbook exercises, and are not claimed to match specific exercise numbers.
 
-## Chemistry Quest
-Choose **Chemistry** from the home page for D- and F-Block Elements revision notes and adaptive MCQ practice. Chapter content is loaded on demand; add chapter metadata in `lib/chemistry/chapters.ts` and its notes/questions in `lib/chemistry/chapters/`.
-
 ## Prerequisites
 Node.js 18.18+ (or 20+), npm, Git, a GitHub account and a Vercel account.
 
@@ -48,3 +45,9 @@ Then on vercel.com: **Add New → Project → Import** the repo → framework is
 ## How answers are checked
 - Every question is MCQ, so the answer is an exact match against the answer key. Nothing is executed.
 - The bank is small (29 questions) and does not cover every possible exam question. Add questions in `lib/questions.ts` using the `f(...)` / `s(...)` / `p(...)` helpers: give 4 options and the index (0-3) of the correct one.
+
+## Chemistry
+**Chemistry** is a third subject (`/chemistry`). Chapter 1, **D- and F-Block Elements**, has four modes: Quick Revision, Flashcards (46 cards), Practice (45 adaptive MCQs) and Challenge (20 conceptual and assertion–reason questions).
+- Chapters are registered in `lib/chemistry/chapters.ts`; each chapter's content (notes, cards, questions) lives in `lib/chemistry/chapters/<slug>.ts` and is loaded on demand.
+- Chemical formulas use Unicode subscripts/superscripts, so no renderer is needed.
+- A loading splash (shown on every open or reload, not on in-app navigation) (`components/FirstVisitSplash.tsx`), background route prefetching (`components/AppPrefetcher.tsx`) and a small service worker (`public/sw.js`, production only) keep navigation fast.

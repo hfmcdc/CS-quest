@@ -1,4 +1,4 @@
-import type { ChemChapterContent, ChemLevel, ChemQuestion, ChemSection } from "../types";
+import type { ChemCard, ChemChapterContent, ChemLevel, ChemQuestion, ChemSection } from "../types";
 
 /** q(id, tag, level, text, options, indexOfCorrect, explanation, hint) */
 const q = (id: string, tag: string, level: ChemLevel, text: string, options: string[], ans: number, why: string, hint: string): ChemQuestion => ({
@@ -231,4 +231,120 @@ const questions: ChemQuestion[] = [
     "The ionic size falls (lanthanoid contraction), so the M–OH bond becomes more covalent and less ionisable.", "Smaller ion means more covalent bond."),
 ];
 
-export const content: ChemChapterContent = { sections, questions };
+
+// ---------------------------------------------------------------- Challenge: conceptual and assertion–reason
+const AR = ["Both A and R are true and R is the correct explanation of A", "Both A and R are true but R is not the correct explanation of A", "A is true but R is false", "A is false but R is true"];
+const ch = (id: string, tag: string, text: string, options: string[], ans: number, why: string, hint: string): ChemQuestion => ({ ...q(id, tag, 3, text, options, ans, why, hint), challenge: true });
+
+const challenge: ChemQuestion[] = [
+  ch("DFC1", "Assertion–Reason", "Assertion (A): Transition elements show variable oxidation states.\nReason (R): The (n−1)d and ns electrons have very small energy differences, so both can be used in bonding.", AR, 0,
+    "Because the d and s electrons are close in energy, different numbers of them can take part in bonding, giving several oxidation states.", "Compare the energies of ns and (n−1)d."),
+  ch("DFC2", "Assertion–Reason", "Assertion (A): Cu⁺ is unstable in aqueous solution and disproportionates.\nReason (R): The hydration enthalpy of Cu²⁺ is so much more negative than that of Cu⁺ that it outweighs the second ionisation enthalpy of copper.", AR, 0,
+    "2Cu⁺ → Cu²⁺ + Cu. The large hydration energy of Cu²⁺ compensates for the energy needed to remove the second electron, so Cu²⁺(aq) is the stable state.", "What stabilises Cu²⁺ in water?"),
+  ch("DFC3", "Assertion–Reason", "Assertion (A): When alkali is added to orange K₂Cr₂O₇ solution, the colour turns yellow because Cr(VI) is reduced.\nReason (R): Both Cr₂O₇²⁻ and CrO₄²⁻ contain chromium in the +6 oxidation state.", AR, 3,
+    "A is false: the change is Cr₂O₇²⁻ + 2OH⁻ → 2CrO₄²⁻ + H₂O, an acid–base equilibrium shift with no change in oxidation state. R is true.", "Check whether the oxidation number of Cr changes."),
+  ch("DFC4", "Assertion–Reason", "Assertion (A): MnO₄⁻ is intensely purple although Mn is in the +7 state with no d electrons.\nReason (R): The colour arises from ligand-to-metal charge transfer from oxygen to Mn(VII).", AR, 0,
+    "No d–d transition is possible in d⁰ Mn(VII), so the colour must come from charge transfer (O²⁻ → Mn).", "d⁰ rules out d–d transitions."),
+  ch("DFC5", "Assertion–Reason", "Assertion (A): Zr and Hf are very difficult to separate.\nReason (R): Lanthanoid contraction makes the atomic and ionic radii of Zr and Hf almost identical.", AR, 0,
+    "Hf follows the lanthanoids, whose poor 4f shielding shrinks it to nearly the size of Zr, so their chemical behaviour is almost the same.", "Think about what lies between Zr and Hf in the periodic table."),
+  ch("DFC6", "Assertion–Reason", "Assertion (A): Actinoid contraction is greater than lanthanoid contraction.\nReason (R): 5f electrons shield the nuclear charge more effectively than 4f electrons.", AR, 2,
+    "A is true, but R is false: 5f electrons shield even more poorly than 4f electrons, which is why the contraction is greater.", "Is the 5f shielding better or worse than 4f?"),
+  ch("DFC7", "Assertion–Reason", "Assertion (A): Mn²⁺ is difficult to oxidise to Mn³⁺, whereas Fe²⁺ is easily oxidised to Fe³⁺.\nReason (R): Mn²⁺ has a stable half-filled 3d⁵ configuration, while oxidation of Fe²⁺ (3d⁶) gives the half-filled 3d⁵ Fe³⁺.", AR, 0,
+    "Mn²⁺ would lose a stable d⁵ arrangement on oxidation, while Fe²⁺ gains one. Hence E°(Mn³⁺/Mn²⁺) is +1.57 V against +0.77 V for Fe³⁺/Fe²⁺.", "Compare d-electron counts before and after oxidation."),
+  ch("DFC8", "Ionisation enthalpy", "The second ionisation enthalpies of Cr and Cu are unusually high compared with their neighbours. This is because:",
+    ["Cr⁺ is 3d⁵ and Cu⁺ is 3d¹⁰, so removing the next electron disrupts a stable configuration", "Cr⁺ and Cu⁺ have empty 3d orbitals", "Both ions have a completely filled 4s subshell", "Both metals have exceptionally large atomic radii"], 0,
+    "Cr⁺ has the half-filled 3d⁵ and Cu⁺ the filled 3d¹⁰ arrangement. Taking out a further electron breaks that extra stability.", "Write the configurations of Cr⁺ and Cu⁺."),
+  ch("DFC9", "Ionisation enthalpy", "The third ionisation enthalpy of manganese is unusually high compared with Cr and Fe because:",
+    ["Mn²⁺ has the stable half-filled 3d⁵ configuration", "Mn³⁺ has the stable 3d⁵ configuration", "Mn has no 4s electrons", "Mn has the smallest atomic radius in the series"], 0,
+    "Removing a third electron from Mn²⁺ (3d⁵) means breaking a half-filled subshell, which needs extra energy.", "Which ion is 3d⁵: Mn²⁺ or Mn³⁺?"),
+  ch("DFC10", "Oxidation states", "Scandium shows only the +3 oxidation state. The best reason is:",
+    ["Sc³⁺ has the stable noble-gas configuration, and a further electron removal would need a very large energy", "Sc has no 4s electrons", "Sc³⁺ has a half-filled 3d subshell", "Sc is not a metal"], 0,
+    "Sc (3d¹ 4s²) loses three electrons to reach [Ar]. Going beyond +3 would break the argon core, which needs far more energy.", "Write the configuration of Sc³⁺."),
+  ch("DFC11", "Oxidation states", "Up to Mn, the maximum oxidation state equals the total number of 3d and 4s electrons, yet Fe never reaches +8. The best explanation is:",
+    ["Beyond Mn the d electrons are held more strongly (rising effective nuclear charge and pairing), so using all of them is energetically unfavourable", "Fe has no 4s electrons", "Fe has only six electrons outside the argon core", "Fe forms no covalent compounds"], 0,
+    "Fe has eight electrons outside [Ar], but the d electrons become progressively harder to remove across the series, so the highest state is only +6 (as in FeO₄²⁻).", "Think about effective nuclear charge across the series."),
+  ch("DFC12", "Catalysis", "V₂O₅ catalyses the oxidation of SO₂ to SO₃ mainly because:",
+    ["Vanadium can cycle between oxidation states (V⁵⁺ and V⁴⁺)", "Vanadium is diamagnetic", "V₂O₅ is an acidic oxide only", "Vanadium has a full d subshell"], 0,
+    "SO₂ reduces V₂O₅ to V₂O₄ while forming SO₃, and oxygen then re-oxidises V₂O₄ to V₂O₅. The catalyst is regenerated.", "A catalyst must be regenerated through changing oxidation states."),
+  ch("DFC13", "Interstitial compounds", "Interstitial compounds such as TiC are harder than the parent metal because:",
+    ["Small atoms in the voids strengthen metal–metal bonding and stop layers sliding", "The metal atoms are removed from the lattice", "They form ionic bonds with carbon", "The lattice becomes less dense"], 0,
+    "Atoms like C, N and H fit into the lattice gaps, increasing bonding and rigidity. This lowers malleability while keeping metallic conductivity.", "What do the trapped atoms do to layer movement?"),
+  ch("DFC14", "Magnetism", "Which pair of ions has the same spin-only magnetic moment (Co²⁺ taken as high spin)?",
+    ["Cr³⁺ and Co²⁺", "Ti³⁺ and V³⁺", "Fe²⁺ and Fe³⁺", "Mn²⁺ and Cu²⁺"], 0,
+    "Cr³⁺ is 3d³ and Co²⁺ is 3d⁷ (high spin), each with 3 unpaired electrons, so μ = √15 ≈ 3.87 BM. The other pairs differ in n (1 vs 2, 4 vs 5, 5 vs 1).", "Count the unpaired electrons in each ion."),
+  ch("DFC15", "Lanthanoids", "Eu and Yb favour the +2 state, while Ce favours +4. Which statement explains this?",
+    ["Eu²⁺ is 4f⁷, Yb²⁺ is 4f¹⁴ and Ce⁴⁺ is 4f⁰, all stable arrangements", "All three attain the noble-gas configuration", "They have empty 5d orbitals", "They are the three radioactive lanthanoids"], 0,
+    "Half-filled, fully filled and empty 4f subshells give extra stability, so these ions deviate from the usual +3.", "Write the 4f electron counts of the ions."),
+  ch("DFC16", "Lanthanoids", "The absorption bands of lanthanoid ions are narrow and little affected by the surrounding ligands, unlike d-block ions. The reason is:",
+    ["The 4f electrons are shielded from the surroundings by the filled 5s and 5p subshells", "The 4f orbitals extend far beyond the 5s and 5p orbitals", "Lanthanoid ions do not absorb visible light", "Lanthanoids do not form ions"], 0,
+    "4f orbitals lie deep inside the atom, so the ligand environment hardly perturbs f–f transitions.", "Where do the 4f orbitals lie relative to 5s and 5p?"),
+  ch("DFC17", "Redox stoichiometry", "In acidic solution, 1 mol of KMnO₄ and 1 mol of K₂Cr₂O₇ each oxidise Fe²⁺. The ratio of moles of Fe²⁺ oxidised (KMnO₄ : K₂Cr₂O₇) is:",
+    ["5 : 6", "6 : 5", "1 : 1", "5 : 3"], 0,
+    "MnO₄⁻ accepts 5 electrons and Cr₂O₇²⁻ accepts 6, so they oxidise 5 and 6 mol of Fe²⁺ respectively.", "Count the electrons each oxidant accepts."),
+  ch("DFC18", "KMnO₄", "A green solution of K₂MnO₄ turns purple with a brown precipitate when acidified. This is because manganate:",
+    ["Disproportionates: Mn(VI) forms Mn(VII) (MnO₄⁻) and Mn(IV) (MnO₂)", "Is oxidised only, forming MnO₄⁻", "Is reduced only, forming MnO₂", "Is converted to Mn²⁺"], 0,
+    "3MnO₄²⁻ + 4H⁺ → 2MnO₄⁻ + MnO₂ + 2H₂O. The same species is both oxidised and reduced.", "Purple and brown involve two different oxidation states."),
+  ch("DFC19", "Oxides", "The acidic character of chromium oxides increases as CrO < Cr₂O₃ < CrO₃. The underlying reason is:",
+    ["A higher oxidation state gives a smaller, more highly charged metal ion with more covalent M–O bonds", "Chromium becomes more electropositive with increasing oxidation state", "The oxygen content decreases", "The oxides become more ionic"], 0,
+    "Greater polarising power of the metal in the higher state increases covalent character, so the oxide behaves as an acid anhydride.", "Think about charge density and covalent character."),
+  ch("DFC20", "Actinoids", "Which statement about actinoids compared with lanthanoids is correct?",
+    ["The 5f electrons take part in bonding to a greater extent than the 4f electrons", "Actinoids show only the +3 oxidation state", "All actinoids are stable and non-radioactive", "The 5f orbitals are more deeply buried than the 4f orbitals"], 0,
+    "5f orbitals extend further out than 4f, so they are available for bonding. This gives actinoids a wider range of oxidation states.", "Which orbitals are more exposed?"),
+];
+
+// ---------------------------------------------------------------- Flashcards
+const card = (() => {
+  let n = 0;
+  return (tag: string, front: string, back: string): ChemCard => ({ id: `DFK${++n}`, tag, front, back });
+})();
+
+const cards: ChemCard[] = [
+  card("Configuration", "Define a transition element.", "An element with an incomplete d subshell in the atom or in any of its common oxidation states."),
+  card("Configuration", "Why are Zn, Cd and Hg not transition elements?", "They have a full d¹⁰ subshell in the atom and in their common ions (Zn²⁺, Cd²⁺, Hg²⁺)."),
+  card("Configuration", "Write the configurations of Cr and Cu.", "Cr = [Ar] 3d⁵ 4s¹\nCu = [Ar] 3d¹⁰ 4s¹\nHalf-filled and fully filled d subshells are extra stable."),
+  card("Configuration", "Which electrons are lost first when a 3d element forms a cation?", "The 4s electrons, then the 3d. Example: Fe²⁺ = 3d⁶, Fe³⁺ = 3d⁵."),
+  card("Properties", "Why do transition metals have high melting points?", "Both (n−1)d and ns electrons take part in strong metallic bonding. The maximum is near the middle of the series (d⁵)."),
+  card("Properties", "Why do Zn, Cd and Hg melt at low temperatures?", "Their d subshell is full, so only the ns² electrons are available for metallic bonding. Hg is a liquid."),
+  card("Properties", "Why is E°(Cu²⁺/Cu) positive (+0.34 V)?", "Cu has a high enthalpy of atomisation and the hydration enthalpy of Cu²⁺ is not large enough to offset it."),
+  card("Properties", "Why is +2 the common oxidation state of 3d metals?", "Both 4s electrons are lost easily."),
+  card("Properties", "Highest oxidation states of Mn in its oxide and its fluoride?", "Oxide Mn₂O₇: +7. Fluoride MnF₄: +4.\nOxygen can form multiple bonds with the metal, fluorine cannot."),
+  card("Properties", "Why is Mn³⁺ a strong oxidising agent?", "Mn³⁺ (d⁴) is reduced to the stable half-filled Mn²⁺ (d⁵). E°(Mn³⁺/Mn²⁺) = +1.57 V."),
+  card("Properties", "Why is Cr²⁺ a strong reducing agent?", "Cr²⁺ (d⁴) is oxidised to the stable Cr³⁺ (d³, t₂g³). E°(Cr³⁺/Cr²⁺) = −0.41 V."),
+  card("Properties", "What happens to Cu⁺ in water?", "It disproportionates: 2Cu⁺ → Cu²⁺ + Cu, because Cu²⁺ has a very high hydration enthalpy."),
+  card("Properties", "Why are most transition metal ions coloured?", "Partly filled d orbitals allow d–d transitions that absorb visible light. The ion shows the complementary colour."),
+  card("Properties", "Name some colourless transition metal ions.", "Sc³⁺, Ti⁴⁺ (d⁰), Zn²⁺, Cu⁺ (d¹⁰). No d–d transition is possible."),
+  card("Magnetism", "Spin-only magnetic moment formula?", "μ = √[n(n+2)] BM, where n = number of unpaired electrons."),
+  card("Magnetism", "μ for n = 1, 2, 3, 4, 5 unpaired electrons?", "1.73, 2.83, 3.87, 4.90 and 5.92 BM."),
+  card("Magnetism", "Unpaired electrons: Fe²⁺, Fe³⁺, Cu²⁺, Cr³⁺?", "Fe²⁺ (d⁶) = 4\nFe³⁺ (d⁵) = 5\nCu²⁺ (d⁹) = 1\nCr³⁺ (d³) = 3"),
+  card("Catalysis", "Match the catalyst: Haber, Contact, hydrogenation, Ziegler–Natta.", "Fe; V₂O₅; Ni; TiCl₄ + Al(C₂H₅)₃."),
+  card("Catalysis", "Why are transition metals good catalysts?", "Variable oxidation states (intermediates form and are regenerated) and the ability to adsorb reactants on the surface."),
+  card("Compounds", "What are interstitial compounds?", "Small atoms (H, C, N) trapped in metal lattice voids, e.g. TiC, Fe₃H. Hard, high melting, conduct electricity, chemically inert and non-stoichiometric."),
+  card("Compounds", "When do two metals form an alloy?", "When their atomic radii differ by no more than about 15%. Examples: brass, bronze, steel."),
+  card("Compounds", "Why do transition metals form complexes?", "Small size, high charge and vacant d orbitals."),
+  card("Compounds", "Trend in acidic character of oxides?", "Acidic character increases with oxidation state: CrO (basic), Cr₂O₃ (amphoteric), CrO₃ (acidic). Likewise MnO to Mn₂O₇."),
+  card("K₂Cr₂O₇", "How is Na₂CrO₄ made from chromite ore?", "4FeCr₂O₄ + 8Na₂CO₃ + 7O₂ → 8Na₂CrO₄ + 2Fe₂O₃ + 8CO₂\n(fusion with sodium carbonate in excess air)"),
+  card("K₂Cr₂O₇", "How is Na₂CrO₄ converted to K₂Cr₂O₇?", "Acidify to Na₂Cr₂O₇, then add KCl. K₂Cr₂O₇ is less soluble and crystallises out."),
+  card("K₂Cr₂O₇", "Chromate–dichromate equilibrium?", "2CrO₄²⁻ (yellow) + 2H⁺ ⇌ Cr₂O₇²⁻ (orange) + H₂O\nAcid gives orange, alkali gives yellow. No redox change."),
+  card("K₂Cr₂O₇", "Oxidising action of dichromate in acid?", "Cr₂O₇²⁻ + 14H⁺ + 6e⁻ → 2Cr³⁺ + 7H₂O\nOrange turns green."),
+  card("K₂Cr₂O₇", "Dichromate with Fe²⁺ and with I⁻?", "Cr₂O₇²⁻ + 14H⁺ + 6Fe²⁺ → 2Cr³⁺ + 6Fe³⁺ + 7H₂O\nCr₂O₇²⁻ + 14H⁺ + 6I⁻ → 2Cr³⁺ + 3I₂ + 7H₂O"),
+  card("K₂Cr₂O₇", "Structure of the dichromate ion?", "Two CrO₄ tetrahedra joined through one common oxygen. Cr–O–Cr angle about 126°."),
+  card("KMnO₄", "How is K₂MnO₄ made from pyrolusite?", "2MnO₂ + 4KOH + O₂ → 2K₂MnO₄ + 2H₂O\n(fusion with KOH in air; green manganate)"),
+  card("KMnO₄", "How is K₂MnO₄ converted to KMnO₄?", "Oxidation of MnO₄²⁻ (electrolytic, in alkali): MnO₄²⁻ → MnO₄⁻ + e⁻.\nIn acid it disproportionates: 3MnO₄²⁻ + 4H⁺ → 2MnO₄⁻ + MnO₂ + 2H₂O."),
+  card("KMnO₄", "What happens when KMnO₄ is heated at about 513 K?", "2KMnO₄ → K₂MnO₄ + MnO₂ + O₂"),
+  card("KMnO₄", "Reduction of MnO₄⁻ in acidic medium?", "MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O"),
+  card("KMnO₄", "Reduction of MnO₄⁻ in neutral/weakly alkaline and strongly alkaline medium?", "Neutral/weakly alkaline: MnO₄⁻ + 2H₂O + 3e⁻ → MnO₂ + 4OH⁻\nStrongly alkaline: MnO₄⁻ + e⁻ → MnO₄²⁻"),
+  card("KMnO₄", "KMnO₄ with oxalate in acid?", "2MnO₄⁻ + 5C₂O₄²⁻ + 16H⁺ → 2Mn²⁺ + 10CO₂ + 8H₂O"),
+  card("KMnO₄", "Why is dilute H₂SO₄ used, not HCl or HNO₃, to acidify KMnO₄?", "HCl is oxidised by KMnO₄ (Cl⁻ → Cl₂) and HNO₃ is itself an oxidising agent."),
+  card("KMnO₄", "Why is MnO₄⁻ purple?", "Ligand-to-metal charge transfer (O → Mn). Mn(VII) is d⁰, so there is no d–d transition."),
+  card("Lanthanoids", "General configuration of lanthanoids?", "[Xe] 4f¹⁻¹⁴ 5d⁰⁻¹ 6s². They are Ce (58) to Lu (71)."),
+  card("Lanthanoids", "Common oxidation state of lanthanoids? Exceptions?", "+3. Ce also +4 (Ce⁴⁺, an oxidant); Eu and Yb also +2 (reductants)."),
+  card("Lanthanoids", "What is lanthanoid contraction and its cause?", "A steady decrease in atomic and ionic radii from La to Lu. The 4f electrons shield the nuclear charge poorly."),
+  card("Lanthanoids", "Consequences of lanthanoid contraction?", "Zr and Hf (and Nb and Ta) have nearly equal radii and are hard to separate. Basic strength of Ln(OH)₃ decreases from La to Lu."),
+  card("Lanthanoids", "What is Misch metal and what is it used for?", "About 95% lanthanoids, 5% Fe and traces of S, C, Ca, Al. Used in Mg alloys and lighter flints."),
+  card("Lanthanoids", "Which lanthanoid is radioactive?", "Promethium (Pm, Z = 61)."),
+  card("Actinoids", "General configuration of actinoids?", "[Rn] 5f¹⁻¹⁴ 6d⁰⁻¹ 7s². They are Th (90) to Lr (103)."),
+  card("Actinoids", "Why do actinoids show many oxidation states?", "The 5f, 6d and 7s energies are close, so many electrons can take part in bonding. Common state +3, up to +7."),
+  card("Actinoids", "Lanthanoids vs actinoids: contraction and radioactivity?", "Actinoid contraction is greater (5f shields even worse). All actinoids are radioactive; among lanthanoids only Pm is."),
+];
+
+export const content: ChemChapterContent = { sections, questions, cards, challenge };

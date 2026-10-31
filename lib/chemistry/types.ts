@@ -9,6 +9,15 @@ export interface ChemQuestion {
   answer: string; // equals one entry of options
   why: string;
   hint: string;
+  /** Harder conceptual / assertion–reason items. Shown only in Challenge mode. */
+  challenge?: boolean;
+}
+
+export interface ChemCard {
+  id: string;
+  tag: string;
+  front: string;
+  back: string;
 }
 
 export interface ChemItem {
@@ -24,6 +33,8 @@ export type ChemSection =
 export interface ChemChapterContent {
   sections: ChemSection[];
   questions: ChemQuestion[];
+  cards: ChemCard[];
+  challenge: ChemQuestion[];
 }
 
 /** Light metadata: safe to import anywhere (home screen, routing, prefetching). */

@@ -28,12 +28,14 @@ function pick(bank: ChemQuestion[], diff: number, seen: string[]) {
   const d = Math.min(...base.map((x) => Math.abs(x.level - diff)));
   const near = base.filter((x) => Math.abs(x.level - diff) === d);
   const b = near[Math.floor(Math.random() * near.length)];
-  const q: ChemQuestion = { ...b, options: [...b.options].sort(() => Math.random() - 0.5) };
+  // Assertion–Reason items keep their conventional option order; everything else is shuffled.
+  const keepOrder = b.text.startsWith("Assertion");
+  const q: ChemQuestion = { ...b, options: keepOrder ? [...b.options] : [...b.options].sort(() => Math.random() - 0.5) };
   return { q, seen: fresh.length ? [...seen, q.id] : [q.id], restarted: !fresh.length && seen.length > 0 };
 }
 
-export default function ChemPractice({ chapterKey, bank, title }: { chapterKey: string; bank: ChemQuestion[]; title: string }) {
-  const navKey = `chem:practice:${chapterKey}`;
+export default function ChemPractice({ chapterKey, bank, title, challenge = false }: { chapterKey: string; bank: ChemQuestion[]; title: string; challenge?: boolean }) {
+  const navKey = `chem:${challenge ? "challenge" : "practice"}:${chapterKey}`;
   // Resume exactly where the student left off if they navigated away and came back.
   const [s, setS] = useState<PState>(() => readNav<PState>(navKey, INITIAL));
   const ref = useRef(s);
@@ -53,6 +55,7 @@ export default function ChemPractice({ chapterKey, bank, title }: { chapterKey: 
   if (!q) return <p className="p-8 text-center text-slate-400" role="status">Loading question…</p>;
 
   const move = (n: number) => {
+    if (challenge) return { nd: diff, msg: "" };
     const nd = Math.min(3, Math.max(1, diff + n));
     const msg = n > 0 ? (nd === diff ? "Already at the hardest level." : "Next question will be harder.") : nd === diff ? "Already at the easiest level." : "Next question will be easier.";
     return { nd, msg };
@@ -76,17 +79,21 @@ export default function ChemPractice({ chapterKey, bank, title }: { chapterKey: 
 
   return (
     <div>
-      <div className="mb-3 text-right text-sm" aria-label={`Current difficulty ${LEVELS[diff - 1]}`}>
-        <span className="text-slate-400">Difficulty </span>
-        <span className="mono text-amber-300">{"●".repeat(diff)}{"○".repeat(3 - diff)} {LEVELS[diff - 1]}</span>
-      </div>
+      {challenge ? (
+        <p className="mb-3 text-right text-sm text-amber-300"><span aria-hidden="true">🔥 </span>Challenge · conceptual</p>
+      ) : (
+        <div className="mb-3 text-right text-sm" aria-label={`Current difficulty ${LEVELS[diff - 1]}`}>
+          <span className="text-slate-400">Difficulty </span>
+          <span className="mono text-amber-300">{"●".repeat(diff)}{"○".repeat(3 - diff)} {LEVELS[diff - 1]}</span>
+        </div>
+      )}
       <article key={s.n} className={`a-rise relative min-w-0 max-w-full rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4 shadow-[0_0_40px_-20px_#fbbf24] sm:p-6 ${phase === "retry" ? "a-shake" : ""}`}>
         <div className="mb-3 flex flex-wrap gap-2 text-xs">
           <span className="rounded-full bg-amber-400/10 px-3 py-1 text-amber-300">{title} · {q.tag}</span>
-          <span className="rounded-full bg-slate-700/50 px-3 py-1 text-slate-300">{LEVELS[q.level - 1]}</span>
+          <span className="rounded-full bg-slate-700/50 px-3 py-1 text-slate-300">{challenge ? "Challenge" : LEVELS[q.level - 1]}</span>
         </div>
         {restarted && <p className="mb-3 rounded-lg bg-slate-800 p-2 text-xs text-slate-300">You have seen every question in this chapter, so the bank is repeating. More questions are on the way.</p>}
-        <p className="mb-3 text-base font-medium leading-relaxed">{q.text}</p>
+        <p className="mb-3 whitespace-pre-line text-base font-medium leading-relaxed">{q.text}</p>
 
         <fieldset disabled={done} className="min-w-0 max-w-full space-y-2">
           <legend className="sr-only">Choose one answer</legend>
@@ -117,7 +124,7 @@ export default function ChemPractice({ chapterKey, bank, title }: { chapterKey: 
               <pre className={`${box} mb-3 font-sans`}>{q.answer}</pre>
               <p className="mb-1 text-slate-400">Explanation</p>
               <p className="mb-3 leading-relaxed">{q.why}</p>
-              <p className="text-xs text-amber-300">{change}</p>
+              {change && <p className="text-xs text-amber-300">{change}</p>}
             </div>
           )}
         </div>

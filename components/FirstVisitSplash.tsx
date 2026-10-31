@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/** localStorage key; also read by the inline script in app/layout.tsx that decides whether the splash shows. */
-export const SPLASH_KEY = "qmc_splash_seen_v1";
 const DURATION = 4500;
 const DURATION_REDUCED = 1800;
 const EXIT_MS = 600;
@@ -11,9 +9,9 @@ const EXIT_MS = 600;
 const WORD = "Quest MC".split("");
 
 /**
- * Full-screen first-visit loader. The markup is always server-rendered but hidden by CSS;
- * the tiny inline script in <head> sets html[data-splash="1"] only when the key is missing,
- * so repeat visits never flash it and internal navigation never re-triggers it.
+ * Full-screen loader shown on every full page load (open or reload). The markup is server-rendered but
+ * hidden by CSS; the tiny inline script in <head> sets html[data-splash="1"] before first paint.
+ * The layout stays mounted during client-side navigation, so moving between screens never replays it.
  * Progress is driven from JS (compositor-friendly transform) so it also works with reduced motion.
  */
 export default function FirstVisitSplash() {
@@ -25,8 +23,6 @@ export default function FirstVisitSplash() {
   useEffect(() => {
     const root = document.documentElement;
     if (root.getAttribute("data-splash") !== "1") { setGone(true); return; }
-
-    try { localStorage.setItem(SPLASH_KEY, "1"); } catch { /* storage blocked: splash may repeat, harmless */ }
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const total = reduced ? DURATION_REDUCED : DURATION;

@@ -7,11 +7,14 @@ import type { ChemChapterContent } from "@/lib/chemistry/types";
 import { readNav, writeNav } from "@/lib/navState";
 import ChemNotes from "@/components/chemistry/ChemNotes";
 import ChemPractice from "@/components/chemistry/ChemPractice";
+import ChemFlashcards from "@/components/chemistry/ChemFlashcards";
 
-type Mode = "revise" | "practice";
+type Mode = "revise" | "cards" | "practice" | "challenge";
 const MODES: { id: Mode; label: string; icon: string; blurb: string }[] = [
   { id: "revise", label: "Quick Revision", icon: "📘", blurb: "Key ideas, reactions and common mistakes" },
+  { id: "cards", label: "Flashcards", icon: "🃏", blurb: "Flip cards for definitions, reasons and reactions" },
   { id: "practice", label: "Practice", icon: "🎯", blurb: "Adaptive MCQs with a hint and one retry" },
+  { id: "challenge", label: "Challenge", icon: "🔥", blurb: "Harder conceptual and assertion–reason questions" },
 ];
 
 function Skeleton() {
@@ -53,7 +56,7 @@ export default function ChapterScreen({ slug }: { slug: string }) {
         <h1 className="text-xl font-bold text-amber-300 sm:text-2xl"><span aria-hidden="true">{meta.icon} </span>{meta.title}</h1>
       </header>
 
-      <nav aria-label="Study mode" className="mb-2 grid grid-cols-2 gap-2">
+      <nav aria-label="Study mode" className="mb-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {MODES.map((m) => (
           <button
             key={m.id}
@@ -70,6 +73,8 @@ export default function ChapterScreen({ slug }: { slug: string }) {
       {failed && <p className="rounded-xl border border-rose-400/40 bg-rose-400/10 p-4 text-sm text-rose-200" role="alert">Could not load this chapter. Check your connection and refresh the page.</p>}
       {!content && !failed && <Skeleton />}
       {content && mode === "revise" && <ChemNotes sections={content.sections} />}
+      {content && mode === "cards" && <ChemFlashcards chapterKey={slug} cards={content.cards} />}
+      {content && mode === "challenge" && <ChemPractice chapterKey={slug} bank={content.challenge} title={meta.short} challenge />}
       {content && mode === "practice" && <ChemPractice chapterKey={slug} bank={content.questions} title={meta.short} />}
     </main>
   );

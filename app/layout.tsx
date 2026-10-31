@@ -9,14 +9,14 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#07090f" };
 
-/** Runs before first paint: marks the page as a first visit so the splash shows with no flash on repeat visits. */
-const FIRST_VISIT = `try{if(!localStorage.getItem("qmc_splash_seen_v1"))document.documentElement.setAttribute("data-splash","1")}catch(e){}`;
+/** Runs before first paint on every full page load (open or reload), so the splash shows with no flash of the page behind it. Client-side navigation never reloads the layout, so it does not replay. */
+const SHOW_SPLASH = `document.documentElement.setAttribute("data-splash","1")`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: FIRST_VISIT }} />
+        <script dangerouslySetInnerHTML={{ __html: SHOW_SPLASH }} />
       </head>
       <body>
         <FirstVisitSplash />

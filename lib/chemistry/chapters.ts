@@ -13,7 +13,7 @@ export const CHEM_CHAPTERS: ChemChapterMeta[] = [
     title: "D- and F-Block Elements",
     short: "D & F Block",
     icon: "🧪",
-    desc: "Transition metals, K₂Cr₂O₇ and KMnO₄, lanthanoids, actinoids, lanthanoid contraction.",
+    desc: "Revision notes, flashcards, MCQ practice and conceptual challenge questions on transition metals, K₂Cr₂O₇, KMnO₄, lanthanoids and actinoids.",
     topics: ["Transition elements", "Properties", "K₂Cr₂O₇ & KMnO₄", "Lanthanoids", "Actinoids"],
     load: () => import("./chapters/d-and-f-block").then((m) => m.content),
   },
