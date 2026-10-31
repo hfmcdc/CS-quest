@@ -5,6 +5,8 @@ import { CARD_KINDS, FLASHCARDS } from "@/lib/flashcards";
 import type { CardKind, Flashcard } from "@/lib/flashcards";
 import { TOPICS } from "@/lib/questions";
 import type { Topic } from "@/lib/types";
+import { BackLink } from "@/components/ui";
+import Icon from "@/components/Icon";
 
 type TopicFilter = Topic | "all";
 
@@ -66,21 +68,21 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
   }, [go, finished]);
 
   const chip = (active: boolean) =>
-    `rounded-full border px-3 py-1.5 text-sm transition ${active ? "border-cyan-400 bg-cyan-400/10 text-cyan-200" : "border-slate-700 text-slate-300 hover:border-slate-500"}`;
-  const box = "mono max-w-full overflow-x-auto whitespace-pre rounded-xl border border-slate-700 bg-slate-950/70 p-4 text-[13px] leading-relaxed text-slate-200";
+    `chip min-h-[2.4rem] px-4 text-sm ${active ? "chip-ac" : ""}`;
+  const box = "mono max-w-full overflow-x-auto whitespace-pre rounded-xl border border-white/10 bg-black/30 p-4 text-[13px] leading-relaxed text-slate-200";
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-6">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <button onClick={onExit} className="rounded-lg border border-slate-700 px-3 py-2 text-sm hover:border-cyan-400">← Dashboard</button>
-        <h1 className="mono text-lg font-bold text-cyan-300">🃏 Flashcards</h1>
+    <main className="theme-cs mx-auto max-w-3xl px-4 py-6">
+      <div className="mb-6 flex items-center justify-between gap-2">
+        <BackLink onClick={onExit}>Computer Science</BackLink>
+        <h1 className="text-lg font-semibold text-white">Flashcards</h1>
       </div>
 
-      <section className="mb-4 space-y-3 rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4" aria-label="Deck options">
+      <section className="card mb-5 space-y-3 p-4" aria-label="Deck options">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Card type">
           {CARD_KINDS.map((k) => (
             <button key={k.id} onClick={() => setKind(k.id)} aria-pressed={kind === k.id} className={chip(kind === k.id)}>
-              {k.icon} {k.label}
+              {k.label}
             </button>
           ))}
         </div>
@@ -88,7 +90,7 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
           <button onClick={() => setTopic("all")} aria-pressed={topic === "all"} className={chip(topic === "all")}>All topics</button>
           {TOPICS.map((t) => (
             <button key={t.id} onClick={() => setTopic(t.id)} aria-pressed={topic === t.id} className={chip(topic === t.id)}>
-              {t.icon} {t.title}
+              {t.title}
             </button>
           ))}
         </div>
@@ -101,21 +103,21 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
         <>
           <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
             <span>Card {idx + 1} of {deck.length}</span>
-            <span>✅ {known.length} · 🔁 {missed.length}</span>
+            <span>{known.length} known · {missed.length} to review</span>
           </div>
           <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-valuemin={0} aria-valuemax={deck.length} aria-valuenow={idx + 1}>
-            <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-400 transition-all" style={{ width: `${((idx + 1) / deck.length) * 100}%` }} />
+            <div className="h-full rounded-full bg-[rgb(var(--ac))] transition-all duration-500" style={{ width: `${((idx + 1) / deck.length) * 100}%` }} />
           </div>
 
           <button
             key={`${card.id}-${flipped}`}
             onClick={() => setFlipped((f) => !f)}
             aria-label={flipped ? "Showing answer. Tap to show the question" : "Showing question. Tap to reveal the answer"}
-            className={`a-rise flex min-h-[18rem] w-full min-w-0 max-w-full flex-col rounded-2xl border p-5 text-left shadow-[0_0_40px_-20px_#22d3ee] sm:p-7 ${flipped ? "border-violet-400/60 bg-violet-400/5" : "border-slate-700/80 bg-slate-900/70"}`}
+            className={`a-flip card flex min-h-[18rem] w-full min-w-0 max-w-full cursor-pointer flex-col p-6 text-left sm:p-8 ${flipped ? "!border-violet-400/50 !bg-violet-400/5" : ""}`}
           >
             <div className="mb-4 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-cyan-300">{TOPICS.find((t) => t.id === card.topic)!.title} · {card.tag}</span>
-              <span className="rounded-full bg-violet-400/10 px-3 py-1 text-violet-300">{flipped ? (isCommand ? "Command" : "Answer") : (isCommand ? "Task" : "Question")}</span>
+              <span className="chip chip-ac">{TOPICS.find((t) => t.id === card.topic)!.title} · {card.tag}</span>
+              <span className="chip">{flipped ? (isCommand ? "Command" : "Answer") : (isCommand ? "Task" : "Question")}</span>
             </div>
             <div className="flex min-w-0 flex-1 items-center">
               {flipped ? (
@@ -129,12 +131,12 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-2">
-              <button onClick={() => go(-1)} disabled={idx === 0} className="rounded-xl border border-slate-600 px-4 py-3 text-sm hover:border-cyan-400 disabled:opacity-40">← Prev</button>
-              <button onClick={() => go(1)} disabled={idx === deck.length - 1} className="rounded-xl border border-slate-600 px-4 py-3 text-sm hover:border-cyan-400 disabled:opacity-40">Next →</button>
+              <button onClick={() => go(-1)} disabled={idx === 0} className="btn-ghost disabled:opacity-40"><Icon name="back" size={16} />Prev</button>
+              <button onClick={() => go(1)} disabled={idx === deck.length - 1} className="btn-ghost disabled:opacity-40">Next<Icon name="forward" size={16} /></button>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => mark(false)} className="rounded-xl border border-rose-400/50 bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-200 hover:bg-rose-400/20">🔁 Review again</button>
-              <button onClick={() => mark(true)} className="rounded-xl bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 hover:brightness-110">✅ Got it</button>
+              <button onClick={() => mark(false)} className="btn-ghost !border-rose-400/40 !bg-rose-400/10 !text-rose-200 hover:!bg-rose-400/20">Review again</button>
+              <button onClick={() => mark(true)} className="btn-primary">Got it</button>
             </div>
           </div>
           <div className="mt-3 text-center">
@@ -144,16 +146,16 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
       )}
 
       {finished && (
-        <div className="a-rise rounded-2xl border border-slate-700/80 bg-slate-900/70 p-6 text-center">
-          <p className="a-pop mb-2 text-2xl font-semibold text-emerald-300">Deck complete 🎉</p>
+        <div className="a-rise card p-6 text-center">
+          <p className="a-pop mb-2 text-2xl font-semibold text-emerald-300">Deck complete</p>
           <p className="mb-5 text-slate-300">You knew <b>{known.length}</b> of {deck.length} cards{missed.length > 0 && <>, and marked <b>{missed.length}</b> to review</>}.</p>
           <div className="flex flex-wrap justify-center gap-3">
             {missed.length > 0 && (
-              <button onClick={() => start(deck.filter((c) => missed.includes(c.id)))} className="rounded-xl bg-gradient-to-r from-cyan-400 to-violet-400 px-5 py-3 font-semibold text-slate-950 hover:brightness-110">
+              <button onClick={() => start(deck.filter((c) => missed.includes(c.id)))} className="btn-primary">
                 Review {missed.length} missed
               </button>
             )}
-            <button onClick={() => start(pool)} className="rounded-xl border border-slate-600 px-5 py-3 hover:border-cyan-400">Restart deck</button>
+            <button onClick={() => start(pool)} className="btn-ghost min-h-[2.9rem]">Restart deck</button>
           </div>
         </div>
       )}

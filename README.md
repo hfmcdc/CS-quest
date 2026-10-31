@@ -50,4 +50,11 @@ Then on vercel.com: **Add New → Project → Import** the repo → framework is
 **Chemistry** is a third subject (`/chemistry`). Chapter 1, **D- and F-Block Elements**, has four modes: Quick Revision, Flashcards (46 cards), Practice (45 adaptive MCQs) and Challenge (20 conceptual and assertion–reason questions).
 - Chapters are registered in `lib/chemistry/chapters.ts`; each chapter's content (notes, cards, questions) lives in `lib/chemistry/chapters/<slug>.ts` and is loaded on demand.
 - Chemical formulas use Unicode subscripts/superscripts, so no renderer is needed.
-- A loading splash (shown on every open or reload, not on in-app navigation) (`components/FirstVisitSplash.tsx`), background route prefetching (`components/AppPrefetcher.tsx`) and a small service worker (`public/sw.js`, production only) keep navigation fast.
+
+## Design system and performance
+- **Look:** premium dark theme. Tokens and shared classes (`.card`, `.btn-primary`, `.btn-ghost`, `.chip`, `.tile`, `.stagger`, `.page-enter`) live in `app/globals.css`; the `slate` palette is remapped in `tailwind.config.ts`, so the whole app re-skins from one place. Each subject sets an accent with `theme-cs`, `theme-maths` or `theme-chem` (an RGB triplet in `--ac`). Shared pieces: `components/ui.tsx`, `Icon.tsx`, `ModeTabs.tsx`, `Collapsible.tsx`, `AppNav.tsx`.
+- **Navigation:** a persistent top bar (desktop) and tab bar (phones) in the root layout, so switching subject never remounts the chrome. `app/template.tsx` adds the route transition.
+- **Splash:** shown **only on a browser's first visit** (`components/FirstVisitSplash.tsx`). It stores one flag, `qmc:seen`, in `localStorage`; clear it to see the splash again. It runs about 4.5 s and waits for `window.load` before fading out.
+- **Caching:** `components/AppPrefetcher.tsx` warms subject routes in the background (skipped on data-saver/2G), prefetches on hover or touch, and loads Chemistry chapter content on demand. `public/sw.js` (production only) caches hashed assets, pre-caches the main pages and serves cached pages when the network is slow. In-app screen state is kept by `lib/navState.ts`.
+- **Motion:** all animation is CSS and respects `prefers-reduced-motion`.
+- **Adding a Chemistry chapter:** create `lib/chemistry/chapters/<slug>.ts` and register it in `lib/chemistry/chapters.ts`.

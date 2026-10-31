@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChemCard } from "@/lib/chemistry/types";
 import { readNav, writeNav } from "@/lib/navState";
+import Icon from "@/components/Icon";
 
 interface DeckState { ids: string[]; idx: number; known: string[]; missed: string[]; finished: boolean; tag: string }
 
@@ -53,11 +54,11 @@ export default function ChemFlashcards({ chapterKey, cards }: { chapterKey: stri
     return () => window.removeEventListener("keydown", onKey);
   }, [s.finished]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const chip = (on: boolean) => `rounded-full border px-3 py-1.5 text-sm transition ${on ? "border-amber-400 bg-amber-400/10 text-amber-200" : "border-slate-700 text-slate-300 hover:border-slate-500"}`;
+  const chip = (on: boolean) => `chip min-h-[2.4rem] px-4 text-sm ${on ? "chip-ac" : ""}`;
 
   return (
     <div>
-      <section className="mb-4 space-y-2 rounded-2xl border border-slate-700/80 bg-slate-900/70 p-4" aria-label="Deck options">
+      <section className="card mb-5 space-y-3 p-4" aria-label="Deck options">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Topic">
           <button onClick={() => restart("all")} aria-pressed={s.tag === "all"} className={chip(s.tag === "all")}>All</button>
           {tags.map((t) => <button key={t} onClick={() => restart(t)} aria-pressed={s.tag === t} className={chip(s.tag === t)}>{t}</button>)}
@@ -69,10 +70,10 @@ export default function ChemFlashcards({ chapterKey, cards }: { chapterKey: stri
         <>
           <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
             <span>Card {s.idx + 1} of {total}</span>
-            <span>✅ {s.known.length} · 🔁 {s.missed.length}</span>
+            <span>{s.known.length} known · {s.missed.length} to review</span>
           </div>
           <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={s.idx + 1}>
-            <div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-orange-400 transition-all" style={{ width: `${((s.idx + 1) / total) * 100}%` }} />
+            <div className="h-full rounded-full bg-[rgb(var(--ac))] transition-all duration-500" style={{ width: `${((s.idx + 1) / total) * 100}%` }} />
           </div>
 
           <div
@@ -82,11 +83,11 @@ export default function ChemFlashcards({ chapterKey, cards }: { chapterKey: stri
             onClick={() => setFlipped((f) => !f)}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped((f) => !f); } }}
             aria-label={flipped ? "Showing answer. Press to show the question" : "Showing question. Press to reveal the answer"}
-            className={`a-rise flex min-h-[16rem] w-full min-w-0 max-w-full cursor-pointer flex-col rounded-2xl border p-5 text-left shadow-[0_0_40px_-20px_#fbbf24] sm:p-7 ${flipped ? "border-violet-400/60 bg-violet-400/5" : "border-slate-700/80 bg-slate-900/70"}`}
+            className={`a-flip card flex min-h-[16rem] w-full min-w-0 max-w-full cursor-pointer flex-col p-6 text-left sm:p-8 ${flipped ? "!border-violet-400/50 !bg-violet-400/5" : ""}`}
           >
             <div className="mb-4 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-amber-400/10 px-3 py-1 text-amber-300">{card.tag}</span>
-              <span className="rounded-full bg-violet-400/10 px-3 py-1 text-violet-300">{flipped ? "Answer" : "Question"}</span>
+              <span className="chip chip-ac">{card.tag}</span>
+              <span className="chip">{flipped ? "Answer" : "Question"}</span>
             </div>
             <div className="flex min-w-0 flex-1 items-center">
               {flipped
@@ -98,12 +99,12 @@ export default function ChemFlashcards({ chapterKey, cards }: { chapterKey: stri
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-2">
-              <button onClick={() => go(-1)} disabled={s.idx === 0} className="rounded-xl border border-slate-600 px-4 py-3 text-sm hover:border-amber-400 disabled:opacity-40">← Prev</button>
-              <button onClick={() => go(1)} disabled={s.idx === total - 1} className="rounded-xl border border-slate-600 px-4 py-3 text-sm hover:border-amber-400 disabled:opacity-40">Next →</button>
+              <button onClick={() => go(-1)} disabled={s.idx === 0} className="btn-ghost disabled:opacity-40"><Icon name="back" size={16} />Prev</button>
+              <button onClick={() => go(1)} disabled={s.idx === total - 1} className="btn-ghost disabled:opacity-40">Next<Icon name="forward" size={16} /></button>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => mark(false)} className="rounded-xl border border-rose-400/50 bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-200 hover:bg-rose-400/20">🔁 Review again</button>
-              <button onClick={() => mark(true)} className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-semibold text-slate-950 hover:brightness-110">✅ Got it</button>
+              <button onClick={() => mark(false)} className="btn-ghost !border-rose-400/40 !bg-rose-400/10 !text-rose-200 hover:!bg-rose-400/20">Review again</button>
+              <button onClick={() => mark(true)} className="btn-primary">Got it</button>
             </div>
           </div>
           <div className="mt-3 text-center">
@@ -113,12 +114,12 @@ export default function ChemFlashcards({ chapterKey, cards }: { chapterKey: stri
       )}
 
       {s.finished && (
-        <div className="a-rise rounded-2xl border border-slate-700/80 bg-slate-900/70 p-6 text-center">
-          <p className="a-pop mb-2 text-2xl font-semibold text-amber-300">Deck complete 🎉</p>
+        <div className="a-rise card p-6 text-center">
+          <p className="a-pop mb-2 text-2xl font-semibold text-[rgb(var(--ac))]">Deck complete</p>
           <p className="mb-5 text-slate-300">You knew <b>{s.known.length}</b> of {total} cards{s.missed.length > 0 && <>, and marked <b>{s.missed.length}</b> to review</>}.</p>
           <div className="flex flex-wrap justify-center gap-3">
-            {s.missed.length > 0 && <button onClick={() => restart(s.tag, s.missed)} className="rounded-xl bg-gradient-to-r from-amber-300 to-orange-400 px-5 py-3 font-semibold text-slate-950 hover:brightness-110">Review {s.missed.length} missed</button>}
-            <button onClick={() => restart(s.tag)} className="rounded-xl border border-slate-600 px-5 py-3 hover:border-amber-400">Restart deck</button>
+            {s.missed.length > 0 && <button onClick={() => restart(s.tag, s.missed)} className="btn-primary">Review {s.missed.length} missed</button>}
+            <button onClick={() => restart(s.tag)} className="btn-ghost min-h-[2.9rem]">Restart deck</button>
           </div>
         </div>
       )}

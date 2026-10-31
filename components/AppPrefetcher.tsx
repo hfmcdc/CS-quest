@@ -40,26 +40,31 @@ export default function AppPrefetcher() {
       const href = queue.shift();
       if (!href || cancelled) return;
       try { router.prefetch(href); } catch { /* ignore */ }
-      idle(next, 1500);
+      idle(next, 600);
     };
-    const t = setTimeout(() => idle(next), 800);
+    // On a first visit the splash covers ~4.5 s, so start almost immediately: the routes are warm by the time it fades.
+    const t = setTimeout(() => idle(next, 600), 300);
     return () => { cancelled = true; clearTimeout(t); };
   }, [router, path]);
 
-  // 3) Intent-based content prefetch: on the Chemistry list, or when a chapter link is touched/hovered.
+  // 3) Intent-based prefetch: when any subject / chapter link is hovered or touched, warm it right away (nav links use prefetch={false}
+  //    so that data-saver mode in (2) is respected; a deliberate hover or touch is the exception).
   useEffect(() => {
     const c = (navigator as Navigator & { connection?: Conn }).connection;
     const saver = !!c?.saveData;
     if (path === "/chemistry" && !saver) idle(() => CHEM_CHAPTERS.forEach((ch) => loadChemContent(ch.slug).catch(() => {})));
     const onIntent = (e: Event) => {
-      const a = (e.target as Element | null)?.closest?.("a[href^='/chemistry/']") as HTMLAnchorElement | null;
-      const slug = a?.getAttribute("href")?.split("/")[2];
-      if (slug && CHEM_CHAPTERS.some((ch) => ch.slug === slug)) loadChemContent(slug).catch(() => {});
+      const a = (e.target as Element | null)?.closest?.("a[href^='/']") as HTMLAnchorElement | null;
+      const href = a?.getAttribute("href");
+      if (!href) return;
+      if (href === "/" || SUBJECT_ROUTES.includes(href)) { try { router.prefetch(href); } catch { /* ignore */ } return; }
+      const m = /^\/chemistry\/([^/?#]+)/.exec(href);
+      if (m && CHEM_CHAPTERS.some((ch) => ch.slug === m[1])) { try { router.prefetch(href); } catch { /* ignore */ } loadChemContent(m[1]).catch(() => {}); }
     };
     document.addEventListener("pointerover", onIntent, { passive: true });
     document.addEventListener("touchstart", onIntent, { passive: true });
     return () => { document.removeEventListener("pointerover", onIntent); document.removeEventListener("touchstart", onIntent); };
-  }, [path]);
+  }, [path, router]);
 
   return null;
 }

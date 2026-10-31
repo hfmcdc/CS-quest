@@ -1,26 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { cachedChemContent, chemChapter, loadChemContent } from "@/lib/chemistry/chapters";
 import type { ChemChapterContent } from "@/lib/chemistry/types";
 import { readNav, writeNav } from "@/lib/navState";
 import ChemNotes from "@/components/chemistry/ChemNotes";
 import ChemPractice from "@/components/chemistry/ChemPractice";
 import ChemFlashcards from "@/components/chemistry/ChemFlashcards";
+import ModeTabs from "@/components/ModeTabs";
+import { BackLink } from "@/components/ui";
+import type { IconName } from "@/components/Icon";
 
 type Mode = "revise" | "cards" | "practice" | "challenge";
-const MODES: { id: Mode; label: string; icon: string; blurb: string }[] = [
-  { id: "revise", label: "Quick Revision", icon: "📘", blurb: "Key ideas, reactions and common mistakes" },
-  { id: "cards", label: "Flashcards", icon: "🃏", blurb: "Flip cards for definitions, reasons and reactions" },
-  { id: "practice", label: "Practice", icon: "🎯", blurb: "Adaptive MCQs with a hint and one retry" },
-  { id: "challenge", label: "Challenge", icon: "🔥", blurb: "Harder conceptual and assertion–reason questions" },
+const MODES: { id: Mode; label: string; icon: IconName; blurb: string }[] = [
+  { id: "revise", label: "Quick Revision", icon: "book", blurb: "Key ideas, reactions and common mistakes" },
+  { id: "cards", label: "Flashcards", icon: "cards", blurb: "Flip cards for definitions, reasons and reactions" },
+  { id: "practice", label: "Practice", icon: "target", blurb: "Adaptive MCQs with a hint and one retry" },
+  { id: "challenge", label: "Challenge", icon: "flame", blurb: "Harder conceptual and assertion–reason questions" },
 ];
 
 function Skeleton() {
   return (
     <div className="space-y-4" role="status" aria-label="Loading chapter">
-      {[0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-2xl border border-slate-800 bg-slate-900/60" />)}
+      {[0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-2xl border border-white/5 bg-white/[0.03]" style={{ animationDelay: `${i * 120}ms` }} />)}
     </div>
   );
 }
@@ -42,40 +44,29 @@ export default function ChapterScreen({ slug }: { slug: string }) {
 
   const setMode = (m: Mode) => { setModeState(m); writeNav(modeKey, m); };
   const current = MODES.find((m) => m.id === mode)!;
-  const nav = "rounded-lg border border-slate-700 px-3 py-2 text-sm hover:border-amber-400";
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-6">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Link href="/chemistry" className={nav}>← Chemistry</Link>
-        <Link href="/" className={nav}><span aria-hidden="true">🏠 </span>Main dashboard</Link>
-      </div>
+    <main className="theme-chem mx-auto max-w-3xl px-4 py-6 sm:py-10">
+      <div className="mb-6"><BackLink href="/chemistry">Chemistry</BackLink></div>
 
-      <header className="mb-4">
-        <p className="mono text-xs text-violet-300">Chapter {meta.number}</p>
-        <h1 className="text-xl font-bold text-amber-300 sm:text-2xl"><span aria-hidden="true">{meta.icon} </span>{meta.title}</h1>
+      <header className="mb-7">
+        <p className="mb-1 text-sm text-slate-500">Chapter {meta.number}</p>
+        <h1 className="text-3xl font-semibold leading-tight tracking-tight text-white">{meta.title}</h1>
       </header>
 
-      <nav aria-label="Study mode" className="mb-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {MODES.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => setMode(m.id)}
-            aria-current={m.id === mode ? "page" : undefined}
-            className={`rounded-xl border px-3 py-2.5 text-left text-sm transition ${m.id === mode ? "border-amber-400 bg-amber-400/10 text-amber-200" : "border-slate-700 text-slate-300 hover:border-slate-500"}`}
-          >
-            <span aria-hidden="true">{m.icon} </span>{m.label}
-          </button>
-        ))}
-      </nav>
-      <p className="mb-4 text-xs text-slate-500">{current.blurb}</p>
+      <ModeTabs
+        blurb={current.blurb}
+        tabs={MODES.map((m) => ({ key: m.id, label: m.label, icon: m.icon, active: m.id === mode, onClick: () => setMode(m.id) }))}
+      />
 
-      {failed && <p className="rounded-xl border border-rose-400/40 bg-rose-400/10 p-4 text-sm text-rose-200" role="alert">Could not load this chapter. Check your connection and refresh the page.</p>}
+      {failed && <p className="rounded-xl border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-200" role="alert">Could not load this chapter. Check your connection and refresh the page.</p>}
       {!content && !failed && <Skeleton />}
-      {content && mode === "revise" && <ChemNotes sections={content.sections} />}
-      {content && mode === "cards" && <ChemFlashcards chapterKey={slug} cards={content.cards} />}
-      {content && mode === "challenge" && <ChemPractice chapterKey={slug} bank={content.challenge} title={meta.short} challenge />}
-      {content && mode === "practice" && <ChemPractice chapterKey={slug} bank={content.questions} title={meta.short} />}
+      <div key={mode} className="a-fade">
+        {content && mode === "revise" && <ChemNotes sections={content.sections} />}
+        {content && mode === "cards" && <ChemFlashcards chapterKey={slug} cards={content.cards} />}
+        {content && mode === "challenge" && <ChemPractice chapterKey={slug} bank={content.challenge} title={meta.short} challenge />}
+        {content && mode === "practice" && <ChemPractice chapterKey={slug} bank={content.questions} title={meta.short} />}
+      </div>
     </main>
   );
 }

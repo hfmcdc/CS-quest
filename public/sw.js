@@ -1,15 +1,24 @@
 /* Quest MC service worker: tiny, dependency-free offline/speed layer.
  *  - /_next/static/*  hashed, immutable          -> cache-first
- *  - page navigations                            -> network-first (3.5 s), cached copy if slow/offline
+ *  - page navigations                            -> network-first (2.5 s), cached copy if slow/offline; main pages are pre-cached on install
  *  - other same-origin static files              -> stale-while-revalidate
  * Next.js RSC/prefetch requests are left to the network + Next's own router cache. */
-const VERSION = "qmc-v1";
+const VERSION = "qmc-v2";
 const STATIC = `${VERSION}-static`;
 const PAGES = `${VERSION}-pages`;
 const MAX_PAGES = 20;
 const MAX_STATIC = 120;
 
-self.addEventListener("install", () => self.skipWaiting());
+// Pages worth having offline / instantly on a cold start. Best effort: a failure never blocks installation.
+const SHELL = ["/", "/computer", "/maths", "/chemistry", "/chemistry/d-and-f-block-elements"];
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(PAGES)
+      .then((cache) => Promise.all(SHELL.map((u) => cache.add(u).catch(() => {}))))
+      .catch(() => {})
+      .then(() => self.skipWaiting())
+  );
+});
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
@@ -41,7 +50,7 @@ async function networkFirst(req) {
   });
   const cached = await cache.match(req);
   if (!cached) return net.catch(async () => (await cache.match("/")) || Response.error());
-  return Promise.race([net, new Promise((r) => setTimeout(() => r(cached), 3500))]).catch(() => cached);
+  return Promise.race([net, new Promise((r) => setTimeout(() => r(cached), 2500))]).catch(() => cached);
 }
 
 async function staleWhileRevalidate(req) {
