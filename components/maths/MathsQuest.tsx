@@ -12,6 +12,7 @@ import { LearnView, RevisionView } from "@/components/maths/StudyViews";
 import MathFlashcards from "@/components/maths/MathFlashcards";
 import Icon, { type IconName } from "@/components/Icon";
 import ModeTabs from "@/components/ModeTabs";
+import BetaBanner from "@/components/BetaBanner";
 import { BackLink, PageHeader } from "@/components/ui";
 
 type ModeId = "revision" | "learn" | "practice" | "challenge";
@@ -31,11 +32,13 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
   useEffect(() => { writeNav("maths:screen", screen); }, [screen]);
 
   if (screen.name === "cards") {
-    return <MathFlashcards key={screen.topic} initial={screen.topic} onBack={() => setScreen({ name: "home" })} onMain={onExit} />;
+    return <><BetaBanner /><MathFlashcards key={screen.topic} initial={screen.topic} onBack={() => setScreen({ name: "home" })} onMain={onExit} /></>;
   }
 
   if (screen.name === "home") {
     return (
+      <>
+      <BetaBanner />
       <main className="theme-maths mx-auto max-w-5xl px-4 py-8 sm:py-12">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-2">
           <BackLink onClick={onExit}>Home</BackLink>
@@ -73,6 +76,7 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
           Coverage follows standard NCERT/CBSE Class XII topics for the chapters above. Questions are written for practice and are not copied from the textbook exercises. Nothing is saved.
         </p>
       </main>
+      </>
     );
   }
 
@@ -81,6 +85,8 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
   const current = MODES.find((m) => m.id === mode)!;
 
   return (
+    <>
+    <BetaBanner />
     <main className="theme-maths mx-auto max-w-3xl px-4 py-6 sm:py-10">
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <BackLink onClick={() => setScreen({ name: "home" })}>Maths</BackLink>
@@ -106,5 +112,6 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
         {(mode === "practice" || mode === "challenge") && <PracticeView key={`${topic}-${mode}`} topic={topic} mode={mode} />}
       </div>
     </main>
+    </>
   );
 }

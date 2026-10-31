@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { CHEM_CHAPTERS, chemChapterHref } from "@/lib/chemistry/chapters";
 import Icon from "@/components/Icon";
+import BetaBanner from "@/components/BetaBanner";
 import { BackLink, PageHeader } from "@/components/ui";
 
 /** Chapter list. Static (no client state) so it renders instantly and is prefetched with the route. */
 export default function ChemistryHome() {
   return (
+    <>
+    <BetaBanner />
     <main className="theme-chem mx-auto max-w-5xl px-4 py-8 sm:py-12">
       <div className="mb-8"><BackLink href="/">Home</BackLink></div>
       <PageHeader title="Chemistry" icon={<Icon name="flask" size={24} />}>CBSE Class XII. Pick a chapter, revise the key ideas, then practise with MCQs.</PageHeader>
@@ -29,5 +32,6 @@ export default function ChemistryHome() {
       </section>
       <p className="mt-10 text-center text-xs text-slate-500">More chapters are coming. Questions are written for practice and follow the CBSE Class XII syllabus. Nothing is saved.</p>
     </main>
+    </>
   );
 }

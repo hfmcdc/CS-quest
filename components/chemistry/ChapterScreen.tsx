@@ -8,6 +8,7 @@ import ChemNotes from "@/components/chemistry/ChemNotes";
 import ChemPractice from "@/components/chemistry/ChemPractice";
 import ChemFlashcards from "@/components/chemistry/ChemFlashcards";
 import ModeTabs from "@/components/ModeTabs";
+import BetaBanner from "@/components/BetaBanner";
 import { BackLink } from "@/components/ui";
 import type { IconName } from "@/components/Icon";
 
@@ -46,6 +47,8 @@ export default function ChapterScreen({ slug }: { slug: string }) {
   const current = MODES.find((m) => m.id === mode)!;
 
   return (
+    <>
+    <BetaBanner />
     <main className="theme-chem mx-auto max-w-3xl px-4 py-6 sm:py-10">
       <div className="mb-6"><BackLink href="/chemistry">Chemistry</BackLink></div>
 
@@ -68,5 +71,6 @@ export default function ChapterScreen({ slug }: { slug: string }) {
         {content && mode === "practice" && <ChemPractice chapterKey={slug} bank={content.questions} title={meta.short} />}
       </div>
     </main>
+    </>
   );
 }

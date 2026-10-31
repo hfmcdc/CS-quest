@@ -8,9 +8,9 @@ import { evaluate } from "@/lib/checker";
 import type { Outcome, Question, Topic } from "@/lib/types";
 import Flashcards from "@/components/Flashcards";
 import Icon from "@/components/Icon";
+import BetaBanner, { IG_URL } from "@/components/BetaBanner";
 import { BackLink, DifficultyMeter, PageHeader } from "@/components/ui";
 
-const IG_URL = "https://www.instagram.com/mr.mallu_gg/";
 
 function Instagram() {
   return (
@@ -20,15 +20,6 @@ function Instagram() {
       </svg>
       @mr.mallu_gg
     </a>
-  );
-}
-
-function BetaBanner() {
-  return (
-    <div role="note" className="px-4 py-2 text-center text-xs text-slate-500">
-      Beta · found a bug? DM{" "}
-      <a href={IG_URL} target="_blank" rel="noopener noreferrer" className="text-slate-300 underline decoration-white/20 underline-offset-2 hover:text-white">@mr.mallu_gg</a>
-    </div>
   );
 }
 
