@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChemCard } from "@/lib/chemistry/types";
 import { readNav, writeNav } from "@/lib/navState";
 import Icon from "@/components/Icon";
+import { celebrate } from "@/lib/fx";
 
 interface DeckState { ids: string[]; idx: number; known: string[]; missed: string[]; finished: boolean; tag: string }
 
@@ -55,6 +56,8 @@ export default function ChemFlashcards({ chapterKey, cards }: { chapterKey: stri
   }, [s.finished]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const chip = (on: boolean) => `chip min-h-[2.4rem] px-4 text-sm ${on ? "chip-ac" : ""}`;
+
+  useEffect(() => { if (s.finished) celebrate(true); }, [s.finished]);
 
   return (
     <div>

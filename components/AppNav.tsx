@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Icon, { type IconName } from "@/components/Icon";
 import Wordmark from "@/components/Wordmark";
+import SoundToggle from "@/components/SoundToggle";
 
 const TABS: { href: string; label: string; icon: IconName; theme: string }[] = [
   { href: "/", label: "Home", icon: "home", theme: "theme-cs" },
@@ -34,6 +35,7 @@ export default function AppNav() {
               );
             })}
           </nav>
+          <SoundToggle />
         </div>
       </header>
 

@@ -6,6 +6,7 @@ import type { CardKind, Flashcard } from "@/lib/flashcards";
 import { TOPICS } from "@/lib/questions";
 import type { Topic } from "@/lib/types";
 import { BackLink } from "@/components/ui";
+import { celebrate } from "@/lib/fx";
 import Icon from "@/components/Icon";
 
 type TopicFilter = Topic | "all";
@@ -70,6 +71,8 @@ export default function Flashcards({ onExit }: { onExit: () => void }) {
   const chip = (active: boolean) =>
     `chip min-h-[2.4rem] px-4 text-sm ${active ? "chip-ac" : ""}`;
   const box = "mono max-w-full overflow-x-auto whitespace-pre rounded-xl border border-white/10 bg-black/30 p-4 text-[13px] leading-relaxed text-slate-200";
+
+  useEffect(() => { if (finished) celebrate(true); }, [finished]);
 
   return (
     <main className="theme-cs mx-auto max-w-3xl px-4 py-6">

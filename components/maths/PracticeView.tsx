@@ -8,6 +8,7 @@ import { KIND_LABEL, LEVEL_LABEL, topicMeta } from "@/lib/maths/topics";
 import type { MathTopicId } from "@/lib/maths/types";
 import { Rich } from "@/components/maths/MathText";
 import Icon from "@/components/Icon";
+import { celebrate, playSound } from "@/lib/fx";
 import { DifficultyMeter } from "@/components/ui";
 
 const PRAISE = ["Nicely done!", "Spot on!", "Great working!", "Exactly right!", "Well solved!", "That's it!"];
@@ -39,6 +40,8 @@ export default function PracticeView({ topic, mode }: { topic: MathTopicId; mode
     const result = checkAnswer(q, answer);
     const next = submit(s, result);
     setS(next);
+    if (next.phase === "correct") celebrate();
+    else if (next.phase === "retry" || next.phase === "solved") playSound("wrong");
     if (next.phase === "retry" && isMcq) setAnswer("");
   };
 

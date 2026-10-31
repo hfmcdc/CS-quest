@@ -8,6 +8,7 @@ import type { MathTopicId } from "@/lib/maths/types";
 import { Rich } from "@/components/maths/MathText";
 import Icon from "@/components/Icon";
 import { BackLink } from "@/components/ui";
+import { celebrate } from "@/lib/fx";
 
 type Filter = MathTopicId | "all";
 
@@ -66,6 +67,8 @@ export default function MathFlashcards({ initial, onBack, onMain }: { initial: F
 
   const chip = (active: boolean) =>
     `chip min-h-[2.4rem] px-4 text-sm ${active ? "chip-ac" : ""}`;
+
+  useEffect(() => { if (finished) celebrate(true); }, [finished]);
 
   return (
     <main className="theme-maths mx-auto max-w-3xl px-4 py-6">

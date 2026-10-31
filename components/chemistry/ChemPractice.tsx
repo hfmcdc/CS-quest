@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ChemQuestion } from "@/lib/chemistry/types";
 import { readNav, writeNav } from "@/lib/navState";
 import Icon from "@/components/Icon";
+import { celebrate, playSound } from "@/lib/fx";
 import { DifficultyMeter } from "@/components/ui";
 
 const LEVELS = ["Easy", "Medium", "Hard"];
@@ -68,11 +69,14 @@ export default function ChemPractice({ chapterKey, bank, title, challenge = fals
     if (input === q.answer) {
       const m = move(1);
       upd({ correct: true, phase: "done", diff: m.nd, change: m.msg });
+      celebrate();
     } else if (phase === "ask") {
       upd({ phase: "retry", hint: true });
+      playSound("wrong");
     } else {
       const m = move(-1);
       upd({ correct: false, phase: "done", diff: m.nd, change: m.msg });
+      playSound("wrong");
     }
   };
 

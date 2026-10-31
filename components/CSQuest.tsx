@@ -8,6 +8,7 @@ import { evaluate } from "@/lib/checker";
 import type { Outcome, Question, Topic } from "@/lib/types";
 import Flashcards from "@/components/Flashcards";
 import Icon from "@/components/Icon";
+import { celebrate, playSound } from "@/lib/fx";
 import BetaBanner, { IG_URL } from "@/components/BetaBanner";
 import { BackLink, DifficultyMeter, PageHeader } from "@/components/ui";
 
@@ -80,9 +81,9 @@ function Practice({ topic, onExit }: { topic: Topic; onExit: () => void }) {
   const submit = () => {
     const r = evaluate(q, input);
     setFx((n) => n + 1);
-    if (r === "correct") { setOutcome(r); setPhase("done"); move(1); }
-    else if (phase === "ask") { setPhase("retry"); setHint(true); }
-    else { setOutcome("incorrect"); setPhase("done"); move(-1); }
+    if (r === "correct") { setOutcome(r); setPhase("done"); move(1); celebrate(); }
+    else if (phase === "ask") { setPhase("retry"); setHint(true); playSound("wrong"); }
+    else { setOutcome("incorrect"); setPhase("done"); move(-1); playSound("wrong"); }
   };
 
   const done = phase === "done";
