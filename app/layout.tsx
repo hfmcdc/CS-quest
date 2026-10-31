@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#070812" };
 
-/** Runs before first paint. The splash is only switched on when this browser has never opened the app
- *  (flag key must match FirstVisitSplash). If storage is blocked we show it, which is the safe fallback. */
-const SHOW_SPLASH = `(function(){var d=document.documentElement;try{if(!localStorage.getItem("qmc:seen"))d.setAttribute("data-splash","1")}catch(e){d.setAttribute("data-splash","1")}})()`;
+/** Runs before first paint on every full page load (open or refresh), so the loading screen shows with no flash of the page behind it.
+ *  Client-side navigation never reloads the layout, so moving between screens does not replay it. */
+const SHOW_SPLASH = `document.documentElement.setAttribute("data-splash","1")`;
 
 /** Seasonal theme: applied before first paint, and only while today is on or before HALLOWEEN_UNTIL (browser date). */
 const SEASON = HALLOWEEN_ENABLED

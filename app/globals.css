@@ -162,7 +162,7 @@ html[data-splash="exit"] main { animation: rise .8s var(--ease) both }
 .splash-orbit { position: absolute; inset: -.6rem; border-radius: 9999px; border: 1px dashed rgba(255, 255, 255, .07); animation: spin 14s linear infinite }
 .splash-mark { font-size: 1.55rem; font-weight: 700; color: #e8fbff; text-shadow: 0 0 22px rgba(34, 211, 238, .5); animation: pop .7s var(--ease) both .1s }
 .splash-word { position: relative; display: flex; overflow: hidden; margin-top: .4rem; font-size: clamp(2.2rem, 10vw, 3.4rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.15;
-  background: linear-gradient(120deg, #e8fbff, #67e8f9 55%, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent }
+  color: #e8fbff; text-shadow: 0 0 26px rgba(103, 232, 249, .45) }
 .splash-letter { display: inline-block; opacity: 0; transform: translateY(.6em); animation: splash-letter .7s var(--ease) forwards }
 .splash-shine { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .5) 50%, transparent 65%);
   transform: translateX(-120%); animation: splash-shine 1.4s ease-in-out 1.4s 2; mix-blend-mode: overlay }
@@ -214,7 +214,7 @@ html[data-theme="halloween"] .wm::before { content: "🎃 "; font-weight: 400 }
 html[data-theme="halloween"] .splash-glow-a { background: radial-gradient(closest-side, rgba(255, 122, 24, .2), transparent) }
 html[data-theme="halloween"] .splash-glow-b { background: radial-gradient(closest-side, rgba(139, 92, 246, .2), transparent) }
 html[data-theme="halloween"] .splash-ring .prg { stroke: #ff8a2b; filter: drop-shadow(0 0 6px rgba(255, 138, 43, .6)) }
-html[data-theme="halloween"] .splash-word { background: linear-gradient(120deg, #fff1e0, #ff9d4d 55%, #a78bfa); -webkit-background-clip: text; background-clip: text }
+html[data-theme="halloween"] .splash-word { color: #ffe9d2; text-shadow: 0 0 26px rgba(255, 138, 43, .55) }
 html[data-theme="halloween"] .splash-mark { color: #ffe3c7; text-shadow: 0 0 22px rgba(255, 138, 43, .55) }
 html[data-theme="halloween"] .btn-primary { color: #1a0a00 }
 /* A single bat drifting across the top of the screen. */
@@ -243,3 +243,32 @@ html[data-theme="halloween"]::after {
 @media (min-width: 768px) { html[data-theme="halloween"]::after { bottom: 2rem } }
 html[data-theme="halloween"] .card-link:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 24px 56px -22px rgb(var(--ac) / .55) }
 html[data-theme="halloween"] .a-pop { text-shadow: 0 0 18px rgb(255 138 43 / .55) }
+
+/* ---- Halloween loading screen: corner cobwebs + spiders dangling on threads ---- */
+.splash-web, .splash-dangler, .t-spooky { display: none }
+html[data-theme="halloween"] .t-normal { display: none }
+html[data-theme="halloween"] .t-spooky { display: inline }
+html[data-theme="halloween"] .splash-mark { font-size: 0 }
+html[data-theme="halloween"] .splash-mark::before { content: "🎃"; font-size: 2.3rem; filter: drop-shadow(0 0 14px rgba(255, 138, 43, .8)); animation: flicker 3s ease-in-out infinite }
+html[data-theme="halloween"] .splash-web {
+  display: block; position: absolute; width: clamp(7rem, 30vw, 15rem); height: auto; color: #d9c8ff; opacity: 0; pointer-events: none;
+  animation: fade .9s ease .2s forwards;
+}
+html[data-theme="halloween"] .splash-web { --o: .38 }
+.web-tl { top: 0; left: 0 }
+.web-tr { top: 0; right: 0; transform: scaleX(-1); transform-origin: center }
+.web-bl { bottom: 0; left: 0; transform: scaleY(-1); transform-origin: center }
+.web-br { bottom: 0; right: 0; transform: scale(-1, -1); transform-origin: center }
+@keyframes web-in { from { opacity: 0 } to { opacity: .4 } }
+html[data-theme="halloween"] .splash-web { animation-name: web-in }
+html[data-theme="halloween"] .splash-dangler {
+  display: block; position: absolute; top: 0; z-index: 2; margin-left: -1.2rem; pointer-events: none;
+  animation: spider-drop 5s ease-in-out infinite; will-change: transform;
+}
+html[data-theme="halloween"] .splash-dangler::before {
+  content: ""; position: absolute; left: 50%; bottom: 80%; width: 1px; height: 100vh; background: linear-gradient(to top, rgba(217, 200, 255, .7), rgba(217, 200, 255, .25));
+}
+html[data-theme="halloween"] .splash-spider { display: block; transform-origin: 50% 0; animation: spider-sway 2.6s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(139, 92, 246, .5)) }
+/* quick drop, slow climb, with a pause at each end, like a spider lowering itself */
+@keyframes spider-drop { 0%, 8% { transform: translateY(-1.5rem) } 38%, 52% { transform: translateY(var(--drop)) } 100% { transform: translateY(-1.5rem) } }
+@keyframes spider-sway { 0%, 100% { transform: rotate(-7deg) } 50% { transform: rotate(7deg) } }
