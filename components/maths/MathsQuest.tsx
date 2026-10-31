@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { readNav, writeNav } from "@/lib/navState";
 import { MATH_TOPICS, topicMeta } from "@/lib/maths/topics";
 import { EXAMPLES } from "@/lib/maths/examples";
 import { topicCounts } from "@/lib/maths/session";
@@ -23,7 +24,8 @@ const MODES: { id: ModeId; label: string; icon: string; blurb: string }[] = [
 const cardCount = (id: MathTopicId) => MATH_CARDS.filter((c) => c.topic === id).length;
 
 export default function MathsQuest({ onExit }: { onExit: () => void }) {
-  const [screen, setScreen] = useState<Screen>({ name: "home" });
+  const [screen, setScreen] = useState<Screen>(() => readNav<Screen>("maths:screen", { name: "home" }));
+  useEffect(() => { writeNav("maths:screen", screen); }, [screen]);
 
   const navBtn = "rounded-lg border border-slate-700 px-3 py-2 text-sm hover:border-emerald-400";
 

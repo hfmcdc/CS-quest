@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { readNav, writeNav } from "@/lib/navState";
 import { BANK, MODE_LABEL, TOPICS } from "@/lib/questions";
 import { evaluate } from "@/lib/checker";
 import type { Outcome, Question, Topic } from "@/lib/types";
@@ -31,24 +32,6 @@ function BetaBanner() {
 
 function ComingSoon() {
   return <p className="text-center text-xs text-slate-500">✍️ Write-your-own-program questions coming soon!</p>;
-}
-
-function Loader({ onDone }: { onDone: () => void }) {
-  useEffect(() => {
-    const t = setTimeout(onDone, 1800);
-    return () => clearTimeout(t);
-  }, [onDone]);
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-      <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">CS Quest</h1>
-      <p className="text-slate-400" role="status">Loading your Class XII practice arena…</p>
-      <div className="h-1.5 w-56 overflow-hidden rounded-full bg-slate-800"><div className="bar h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-400" /></div>
-      <div className="flex flex-col items-center gap-3">
-        <button onClick={onDone} className="text-sm text-slate-500 underline hover:text-slate-300">Skip</button>
-        <Instagram />
-      </div>
-    </main>
-  );
 }
 
 function pick(topic: Topic, diff: number, seen: string[]) {
@@ -191,8 +174,8 @@ function Practice({ topic, onExit }: { topic: Topic; onExit: () => void }) {
 }
 
 export default function CSQuest() {
-  const [screen, setScreen] = useState<"loading" | "home" | "flash" | Topic>("loading");
-  if (screen === "loading") return <><BetaBanner /><Loader onDone={() => setScreen("home")} /></>;
+  const [screen, setScreen] = useState<"home" | "flash" | Topic>(() => readNav<"home" | "flash" | Topic>("cs:screen", "home"));
+  useEffect(() => { writeNav("cs:screen", screen); }, [screen]);
   if (screen === "flash") return <><BetaBanner /><Flashcards onExit={() => setScreen("home")} /></>;
   if (screen !== "home") return <><BetaBanner /><Practice key={screen} topic={screen} onExit={() => setScreen("home")} /></>;
   return (

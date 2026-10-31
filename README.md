@@ -21,6 +21,9 @@ Choose **Maths** from the home page to open Class XII practice for the Second Mi
 - `npm run verify:maths` runs the content, renderer, checker, generator and adaptive-flow self-checks (it fetches `tsx` with `npx`; nothing is added to `package.json` dependencies).
 - Scope note: coverage follows standard NCERT/CBSE topics for these chapters. Questions are original practice questions, **not** copied from textbook exercises, and are not claimed to match specific exercise numbers.
 
+## Chemistry Quest
+Choose **Chemistry** from the home page for D- and F-Block Elements revision notes and adaptive MCQ practice. Chapter content is loaded on demand; add chapter metadata in `lib/chemistry/chapters.ts` and its notes/questions in `lib/chemistry/chapters/`.
+
 ## Prerequisites
 Node.js 18.18+ (or 20+), npm, Git, a GitHub account and a Vercel account.
 

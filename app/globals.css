@@ -24,4 +24,43 @@ fieldset { min-width: 0; }
 .a-rise { animation: rise .3s ease-out }
 .spark { position: absolute; left: 1.25rem; top: 50%; width: 8px; height: 8px; border-radius: 9999px; background: #22d3ee; animation: burst .8s ease-out forwards; pointer-events: none }
 .bar { animation: fill 1.6s ease-in-out forwards }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+/* ---------- First-visit splash ---------- */
+#splash { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; overflow: hidden;
+  background: #07090f; transition: opacity .6s ease, transform .6s ease; will-change: opacity, transform }
+html[data-splash="1"] #splash, html[data-splash="exit"] #splash { display: flex }
+html[data-splash="1"] body { overflow: hidden }
+html[data-splash="1"] body > *:not(#splash):not(script) { visibility: hidden }
+html[data-splash="exit"] #splash { opacity: 0; transform: scale(1.04); pointer-events: none }
+html[data-splash="exit"] main { animation: rise .7s ease-out }
+.splash-center { position: relative; display: flex; flex-direction: column; align-items: center; gap: .9rem; padding: 0 1.5rem; text-align: center }
+.splash-word { position: relative; display: flex; overflow: hidden; font-size: clamp(2.6rem, 12vw, 4.5rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.15;
+  color: #67e8f9; text-shadow: 0 0 28px rgba(34,211,238,.35) }
+.splash-letter { display: inline-block; opacity: 0; transform: translateY(.6em) scale(.9); animation: splash-letter .7s cubic-bezier(.2,.8,.2,1) forwards }
+.splash-shine { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
+  transform: translateX(-120%); animation: splash-shine 1.4s ease-in-out 1.3s 2 }
+.splash-tag { color: #94a3b8; font-size: .95rem; opacity: 0; animation: rise .6s ease-out 1s forwards }
+.splash-track { width: min(18rem, 70vw); height: 6px; margin-top: .6rem; overflow: hidden; border-radius: 9999px; background: #1e293b }
+.splash-fill { width: 100%; height: 100%; border-radius: 9999px; transform: scaleX(0); transform-origin: left center;
+  background: linear-gradient(90deg, #22d3ee, #a78bfa); box-shadow: 0 0 14px rgba(34,211,238,.6) }
+.splash-pct { color: #64748b; font-size: .8rem; font-variant-numeric: tabular-nums }
+.splash-skip { position: absolute; bottom: max(1.25rem, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); padding: .5rem 1rem;
+  color: #64748b; font-size: .8rem; text-decoration: underline; background: none; border: 0; cursor: pointer }
+.splash-skip:hover { color: #cbd5e1 }
+.splash-glow { position: absolute; width: 60vmax; height: 60vmax; border-radius: 9999px; pointer-events: none; opacity: .9; animation: splash-pulse 4s ease-in-out infinite }
+.splash-glow-a { top: -25vmax; left: -20vmax; background: radial-gradient(closest-side, rgba(34,211,238,.20), transparent) }
+.splash-glow-b { bottom: -25vmax; right: -20vmax; background: radial-gradient(closest-side, rgba(167,139,250,.20), transparent); animation-delay: -2s }
+.splash-chip { position: absolute; font-size: 1.6rem; font-weight: 700; opacity: 0; pointer-events: none; animation: splash-float 4.5s ease-in-out infinite }
+.splash-chip-1 { left: 12%; top: 22%; color: #67e8f9 }
+.splash-chip-2 { right: 14%; top: 30%; color: #6ee7b7; animation-delay: -1.5s }
+.splash-chip-3 { left: 22%; bottom: 20%; color: #fcd34d; animation-delay: -3s }
+@keyframes splash-letter { to { opacity: 1; transform: none } }
+@keyframes splash-shine { to { transform: translateX(120%) } }
+@keyframes splash-pulse { 0%,100% { transform: scale(1); opacity: .6 } 50% { transform: scale(1.12); opacity: 1 } }
+@keyframes splash-float { 0% { opacity: 0; transform: translateY(14px) } 30%,70% { opacity: .35 } 100% { opacity: 0; transform: translateY(-22px) } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important }
+  .splash-letter, .splash-tag { opacity: 1; transform: none }
+  .splash-chip, .splash-shine { display: none }
+}

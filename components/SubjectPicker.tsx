@@ -1,35 +1,15 @@
 import Link from "next/link";
-
-const SUBJECTS = [
-  {
-    href: "/computer",
-    glyph: "</>",
-    title: "Computer Science",
-    note: "Binary files, CSV, MySQL and Python–SQL practice.",
-    cta: "Start practice",
-    glyphClass: "text-cyan-300",
-    hoverClass: "hover:border-cyan-300/60",
-  },
-  {
-    href: "/maths",
-    glyph: "∑",
-    title: "Maths",
-    note: "Revision notes, worked examples, adaptive practice and challenges.",
-    cta: "Start practice",
-    glyphClass: "text-emerald-300",
-    hoverClass: "hover:border-emerald-300/60",
-  },
-];
+import { SUBJECTS } from "@/lib/subjects";
 
 export default function SubjectPicker() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-8 px-5 py-12">
+    <main className="mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center gap-8 px-5 py-12">
       <div className="text-center">
         <h1 className="mono text-5xl font-bold tracking-tight text-cyan-300 sm:text-6xl">Quest MC</h1>
         <p className="mt-3 text-slate-400">CBSE Class XII practice. Which subject today?</p>
       </div>
 
-      <div className="grid w-full gap-4 sm:grid-cols-2">
+      <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {SUBJECTS.map((subject) => (
           <Link
             key={subject.href}
