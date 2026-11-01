@@ -3,6 +3,7 @@ import "./globals.css";
 import FirstVisitSplash from "@/components/FirstVisitSplash";
 import AppPrefetcher from "@/components/AppPrefetcher";
 import AppNav from "@/components/AppNav";
+import PhysicsAnnouncement from "@/components/PhysicsAnnouncement";
 import { HALLOWEEN_ENABLED, HALLOWEEN_UNTIL } from "@/lib/seasonal";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <FirstVisitSplash />
         <AppNav />
+        <PhysicsAnnouncement />
         {children}
         <AppPrefetcher />
       </body>

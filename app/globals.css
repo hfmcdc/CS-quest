@@ -272,3 +272,34 @@ html[data-theme="halloween"] .splash-spider { display: block; transform-origin: 
 /* quick drop, slow climb, with a pause at each end, like a spider lowering itself */
 @keyframes spider-drop { 0%, 8% { transform: translateY(-1.5rem) } 38%, 52% { transform: translateY(var(--drop)) } 100% { transform: translateY(-1.5rem) } }
 @keyframes spider-sway { 0%, 100% { transform: rotate(-7deg) } 50% { transform: rotate(7deg) } }
+
+/* ================================================================== Physics Quest launch announcement */
+.physics-ticker {
+  position: relative; z-index: 35; display: flex; height: 2.35rem; align-items: center; gap: .75rem; overflow: hidden;
+  border-bottom: 1px solid rgba(250, 204, 21, .18); background: linear-gradient(90deg, rgba(35, 29, 12, .96), rgba(12, 15, 28, .96), rgba(35, 29, 12, .96));
+  color: #fde68a; text-decoration: none;
+}
+.physics-ticker-label, .physics-ticker-open { position: relative; z-index: 1; flex: none; height: 100%; display: inline-flex; align-items: center; padding: 0 .7rem; background: rgba(18, 19, 31, .95); font: 700 .62rem/1 ui-monospace, "Cascadia Code", monospace; letter-spacing: .08em }
+.physics-ticker-label { border-right: 1px solid rgba(250, 204, 21, .18) }
+.physics-ticker-open { border-left: 1px solid rgba(250, 204, 21, .18); color: #fef3c7 }
+.physics-marquee { min-width: 0; flex: 1; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent) }
+.physics-marquee-track { display: flex; width: max-content; animation: physics-marquee 24s linear infinite }
+.physics-marquee-track > span { flex: none; padding-right: 2.5rem; font: 700 .72rem/1.2 ui-monospace, "Cascadia Code", monospace; letter-spacing: .06em; white-space: nowrap; text-shadow: 0 0 10px rgba(250, 204, 21, .38) }
+.physics-led-dot { color: #facc15; text-shadow: 0 0 12px #facc15 }
+.physics-ticker:hover .physics-marquee-track { animation-play-state: paused }
+@keyframes physics-marquee { to { transform: translateX(-50%) } }
+.physics-modal-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1.25rem; background: rgba(3, 5, 14, .76); backdrop-filter: blur(12px); animation: fade .25s ease both }
+.physics-modal { position: relative; display: flex; width: min(100%, 31rem); flex-direction: column; align-items: flex-start; gap: .9rem; padding: 1.5rem; border-color: rgba(250, 204, 21, .22); box-shadow: 0 28px 100px rgba(0, 0, 0, .55), 0 0 55px rgba(250, 204, 21, .08); animation: rise .35s var(--ease) both }
+.physics-modal-close { position: absolute; top: .7rem; right: .9rem; width: 2.5rem; height: 2.5rem; border: 0; border-radius: .75rem; background: transparent; color: #9ca3af; font-size: 1.7rem; line-height: 1; cursor: pointer }
+.physics-modal-close:hover { background: rgba(255,255,255,.07); color: #fff }
+.physics-eyebrow { color: #facc15; font: 700 .68rem/1.2 ui-monospace, "Cascadia Code", monospace; letter-spacing: .15em }
+.physics-orbit { display: grid; width: 5rem; height: 5rem; place-items: center; border: 1px solid rgba(250, 204, 21, .35); border-radius: 50%; background: radial-gradient(circle, rgba(250, 204, 21, .16), rgba(250, 204, 21, .02) 70%); box-shadow: 0 0 45px rgba(250, 204, 21, .13), inset 0 0 22px rgba(250, 204, 21, .08); animation: physics-orbit-pulse 3s ease-in-out infinite }
+.physics-orbit span { font-size: 2rem; filter: drop-shadow(0 0 12px rgba(250, 204, 21, .6)) }
+@keyframes physics-orbit-pulse { 50% { transform: scale(1.06); box-shadow: 0 0 60px rgba(250, 204, 21, .2), inset 0 0 26px rgba(250, 204, 21, .12) } }
+.physics-countdown-card { border-color: rgba(250, 204, 21, .2); background: linear-gradient(145deg, rgba(250, 204, 21, .07), rgba(255, 255, 255, .025) 55%); box-shadow: 0 22px 65px -38px rgba(250, 204, 21, .28), inset 0 1px 0 rgba(255,255,255,.05) }
+.physics-countdown-unit { min-width: 0; padding: .8rem .25rem; border: 1px solid rgba(255, 255, 255, .07); border-radius: .9rem; background: rgba(4, 7, 18, .46) }
+.physics-countdown-number { display: block; color: #fef3c7; font-size: clamp(1.5rem, 7vw, 3rem); line-height: 1; text-shadow: 0 0 20px rgba(250, 204, 21, .22); font-variant-numeric: tabular-nums }
+.physics-temp-update { display: flex; width: 100%; gap: .8rem; border: 1px solid rgba(255,255,255,.07); border-radius: 1rem; padding: .9rem 1rem; background: rgba(255,255,255,.025) }
+.physics-update-dot { flex: none; width: .55rem; height: .55rem; margin-top: .28rem; border-radius: 50%; background: #facc15; box-shadow: 0 0 13px rgba(250,204,21,.7) }
+@media (max-width: 480px) { .physics-ticker { gap: .35rem } .physics-ticker-label, .physics-ticker-open { padding: 0 .45rem; font-size: .55rem } .physics-marquee-track > span { font-size: .65rem } .physics-modal { padding: 1.25rem } }
+@media (prefers-reduced-motion: reduce) { .physics-marquee-track { animation-duration: 60s } .physics-orbit { animation: none } }
