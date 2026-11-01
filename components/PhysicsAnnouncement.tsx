@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const LAUNCH_AT = new Date("2026-11-02T18:30:00.000Z").getTime(); // 3 Nov 2026, 12:00 AM IST
 const MESSAGE = "PHYSICS QUEST  •  LAUNCHING 3 NOVEMBER  •  12:00 AM IST  •  TAP TO SEE COUNTDOWN";
 
 export default function PhysicsAnnouncement() {
-  const pathname = usePathname();
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -23,18 +21,16 @@ export default function PhysicsAnnouncement() {
 
   return (
     <>
-      {pathname !== "/" && (
-        <Link href="/physics" prefetch={false} className="physics-ticker" aria-label="Physics Quest announcement. Open launch countdown.">
-          <span className="physics-ticker-label">📣 ANNOUNCEMENT</span>
-          <span className="physics-marquee" aria-hidden="true">
-            <span className="physics-marquee-track">
-              <span>{MESSAGE}<span className="physics-led-dot"> ◆ </span></span>
-              <span>{MESSAGE}<span className="physics-led-dot"> ◆ </span></span>
-            </span>
+      <Link href="/physics" prefetch={false} className="physics-ticker" aria-label="Physics Quest announcement. Open launch countdown.">
+        <span className="physics-ticker-label">📣 ANNOUNCEMENT</span>
+        <span className="physics-marquee" aria-hidden="true">
+          <span className="physics-marquee-track">
+            <span className="physics-marquee-copy">{MESSAGE}<span className="physics-led-dot"> ◆ </span></span>
+            <span className="physics-marquee-copy">{MESSAGE}<span className="physics-led-dot"> ◆ </span></span>
           </span>
-          <span className="physics-ticker-open">OPEN ↗</span>
-        </Link>
-      )}
+        </span>
+        <span className="physics-ticker-open">OPEN ↗</span>
+      </Link>
 
       {showPopup && (
         <div className="physics-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closePopup(); }}>
