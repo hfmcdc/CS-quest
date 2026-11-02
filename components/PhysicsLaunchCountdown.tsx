@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const LAUNCH_AT = new Date("2026-11-02T18:30:00.000Z").getTime(); // 3 Nov 2026, 12:00 AM IST
+const LAUNCH_AT = new Date("2026-11-03T18:30:00.000Z").getTime(); // 4 Nov 2026, 12:00 AM IST
 const UNITS = [
   { label: "Days", seconds: 86400 },
   { label: "Hours", seconds: 3600 },
@@ -45,7 +45,7 @@ export default function PhysicsLaunchCountdown() {
             );
           })}
         </div>
-        <p className="mt-6 text-sm text-slate-400">3 November 2026 <span className="mx-1 text-slate-600">·</span> 12:00 AM IST</p>
+        <p className="mt-6 text-sm text-slate-400">4 November 2026 <span className="mx-1 text-slate-600">·</span> 12:00 AM IST</p>
       </section>
 
       <aside className="physics-temp-update mt-5 max-w-2xl text-left" aria-label="Temporary update">

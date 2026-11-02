@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const LAUNCH_AT = new Date("2026-11-02T18:30:00.000Z").getTime(); // 3 Nov 2026, 12:00 AM IST
-const MESSAGE = "PHYSICS QUEST  •  LAUNCHING 3 NOVEMBER  •  12:00 AM IST  •  TAP TO SEE COUNTDOWN";
+const LAUNCH_AT = new Date("2026-11-03T18:30:00.000Z").getTime(); // 4 Nov 2026, 12:00 AM IST
+const MESSAGE = "PHYSICS QUEST  •  LAUNCHING 4 NOVEMBER  •  12:00 AM IST  •  TAP TO SEE COUNTDOWN";
 
 export default function PhysicsAnnouncement() {
   const [showPopup, setShowPopup] = useState(false);
@@ -39,7 +39,7 @@ export default function PhysicsAnnouncement() {
             <span className="tile theme-chem h-12 w-12 text-2xl" aria-hidden="true">⚡</span>
             <p className="physics-eyebrow">COMING SOON</p>
             <h2 id="physics-modal-title" className="text-2xl font-semibold text-white sm:text-3xl">Physics Quest is on its way!</h2>
-            <p className="text-sm leading-relaxed text-slate-300">Launching <strong className="text-amber-200">3 November 2026 at 12:00 AM IST</strong>. Tap below for the countdown and latest update.</p>
+            <p className="text-sm leading-relaxed text-slate-300">Launching <strong className="text-amber-200">4 November 2026 at 12:00 AM IST</strong>. Tap below for the countdown and latest update.</p>
             <div className="mt-2 flex flex-wrap gap-3">
               <Link href="/physics" className="btn-primary theme-chem" onClick={closePopup}>See countdown <span aria-hidden="true">→</span></Link>
               <button type="button" className="btn-ghost" onClick={closePopup}>Maybe later</button>
