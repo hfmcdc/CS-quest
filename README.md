@@ -1,6 +1,6 @@
 # CS Quest — CBSE Class XII Computer Science & Maths practice
 
-> ⚠️ **Beta version.** Found a bug? DM me on Instagram: **[@mr.mallu_gg](https://www.instagram.com/mr.mallu_gg/)**
+> ⚠️ **Beta version.** Found a bug? DM me on Instagram: **[@questmc.official](https://www.instagram.com/questmc.official/)**
 
 All questions are now **multiple choice (MCQ)**. ✍️ Write-your-own-program questions are coming soon.
 
