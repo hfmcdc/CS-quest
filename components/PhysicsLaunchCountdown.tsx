@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const LAUNCH_AT = new Date("2026-11-03T18:30:00.000Z").getTime(); // 4 Nov 2026, 12:00 AM IST
+const LAUNCH_AT = new Date("2026-11-04T02:30:00.000Z").getTime(); // 4 Nov 2026, 8:00 AM IST
 const UNITS = [
   { label: "Days", seconds: 86400 },
   { label: "Hours", seconds: 3600 },
@@ -29,7 +29,7 @@ export default function PhysicsLaunchCountdown() {
       <p className="physics-eyebrow">A NEW QUEST IS APPROACHING</p>
       <h1 className="mt-3 text-4xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">Physics Quest</h1>
       <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
-        {launched ? "Launch time is here! We’re putting the finishing touches on Physics Quest." : "Get ready to explore Physics. Your next quest begins soon."}
+        {launched ? "Physics Quest should now be available. Thanks for waiting while we fixed the coding errors." : "Get ready to explore Physics. We’re fixing a few coding errors and will be ready soon."}
       </p>
 
       <section className="physics-countdown-card card mt-9 w-full max-w-2xl p-5 sm:p-8" aria-label="Physics Quest launch countdown">
@@ -45,12 +45,12 @@ export default function PhysicsLaunchCountdown() {
             );
           })}
         </div>
-        <p className="mt-6 text-sm text-slate-400">4 November 2026 <span className="mx-1 text-slate-600">·</span> 12:00 AM IST</p>
+        <p className="mt-6 text-sm text-slate-400">4 November 2026 <span className="mx-1 text-slate-600">·</span> 8:00 AM IST</p>
       </section>
 
       <aside className="physics-temp-update mt-5 max-w-2xl text-left" aria-label="Temporary update">
         <span className="physics-update-dot" aria-hidden="true" />
-        <div><strong className="text-slate-100">Temporary update</strong><p className="mt-1 text-sm leading-relaxed text-slate-400">Physics Quest is being prepared. The countdown will update automatically; check back here for launch details.</p></div>
+        <div><strong className="text-slate-100">Temporary update</strong><p className="mt-1 text-sm leading-relaxed text-slate-400">Live coding was delayed while we fix a few errors. Physics Quest will be available by 8:00 AM IST on 4 November. The countdown updates automatically.</p></div>
       </aside>
 
       <Link href="/" className="btn-ghost mt-7">← Back to subjects</Link>
