@@ -4,7 +4,7 @@ import FirstVisitSplash from "@/components/FirstVisitSplash";
 import AppPrefetcher from "@/components/AppPrefetcher";
 import AppNav from "@/components/AppNav";
 import PhysicsAnnouncement from "@/components/PhysicsAnnouncement";
-import { HALLOWEEN_ENABLED, HALLOWEEN_UNTIL } from "@/lib/seasonal";
+import { HALLOWEEN_ENABLED, HALLOWEEN_END_AT } from "@/lib/seasonal";
 
 export const metadata: Metadata = {
   title: "Quest MC | CBSE Class XII Practice",
@@ -16,9 +16,9 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, view
  *  Client-side navigation never reloads the layout, so moving between screens does not replay it. */
 const SHOW_SPLASH = `document.documentElement.setAttribute("data-splash","1")`;
 
-/** Seasonal theme: applied before first paint, and only while today is on or before HALLOWEEN_UNTIL (browser date). */
+/** Seasonal theme: apply before first paint, then remove it exactly at the India-time cutoff. */
 const SEASON = HALLOWEEN_ENABLED
-  ? `(function(){var d=document.documentElement,e=new Date("${HALLOWEEN_UNTIL}T23:59:59");if(new Date()<=e)d.setAttribute("data-theme","halloween")})()`
+  ? `(function(){var d=document.documentElement,t=Date.parse("${HALLOWEEN_END_AT}"),n=Date.now();if(n<t){d.setAttribute("data-theme","halloween");window.setTimeout(function(){d.removeAttribute("data-theme")},t-n)}})()`
   : "";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
