@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Wordmark from "@/components/Wordmark";
 
 const DURATION = 4500;
 const DURATION_REDUCED = 1800;
@@ -8,7 +9,6 @@ const EXIT_MS = 700;
 const READY_GRACE_MS = 3000; // never hold the splash longer than this waiting for the page to finish loading
 const R = 54;
 const C = 2 * Math.PI * R;
-const WORD = "Quest MC".split("");
 
 /** Cobweb for the top-left corner (mirrored by CSS for the other three). Spokes + sagging rings, built once. */
 const WEB = (() => {
@@ -139,15 +139,9 @@ export default function FirstVisitSplash() {
             <circle className="trk" cx="60" cy="60" r={R} />
             <circle ref={ring} className="prg" cx="60" cy="60" r={R} strokeDasharray={C} strokeDashoffset={C} />
           </svg>
-          <span className="splash-mark mono">{"</>"}</span>
+          <Wordmark className="splash-mark" />
         </div>
 
-        <h1 className="splash-word mono" aria-hidden="true">
-          {WORD.map((ch, i) => (
-            <span key={i} className="splash-letter" style={{ animationDelay: `${0.2 + i * 0.07}s` }}>{ch === " " ? "\u00A0" : ch}</span>
-          ))}
-          <span className="splash-shine" />
-        </h1>
         <p className="splash-tag"><span className="t-normal">CBSE Class XII practice</span><span className="t-spooky">Summoning your questions…</span></p>
         <p className="splash-pct mono" aria-hidden="true"><span ref={pct}>0</span>%</p>
       </div>
