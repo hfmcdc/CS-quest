@@ -58,3 +58,17 @@ Then on vercel.com: **Add New → Project → Import** the repo → framework is
 - **Caching:** `components/AppPrefetcher.tsx` warms subject routes in the background (skipped on data-saver/2G), prefetches on hover or touch, and loads Chemistry chapter content on demand. `public/sw.js` (production only) caches hashed assets, pre-caches the main pages and serves cached pages when the network is slow. In-app screen state is kept by `lib/navState.ts`.
 - **Motion:** all animation is CSS and respects `prefers-reduced-motion`.
 - **Adding a Chemistry chapter:** create `lib/chemistry/chapters/<slug>.ts` and register it in `lib/chemistry/chapters.ts`.
+
+
+## Physics
+
+Physics lives in its own modules and does not touch the other subjects.
+
+- `lib/physics/chapters.ts` is the chapter registry. Routes, the chapter list, static generation and prefetching all read from it.
+- `lib/physics/chapters/<slug>/` holds one chapter's question bank (`cards.ts`, `concepts.ts`, `equations.ts`, `numericals.ts`).
+- `lib/physics/checker.ts` checks typed equations (any equivalent rearrangement is accepted) and numeric answers with units.
+- `components/physics/` has the screens. Routes are `/physics`, `/physics/<chapter>` and `/physics/<chapter>/<feature>`.
+
+**Adding a chapter:** create `lib/physics/chapters/<slug>/index.ts` exporting `content`, then add one entry to `PHYS_CHAPTERS`. Nothing else needs to change.
+
+**Checking the question bank:** `npm run verify:physics` re-solves every numerical answer from its accepted equation, tests the checker with correct and deliberately wrong inputs, and checks that every TeX command is supported by the renderer. Run it after editing any question.

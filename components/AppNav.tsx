@@ -11,6 +11,7 @@ const TABS: { href: string; label: string; icon: IconName; theme: string }[] = [
   { href: "/computer", label: "Computer", icon: "code", theme: "theme-cs" },
   { href: "/maths", label: "Maths", icon: "sigma", theme: "theme-maths" },
   { href: "/chemistry", label: "Chemistry", icon: "flask", theme: "theme-chem" },
+  { href: "/physics", label: "Physics", icon: "magnet", theme: "theme-phys" },
 ];
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(href + "/"));
@@ -40,7 +41,7 @@ export default function AppNav() {
       </header>
 
       <nav aria-label="Subjects" className="tab-bar md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4">
+        <div className="mx-auto grid max-w-md grid-cols-5">
           {TABS.map((t) => {
             const on = isActive(path, t.href);
             return (

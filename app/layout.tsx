@@ -3,12 +3,11 @@ import "./globals.css";
 import FirstVisitSplash from "@/components/FirstVisitSplash";
 import AppPrefetcher from "@/components/AppPrefetcher";
 import AppNav from "@/components/AppNav";
-import PhysicsAnnouncement from "@/components/PhysicsAnnouncement";
 import { HALLOWEEN_ENABLED, HALLOWEEN_END_AT } from "@/lib/seasonal";
 
 export const metadata: Metadata = {
   title: "Quest MC | CBSE Class XII Practice",
-  description: "Choose Computer Science, Maths or Chemistry practice for CBSE Class XII.",
+  description: "Choose Computer Science, Maths, Chemistry or Physics practice for CBSE Class XII.",
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#070812" };
 
@@ -30,7 +29,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <FirstVisitSplash />
         <AppNav />
-        <PhysicsAnnouncement />
         {children}
         <AppPrefetcher />
       </body>

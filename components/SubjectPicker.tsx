@@ -13,7 +13,7 @@ export default function SubjectPicker() {
         <p className="mt-5 text-lg text-slate-400">Pick a subject and start practising.</p>
       </header>
 
-      <div className="stagger grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="stagger grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {SUBJECTS.map((s) => (
           <Link key={s.href} href={s.href} prefetch={false} className={`card card-link ${s.theme} min-h-56 gap-4 p-6`}>
             <span className="tile h-12 w-12"><Icon name={s.icon} size={24} /></span>

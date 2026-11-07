@@ -1,10 +1,11 @@
-import PhysicsLaunchCountdown from "@/components/PhysicsLaunchCountdown";
+import type { Metadata } from "next";
+import PhysicsHome from "@/components/physics/PhysicsHome";
 
-export const metadata = {
-  title: "Physics Quest is Coming Soon | Quest MC",
-  description: "See the countdown and latest temporary update for Physics Quest.",
+export const metadata: Metadata = {
+  title: "Physics | Quest MC",
+  description: "CBSE Class XII Physics: formula flashcards, practice, equation identification and advanced numericals.",
 };
 
-export default function PhysicsLaunchPage() {
-  return <PhysicsLaunchCountdown />;
+export default function PhysicsPage() {
+  return <PhysicsHome />;
 }

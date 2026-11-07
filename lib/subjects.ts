@@ -3,7 +3,7 @@ export interface SubjectMeta {
   id: string;
   href: string;
   glyph: string;
-  icon: "code" | "sigma" | "flask";
+  icon: "code" | "sigma" | "flask" | "magnet";
   theme: string;
   title: string;
   note: string;
@@ -48,6 +48,18 @@ export const SUBJECTS: SubjectMeta[] = [
     cta: "Start practice",
     glyphClass: "text-amber-300",
     hoverClass: "hover:border-amber-300/60",
+  },
+  {
+    id: "physics",
+    href: "/physics",
+    glyph: "⚡",
+    icon: "magnet",
+    theme: "theme-phys",
+    title: "Physics",
+    note: "Moving Charges and Magnetism: formula flashcards, practice and advanced numericals.",
+    cta: "Start practice",
+    glyphClass: "text-violet-300",
+    hoverClass: "hover:border-violet-300/60",
   },
 ];
 

@@ -12,6 +12,8 @@ const SYMBOLS: Record<string, string> = {
   infty: "∞", cdot: "·", times: "×", div: "÷", pm: "±", mp: "∓", le: "≤", leq: "≤", ge: "≥", geq: "≥", ne: "≠", neq: "≠",
   to: "→", rightarrow: "→", Rightarrow: "⇒", Leftrightarrow: "⇔", int: "∫", circ: "°", degree: "°", approx: "≈",
   parallel: "∥", perp: "⊥", ldots: "…", cdots: "⋯", notin: "∉", in: "∈", angle: "∠", therefore: "∴", because: "∵", prime: "′", sum: "Σ",
+  // additions for Physics (additive: these previously rendered as a literal "\\name")
+  tau: "τ", nu: "ν", Omega: "Ω", Delta: "Δ", oint: "∮", propto: "∝", sigma: "σ", rho: "ρ", epsilon: "ε",
 };
 const FUNCS = new Set(["sin", "cos", "tan", "cot", "sec", "csc", "cosec", "log", "ln", "exp", "max", "min", "lim"]);
 const BINARY = new Set(["+", "-", "=", "<", ">", "≤", "≥", "≠", "×", "±", "→", "⇒", "⇔", "≈", "∥", "⊥", "∈", "∉"]);

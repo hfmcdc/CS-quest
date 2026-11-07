@@ -10,7 +10,7 @@ const MAX_PAGES = 20;
 const MAX_STATIC = 120;
 
 // Pages worth having offline / instantly on a cold start. Best effort: a failure never blocks installation.
-const SHELL = ["/", "/computer", "/maths", "/chemistry", "/chemistry/d-and-f-block-elements"];
+const SHELL = ["/", "/computer", "/maths", "/chemistry", "/chemistry/d-and-f-block-elements", "/physics", "/physics/moving-charges-and-magnetism"];
 self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open(PAGES)

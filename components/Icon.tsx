@@ -19,6 +19,7 @@ const PATHS = {
   sound: "M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
   mute: "M11 5 6 9H3v6h3l5 4zM22 9l-6 6M16 9l6 6",
   spark: "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z",
+  magnet: "M5 3h4v8a3 3 0 0 0 6 0V3h4v8a7 7 0 0 1-14 0zM5 7h4M15 7h4",
 } as const;
 
 export type IconName = keyof typeof PATHS;

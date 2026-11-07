@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { SUBJECT_ROUTES } from "@/lib/subjects";
 import { CHEM_CHAPTERS, chemChapterHref, loadChemContent } from "@/lib/chemistry/chapters";
+import { PHYS_CHAPTERS, physChapterHref, loadPhysContent } from "@/lib/physics/chapters";
 
 type Conn = { saveData?: boolean; effectiveType?: string };
 const idle = (fn: () => void, timeout = 2500) => {
@@ -34,7 +35,7 @@ export default function AppPrefetcher() {
     const c = (navigator as Navigator & { connection?: Conn }).connection;
     if (c?.saveData || /(^|-)2g$/.test(c?.effectiveType ?? "")) return;
     const fast = !/3g/.test(c?.effectiveType ?? "");
-    const queue = [...SUBJECT_ROUTES.filter((r) => r !== path), ...(fast ? CHEM_CHAPTERS.map((ch) => chemChapterHref(ch.slug)) : [])];
+    const queue = [...SUBJECT_ROUTES.filter((r) => r !== path), ...(fast ? [...CHEM_CHAPTERS.map((ch) => chemChapterHref(ch.slug)), ...PHYS_CHAPTERS.map((ch) => physChapterHref(ch.slug))] : [])];
     let cancelled = false;
     const next = () => {
       const href = queue.shift();
@@ -53,11 +54,14 @@ export default function AppPrefetcher() {
     const c = (navigator as Navigator & { connection?: Conn }).connection;
     const saver = !!c?.saveData;
     if (path === "/chemistry" && !saver) idle(() => CHEM_CHAPTERS.forEach((ch) => loadChemContent(ch.slug).catch(() => {})));
+    if (path === "/physics" && !saver) idle(() => PHYS_CHAPTERS.forEach((ch) => loadPhysContent(ch.slug).catch(() => {})));
     const onIntent = (e: Event) => {
       const a = (e.target as Element | null)?.closest?.("a[href^='/']") as HTMLAnchorElement | null;
       const href = a?.getAttribute("href");
       if (!href) return;
       if (href === "/" || SUBJECT_ROUTES.includes(href)) { try { router.prefetch(href); } catch { /* ignore */ } return; }
+      const pm = /^\/physics\/([^/?#]+)/.exec(href);
+      if (pm && PHYS_CHAPTERS.some((ch) => ch.slug === pm[1])) { try { router.prefetch(href); } catch { /* ignore */ } loadPhysContent(pm[1]).catch(() => {}); return; }
       const m = /^\/chemistry\/([^/?#]+)/.exec(href);
       if (m && CHEM_CHAPTERS.some((ch) => ch.slug === m[1])) { try { router.prefetch(href); } catch { /* ignore */ } loadChemContent(m[1]).catch(() => {}); }
     };
