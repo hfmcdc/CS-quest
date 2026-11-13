@@ -6,8 +6,8 @@ import AppNav from "@/components/AppNav";
 import { HALLOWEEN_ENABLED, HALLOWEEN_END_AT } from "@/lib/seasonal";
 
 export const metadata: Metadata = {
-  title: "Quest MC | CBSE Class XII Practice",
-  description: "Choose Computer Science, Maths, Chemistry or Physics practice for CBSE Class XII.",
+  title: "Quest MC | Computer Science Practice",
+  description: "Computer Science practice for CBSE Class XII: Binary Files, CSV, MySQL and Python–SQL.",
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#070812" };
 

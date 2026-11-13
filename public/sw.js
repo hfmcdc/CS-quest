@@ -3,14 +3,14 @@
  *  - page navigations                            -> network-first (2.5 s), cached copy if slow/offline; main pages are pre-cached on install
  *  - other same-origin static files              -> stale-while-revalidate
  * Next.js RSC/prefetch requests are left to the network + Next's own router cache. */
-const VERSION = "qmc-v2";
+const VERSION = "qmc-v3";
 const STATIC = `${VERSION}-static`;
 const PAGES = `${VERSION}-pages`;
 const MAX_PAGES = 20;
 const MAX_STATIC = 120;
 
 // Pages worth having offline / instantly on a cold start. Best effort: a failure never blocks installation.
-const SHELL = ["/", "/computer", "/maths", "/chemistry", "/chemistry/d-and-f-block-elements", "/physics", "/physics/moving-charges-and-magnetism"];
+const SHELL = ["/"];
 self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open(PAGES)

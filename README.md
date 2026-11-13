@@ -1,25 +1,14 @@
-# CS Quest — CBSE Class XII Computer Science & Maths practice
+# CS Quest — CBSE Class XII Computer Science practice
 
 > ⚠️ **Beta version.** Found a bug? DM me on Instagram: **[@questmc.official](https://www.instagram.com/questmc.official/)**
 
 All questions are now **multiple choice (MCQ)**. ✍️ Write-your-own-program questions are coming soon.
 
 Next.js 14 + TypeScript + Tailwind CSS. No backend, no database, no storage: refreshing the page resets everything.
-Syllabus: Binary Files, CSV Files, MySQL table questions, Python–SQL interface.
+Syllabus: Binary Files, CSV Files, MySQL table questions, Python–SQL interface. **Viva** and **Practical** sections are coming soon. The site is Computer Science only for now.
 
 ## Flashcards
 A **Flashcards** option on the dashboard offers revision decks for **Theory** and **Commands** across all topics (`lib/flashcards.ts`). Flip a card, mark *Got it* / *Review again*, and re-study the missed ones. Add cards with the `ft/fc/st/sc/pt/pc` helpers.
-
-## Maths Quest
-Choose **Maths** from the home page to open Class XII practice for the Second Mid-Term portions: Inverse Trigonometric Functions, Vector Algebra, Three-Dimensional Geometry, Applications of Derivatives (**maxima and minima only**) and Integrals (**up to Exercise 7.4**). Each topic has four modes: **Quick Revision**, **Learn with Examples**, **Practice** (adaptive) and **Challenge**, plus **Maths Flashcards** (111 cards of formulas, conditions and principal values; `lib/maths/flashcards.ts`). Computer Science is available at `/computer`; Maths is available at `/maths`.
-
-- Code lives in `lib/maths/` and `components/maths/`; the subject picker is in `components/SubjectPicker.tsx`.
-- Maths is shown with a small built-in renderer (`components/maths/MathText.tsx`), so **no new dependency** was added. Write maths in questions as `$inline$` or `$$display$$` LaTeX.
-- Answers are checked by `lib/maths/checker.ts` using a safe expression parser (no `eval`): numbers, `pi`, `sqrt()`, vectors (`2i-3j+k`), direction ratios, and expressions in x. Equivalent forms are accepted and integrals are compared up to the constant `+C`. If an answer cannot be read or compared reliably it is **never marked wrong**: the model answer is shown for self-comparison.
-- Adaptive practice (temporary, in memory only): correct → harder; wrong → hint and one retry; wrong again → worked solution and easier; unsure → model answer, difficulty unchanged. There is no score, streak or saved progress.
-- Add a question in `lib/maths/questions.ts` (`ig(...)`, `vc(...)` etc.) with a model answer, steps and hint. **Verify the answer independently before adding it**, then run `npm run verify:maths`.
-- `npm run verify:maths` runs the content, renderer, checker, generator and adaptive-flow self-checks (it fetches `tsx` with `npx`; nothing is added to `package.json` dependencies).
-- Scope note: coverage follows standard NCERT/CBSE topics for these chapters. Questions are original practice questions, **not** copied from textbook exercises, and are not claimed to match specific exercise numbers.
 
 ## Prerequisites
 Node.js 18.18+ (or 20+), npm, Git, a GitHub account and a Vercel account.
@@ -46,29 +35,9 @@ Then on vercel.com: **Add New → Project → Import** the repo → framework is
 - Every question is MCQ, so the answer is an exact match against the answer key. Nothing is executed.
 - The bank is small (29 questions) and does not cover every possible exam question. Add questions in `lib/questions.ts` using the `f(...)` / `s(...)` / `p(...)` helpers: give 4 options and the index (0-3) of the correct one.
 
-## Chemistry
-**Chemistry** is a third subject (`/chemistry`). Chapter 1, **D- and F-Block Elements**, has four modes: Quick Revision, Flashcards (46 cards), Practice (45 adaptive MCQs) and Challenge (20 conceptual and assertion–reason questions).
-- Chapters are registered in `lib/chemistry/chapters.ts`; each chapter's content (notes, cards, questions) lives in `lib/chemistry/chapters/<slug>.ts` and is loaded on demand.
-- Chemical formulas use Unicode subscripts/superscripts, so no renderer is needed.
-
 ## Design system and performance
-- **Look:** premium dark theme. Tokens and shared classes (`.card`, `.btn-primary`, `.btn-ghost`, `.chip`, `.tile`, `.stagger`, `.page-enter`) live in `app/globals.css`; the `slate` palette is remapped in `tailwind.config.ts`, so the whole app re-skins from one place. Each subject sets an accent with `theme-cs`, `theme-maths` or `theme-chem` (an RGB triplet in `--ac`). Shared pieces: `components/ui.tsx`, `Icon.tsx`, `ModeTabs.tsx`, `Collapsible.tsx`, `AppNav.tsx`.
-- **Navigation:** a persistent top bar (desktop) and tab bar (phones) in the root layout, so switching subject never remounts the chrome. `app/template.tsx` adds the route transition.
+- **Look:** premium dark theme. Tokens and shared classes (`.card`, `.btn-primary`, `.btn-ghost`, `.chip`, `.tile`, `.stagger`, `.page-enter`) live in `app/globals.css`; the `slate` palette is remapped in `tailwind.config.ts`, so the whole app re-skins from one place. The accent is set by `theme-cs` (an RGB triplet in `--ac`). Shared pieces: `components/ui.tsx`, `Icon.tsx`, `AppNav.tsx`.
+- **Navigation:** a persistent top bar (logo and sound toggle) in the root layout. `app/template.tsx` adds the route transition.
 - **Splash:** shown on every full page load (open and refresh), never during in-app navigation (`components/FirstVisitSplash.tsx`). It runs about 4.5 s and waits for `window.load` before fading out. Halloween adds cobwebs and spiders until the date in `lib/seasonal.ts`.
-- **Caching:** `components/AppPrefetcher.tsx` warms subject routes in the background (skipped on data-saver/2G), prefetches on hover or touch, and loads Chemistry chapter content on demand. `public/sw.js` (production only) caches hashed assets, pre-caches the main pages and serves cached pages when the network is slow. In-app screen state is kept by `lib/navState.ts`.
+- **Caching:** `components/AppPrefetcher.tsx` registers the service worker. `public/sw.js` (production only) caches hashed assets, pre-caches the main pages and serves cached pages when the network is slow. In-app screen state is kept by `lib/navState.ts`.
 - **Motion:** all animation is CSS and respects `prefers-reduced-motion`.
-- **Adding a Chemistry chapter:** create `lib/chemistry/chapters/<slug>.ts` and register it in `lib/chemistry/chapters.ts`.
-
-
-## Physics
-
-Physics lives in its own modules and does not touch the other subjects.
-
-- `lib/physics/chapters.ts` is the chapter registry. Routes, the chapter list, static generation and prefetching all read from it.
-- `lib/physics/chapters/<slug>/` holds one chapter's question bank (`cards.ts`, `concepts.ts`, `equations.ts`, `numericals.ts`).
-- `lib/physics/checker.ts` checks typed equations (any equivalent rearrangement is accepted) and numeric answers with units.
-- `components/physics/` has the screens. Routes are `/physics`, `/physics/<chapter>` and `/physics/<chapter>/<feature>`.
-
-**Adding a chapter:** create `lib/physics/chapters/<slug>/index.ts` exporting `content`, then add one entry to `PHYS_CHAPTERS`. Nothing else needs to change.
-
-**Checking the question bank:** `npm run verify:physics` re-solves every numerical answer from its accepted equation, tests the checker with correct and deliberately wrong inputs, and checks that every TeX command is supported by the renderer. Run it after editing any question.
