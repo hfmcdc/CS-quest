@@ -1,5 +1,5 @@
-export const IG_HANDLE = "questmc.official";
-export const IG_URL = "https://www.instagram.com/questmc.official/";
+export const IG_HANDLE = "mr.mallu_gg";
+export const IG_URL = "https://www.instagram.com/mr.mallu_gg/";
 
 /** Small beta notice shown at the top of every screen. */
 export default function BetaBanner() {
