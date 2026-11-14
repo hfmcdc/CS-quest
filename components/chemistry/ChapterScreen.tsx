@@ -2,23 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { cachedChemContent, chemChapter, loadChemContent } from "@/lib/chemistry/chapters";
-import type { ChemChapterContent } from "@/lib/chemistry/types";
+import type { ChemChapterContent, ChemFeature } from "@/lib/chemistry/types";
 import { readNav, writeNav } from "@/lib/navState";
 import ChemNotes from "@/components/chemistry/ChemNotes";
 import ChemPractice from "@/components/chemistry/ChemPractice";
 import ChemFlashcards from "@/components/chemistry/ChemFlashcards";
+import ChemConcept from "@/components/chemistry/ChemConcept";
+import ChemNumerical from "@/components/chemistry/ChemNumerical";
 import ModeTabs from "@/components/ModeTabs";
 import BetaBanner from "@/components/BetaBanner";
 import { BackLink } from "@/components/ui";
 import type { IconName } from "@/components/Icon";
 
-type Mode = "revise" | "cards" | "practice" | "challenge";
-const MODES: { id: Mode; label: string; icon: IconName; blurb: string }[] = [
-  { id: "revise", label: "Quick Revision", icon: "book", blurb: "Key ideas, reactions and common mistakes" },
-  { id: "cards", label: "Flashcards", icon: "cards", blurb: "Flip cards for definitions, reasons and reactions" },
-  { id: "practice", label: "Practice", icon: "target", blurb: "Adaptive MCQs with a hint and one retry" },
-  { id: "challenge", label: "Challenge", icon: "flame", blurb: "Harder conceptual and assertion–reason questions" },
-];
+type Mode = ChemFeature;
+const ALL_MODES: Record<ChemFeature, { label: string; icon: IconName; blurb: string }> = {
+  revise: { label: "Revise", icon: "book", blurb: "Key ideas, reactions and common mistakes" },
+  cards: { label: "Flashcards", icon: "cards", blurb: "Flip cards for formulas, definitions and reactions" },
+  concept: { label: "Concept", icon: "bulb", blurb: "Short-answer questions with a hint and one retry" },
+  numerical: { label: "Numericals", icon: "sigma", blurb: "Pick the equation, then calculate with units" },
+  practice: { label: "MCQ", icon: "target", blurb: "Adaptive multiple choice with a hint and one retry" },
+  predict: { label: "Predict", icon: "flask", blurb: "Predict what happens, with step-by-step reasoning" },
+  challenge: { label: "Challenge", icon: "flame", blurb: "Harder conceptual and assertion–reason questions" },
+};
 
 function Skeleton() {
   return (
@@ -31,7 +36,8 @@ function Skeleton() {
 export default function ChapterScreen({ slug }: { slug: string }) {
   const meta = chemChapter(slug)!;
   const modeKey = `chem:mode:${slug}`;
-  const [mode, setModeState] = useState<Mode>(() => readNav<Mode>(modeKey, "revise"));
+  const MODES = meta.features.map((id) => ({ id, ...ALL_MODES[id] }));
+  const [mode, setModeState] = useState<Mode>(() => { const m = readNav<Mode>(modeKey, meta.features[0]); return meta.features.includes(m) ? m : meta.features[0]; });
   // Synchronous cache hit means no spinner when returning to a chapter that was already opened or prefetched.
   const [content, setContent] = useState<ChemChapterContent | undefined>(() => cachedChemContent(slug));
   const [failed, setFailed] = useState(false);
@@ -69,6 +75,9 @@ export default function ChapterScreen({ slug }: { slug: string }) {
         {content && mode === "cards" && <ChemFlashcards chapterKey={slug} cards={content.cards} />}
         {content && mode === "challenge" && <ChemPractice chapterKey={slug} bank={content.challenge} title={meta.short} challenge />}
         {content && mode === "practice" && <ChemPractice chapterKey={slug} bank={content.questions} title={meta.short} />}
+        {content && mode === "concept" && content.concept && <ChemConcept chapterKey={slug} bank={content.concept} title={meta.short} />}
+        {content && mode === "numerical" && content.numerical && <ChemNumerical chapterKey={slug} bank={content.numerical} title={meta.short} />}
+        {content && mode === "predict" && content.predict && <ChemPractice chapterKey={slug} bank={content.predict} title={meta.short} predict />}
       </div>
     </main>
     </>

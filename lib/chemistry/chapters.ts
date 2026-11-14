@@ -2,19 +2,35 @@ import type { ChemChapterContent, ChemChapterMeta } from "./types";
 
 /**
  * Chemistry chapter registry.
- * To add a chapter: create lib/chemistry/chapters/<slug>.ts exporting `content`,
- * then add one entry here. Routes, the chapter list, static generation and
+ * Chapters are listed in syllabus order. A chapter is added only when its content is complete: no placeholders.
+ * To add one: create lib/chemistry/chapters/<slug>.ts exporting `content`, add one entry here, run `npm run verify:chemistry`. Routes, the chapter list, static generation and
  * prefetching all pick it up automatically.
  */
 export const CHEM_CHAPTERS: ChemChapterMeta[] = [
   {
+    slug: "chemical-kinetics",
+    number: 3,
+    title: "Chemical Kinetics",
+    short: "Kinetics",
+    icon: "⏱",
+    desc: "Rate of reaction, rate law, order and molecularity, zero- and first-order integrated equations, the Arrhenius equation and collision theory.",
+    topics: ["Rate of reaction", "Rate law & order", "Integrated rate equations", "Arrhenius equation", "Collision theory"],
+    branch: "physical",
+    marks: 7,
+    features: ["revise", "cards", "concept", "numerical", "practice", "predict", "challenge"],
+    load: () => import("./chapters/chemical-kinetics").then((m) => m.content),
+  },
+  {
     slug: "d-and-f-block-elements",
-    number: 1,
+    number: 4,
     title: "D- and F-Block Elements",
     short: "D & F Block",
     icon: "🧪",
     desc: "Revision notes, flashcards, MCQ practice and conceptual challenge questions on transition metals, K₂Cr₂O₇, KMnO₄, lanthanoids and actinoids.",
     topics: ["Transition elements", "Properties", "K₂Cr₂O₇ & KMnO₄", "Lanthanoids", "Actinoids"],
+    branch: "inorganic",
+    marks: 7,
+    features: ["revise", "cards", "practice", "challenge"],
     load: () => import("./chapters/d-and-f-block").then((m) => m.content),
   },
 ];

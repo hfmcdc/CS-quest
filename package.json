@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "verify:maths": "npx --yes tsx scripts/verify-maths.ts",
-    "verify:physics": "npx --yes tsx scripts/verify-physics.ts"
+    "verify:physics": "npx --yes tsx scripts/verify-physics.ts",
+    "verify:chemistry": "npx --yes tsx scripts/verify-chemistry.ts"
   },
   "dependencies": {
     "next": "14.2.15",

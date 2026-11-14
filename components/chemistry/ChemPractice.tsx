@@ -37,8 +37,8 @@ function pick(bank: ChemQuestion[], diff: number, seen: string[]) {
   return { q, seen: fresh.length ? [...seen, q.id] : [q.id], restarted: !fresh.length && seen.length > 0 };
 }
 
-export default function ChemPractice({ chapterKey, bank, title, challenge = false }: { chapterKey: string; bank: ChemQuestion[]; title: string; challenge?: boolean }) {
-  const navKey = `chem:${challenge ? "challenge" : "practice"}:${chapterKey}`;
+export default function ChemPractice({ chapterKey, bank, title, challenge = false, predict = false }: { chapterKey: string; bank: ChemQuestion[]; title: string; challenge?: boolean; predict?: boolean }) {
+  const navKey = `chem:${predict ? "predict" : challenge ? "challenge" : "practice"}:${chapterKey}`;
   // Resume exactly where the student left off if they navigated away and came back.
   const [s, setS] = useState<PState>(() => readNav<PState>(navKey, INITIAL));
   const ref = useRef(s);
@@ -86,7 +86,7 @@ export default function ChemPractice({ chapterKey, bank, title, challenge = fals
   return (
     <div>
       {challenge ? (
-        <p className="mb-4 flex items-center justify-end gap-2 text-sm text-[rgb(var(--ac))]"><Icon name="flame" size={16} />Challenge · conceptual</p>
+        <p className="mb-4 flex items-center justify-end gap-2 text-sm text-[rgb(var(--ac))]"><Icon name="flame" size={16} />Challenge · conceptual and assertion–reason</p>
       ) : (
         <div className="mb-4 flex justify-end"><DifficultyMeter level={diff} /></div>
       )}
@@ -127,6 +127,7 @@ export default function ChemPractice({ chapterKey, bank, title, challenge = fals
               <pre className={`${box} mb-3 font-sans`}>{q.answer}</pre>
               <p className="mb-1 text-slate-400">Explanation</p>
               <p className="mb-3 leading-relaxed">{q.why}</p>
+              {q.steps && q.steps.length > 0 && (<><p className="mb-1 text-slate-400">Step by step</p><ol className="mb-3 list-decimal space-y-1 pl-5 leading-relaxed">{q.steps.map((st, k) => <li key={k}>{st}</li>)}</ol></>)}
               {change && <p className="text-xs text-[rgb(var(--ac))]">{change}</p>}
             </div>
           )}

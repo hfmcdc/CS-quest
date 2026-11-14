@@ -11,7 +11,7 @@ export default function ChemistryHome() {
     <BetaBanner />
     <main className="theme-chem mx-auto max-w-5xl px-4 py-8 sm:py-12">
       <div className="mb-8"><BackLink href="/">Home</BackLink></div>
-      <PageHeader title="Chemistry" icon={<Icon name="flask" size={24} />}>CBSE Class XII. Pick a chapter, revise the key ideas, then practise with MCQs.</PageHeader>
+      <PageHeader title="Chemistry" icon={<Icon name="flask" size={24} />}>CBSE Class XII (2026–27 syllabus). Pick a chapter, revise, then practise.</PageHeader>
       <section className="stagger grid gap-4 md:grid-cols-2" aria-label="Chemistry chapters">
         {CHEM_CHAPTERS.map((c) => (
           <Link key={c.slug} href={chemChapterHref(c.slug)} className="card card-link gap-4 p-6">
@@ -26,11 +26,12 @@ export default function ChemistryHome() {
             <ul className="flex flex-wrap gap-2" aria-label="Topics covered">
               {c.topics.map((t) => <li key={t} className="chip">{t}</li>)}
             </ul>
+            <p className="text-xs text-slate-500">{c.features.length} learning modes · {c.marks} marks in the CBSE 2026–27 theory paper</p>
             <span className="mt-auto flex items-center gap-2 pt-1 text-sm font-medium text-[rgb(var(--ac))]">Open chapter<Icon name="forward" size={16} /></span>
           </Link>
         ))}
       </section>
-      <p className="mt-10 text-center text-xs text-slate-500">More chapters are coming. Questions are written for practice and follow the CBSE Class XII syllabus. Nothing is saved.</p>
+      <p className="mt-10 text-center text-xs text-slate-500">Chapters are added only when their questions have been checked, so the list is still growing. Practicals are not covered. Nothing is saved.</p>
     </main>
     </>
   );
