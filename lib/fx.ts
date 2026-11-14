@@ -5,6 +5,8 @@
  * - During the Halloween theme the confetti is pumpkins, bats, ghosts and sweets.
  * Every function is safe to call anywhere; failures are swallowed so an effect can never break a quiz.
  */
+import { musicReact } from "@/lib/music";
+
 const SOUND_KEY = "qmc:sound";
 export type Sfx = "correct" | "wrong" | "done" | "tap";
 
@@ -33,7 +35,9 @@ function tone(freq: number, at: number, dur: number, type: OscillatorType, vol: 
 }
 
 export function playSound(kind: Sfx): void {
-  if (typeof window === "undefined" || !soundOn()) return;
+  if (typeof window === "undefined") return;
+  if (kind !== "tap") musicReact(kind); // the background music follows how the learner is doing (works even if effects are muted)
+  if (!soundOn()) return;
   try {
     const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AC) return;

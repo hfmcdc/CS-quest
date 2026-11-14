@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Icon, { type IconName } from "@/components/Icon";
 import Wordmark from "@/components/Wordmark";
 import SoundToggle from "@/components/SoundToggle";
+import MusicToggle from "@/components/MusicToggle";
+import { moodForPath, setMusicMood } from "@/lib/music";
 import CardSpotlight from "@/components/physics/CardSpotlight";
 import "@/app/physics.css"; // Physics styles (all selectors are namespaced, nothing here affects other subjects)
 
@@ -22,6 +25,7 @@ const isActive = (path: string, href: string) => (href === "/" ? path === "/" : 
  *  It lives in the root layout, so it never remounts while moving between subjects; <Link> prefetches each tab. */
 export default function AppNav() {
   const path = usePathname() || "/";
+  useEffect(() => { setMusicMood(moodForPath(path)); }, [path]); // each subject gets its own music
   return (
     <>
       <CardSpotlight />
@@ -39,7 +43,10 @@ export default function AppNav() {
               );
             })}
           </nav>
-          <SoundToggle />
+          <div className="flex items-center">
+            <MusicToggle />
+            <SoundToggle />
+          </div>
         </div>
       </header>
 
