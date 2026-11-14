@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { musicOn, setMusic } from "@/lib/music";
 
-/** Start / stop the calm background music. Off by default; the choice is remembered, and it
- *  resumes on the visitor's next tap anywhere (browsers only allow audio after a tap). */
+/** Start / stop the calm background music. On by default; the choice is remembered, and it
+ *  starts on the visitor's first tap anywhere (browsers only allow audio after a tap). */
 export default function MusicToggle() {
-  const [on, setOn] = useState(false);
+  const [on, setOn] = useState(true);
   useEffect(() => {
     const sync = () => setOn(musicOn());
     sync();

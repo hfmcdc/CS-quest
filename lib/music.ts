@@ -16,7 +16,7 @@
  */
 const MUSIC_KEY = "qmc:music";
 const LOOKAHEAD = 0.15;   // seconds scheduled ahead
-const MASTER = 0.5;       // overall loudness (sound effects stay on top)
+const MASTER = 0.6;       // slightly louder; sound effects stay on top
 const BASE_ENERGY = 0.15; // where energy settles when nothing is happening
 
 export type Mood = "home" | "computer" | "maths" | "chemistry" | "physics";
@@ -101,7 +101,10 @@ export function moodForPath(path: string): Mood {
 }
 
 export function musicOn(): boolean {
-  try { return localStorage.getItem(MUSIC_KEY) === "1"; } catch { return false; }
+  try {
+    const saved = localStorage.getItem(MUSIC_KEY);
+    return saved === null || saved === "1";
+  } catch { return true; }
 }
 function remember(on: boolean) {
   try { localStorage.setItem(MUSIC_KEY, on ? "1" : "0"); } catch { /* ignore */ }
