@@ -104,15 +104,15 @@ function checkChapter(slug: string, c: ChemChapterContent, features: string[]) {
 
   for (const s of c.concept ?? []) {
     if (ids.has(s.id)) bad(`duplicate id ${s.id}`); ids.add(s.id);
-    const r = matchConcept(s.model, s.groups);
+    const r = matchConcept(s.model, s.groups, s.reject);
     if (r.status !== "correct") bad(`${s.id}: the model answer does not satisfy its own matcher (${r.matched}/${r.total})`);
-    if (matchConcept("I do not know", s.groups).status === "correct") bad(`${s.id}: matcher accepts an empty answer`);
+    if (matchConcept("I do not know", s.groups, s.reject).status === "correct") bad(`${s.id}: matcher accepts an empty answer`);
   }
 
   for (const s of c.equations ?? []) {
     if (ids.has(s.id)) bad(`duplicate id ${s.id}`); ids.add(s.id);
-    if (matchConcept(s.model, s.groups).status !== "correct") bad(`${s.id}: the model answer does not satisfy its own matcher`);
-    if (matchConcept("I do not know", s.groups).status === "correct") bad(`${s.id}: matcher accepts an empty answer`);
+    if (matchConcept(s.model, s.groups, s.reject).status !== "correct") bad(`${s.id}: the model answer does not satisfy its own matcher`);
+    if (matchConcept("I do not know", s.groups, s.reject).status === "correct") bad(`${s.id}: matcher accepts an empty answer`);
     checkBalance(s.id, s.balance);
   }
   for (const r of c.reactions ?? []) {
@@ -158,6 +158,31 @@ console.log("Chemistry content checks");
     if (got.status !== want) bad(`${id} "${input}" -> ${got.status} (wanted ${want}): ${got.message}`);
   }
   console.log(`  ${cases.length} spellings checked`);
+
+  console.log("\ntyped-answer matcher: accepted and rejected wordings");
+  const bank = new Map<string, import("../lib/chemistry/types").ChemConceptQ>();
+  for (const m of CHEM_CHAPTERS) { const c = await m.load(); for (const x of [...(c.concept ?? []), ...(c.equations ?? [])]) bank.set(x.id, x); }
+  const M: [string, string, boolean][] = [
+    ["ap-e2", "ethene", true], ["ap-e2", "CH2=CH2", true], ["ap-e2", "C2H4", true], ["ap-e2", "C2H4O", false], ["ap-e2", "ethanol", false], ["ap-e2", "ethane", false],
+    ["ha-e1", "chloroethane", true], ["ha-e1", "CH3CH2Cl", true], ["ha-e1", "CH 3 CH 2 Cl", true], ["ha-e1", "CH3CH2OH", false], ["ha-e1", "dichloroethane", false], ["ha-e8", "2-bromopropane", true], ["ha-e8", "1-bromopropane", false], ["ap-e8", "propan-2-ol", true], ["ap-e8", "2-propanol", true], ["ap-e8", "propan-1-ol", false],
+    ["ha-e7", "ethyl isocyanide", true], ["ha-e7", "ethyl cyanide", false], ["ha-e7", "CH3CH2CN", false],
+    ["ak-e1", "acetaldehyde", true], ["ak-e1", "CH3CHO", true], ["ak-e1", "ethanoic acid", false], ["ak-e1", "CH3COOH", false],
+    ["ak-e9", "methane", true], ["ak-e9", "CH4", true], ["ak-e9", "ethane", false],
+    ["am-e3", "methanamine", true], ["am-e3", "CH3NH2", true], ["am-e3", "ethanamine", false], ["am-e3", "CH3CH2NH2", false],
+    ["am-e10", "ethanol", true], ["am-e10", "ethylamine", false],
+    ["kn-s5", "s^-1", true], ["kn-s5", "per second", true], ["kn-s5", "mol L^-1 s^-1", false], ["kn-s5", "L mol^-1 s^-1", false],
+    ["kn-s6", "straight line of [R] against t with slope -k", true], ["kn-s6", "a straight line", false],
+    ["ak-s7", "formaldehyde has no alpha hydrogen", true], ["ak-s7", "no", false],
+    ["ap-s1", "phenoxide ion is stabilised by resonance", true], ["ap-s1", "phenol has an OH group", false],
+    ["am-s1", "alkyl groups have +I effect and increase electron density on N", true], ["am-s1", "they are bigger", false],
+  ];
+  for (const [id, input, want] of M) {
+    const x = bank.get(id);
+    if (!x) { bad(`matcher test: unknown id ${id}`); continue; }
+    const got = matchConcept(input, x.groups, x.reject).status === "correct";
+    if (got !== want) bad(`${id} "${input}" -> ${got ? "accepted" : "rejected"} (wanted ${want ? "accepted" : "rejected"})`);
+  }
+  console.log(`  ${M.length} wordings checked`);
   // mmHg must not be misread
   const mm = normaliseUnit("mmHg");
   if (mm.text !== "Pa" || !near(mm.scale, 133.322368, 1e-6)) bad("mmHg normalisation");

@@ -33,6 +33,8 @@ export interface ChemConceptQ {
   groups: string[][];
   model: string;
   hint: string;
+  /** Wordings that make an answer wrong even when the keywords match (e.g. a second-order unit offered for a first-order question). */
+  reject?: string[];
   balance?: string[];
 }
 

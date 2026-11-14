@@ -28,7 +28,7 @@ export default function ChemConcept({ chapterKey, bank, title, variant = "concep
 
   const submit = () => {
     if (!s.input.trim()) return;
-    const r = matchConcept(s.input, q.groups);
+    const r = matchConcept(s.input, q.groups, q.reject);
     if (r.status === "correct") { upd({ ok: true, phase: "done", note: "" }); celebrate(); return; }
     const note = r.status === "partial" ? "You have part of it, but an important idea is missing." : "That does not match what I was looking for.";
     if (s.phase === "ask") { upd({ phase: "retry", hint: true, note }); playSound("wrong"); }
