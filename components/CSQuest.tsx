@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { readNav, writeNav } from "@/lib/navState";
 import { BANK, MODE_LABEL, TOPICS } from "@/lib/questions";
 import { evaluate } from "@/lib/checker";
@@ -8,7 +9,7 @@ import type { Outcome, Question, Topic } from "@/lib/types";
 import Flashcards from "@/components/Flashcards";
 import Icon from "@/components/Icon";
 import { celebrate, playSound } from "@/lib/fx";
-import BetaBanner, { IG_HANDLE, IG_URL } from "@/components/BetaBanner";
+import BetaBanner, { IG_URL } from "@/components/BetaBanner";
 import { BackLink, DifficultyMeter, PageHeader } from "@/components/ui";
 
 
@@ -18,7 +19,7 @@ function Instagram() {
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         <rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
       </svg>
-      @{IG_HANDLE}
+      @questmc.official
     </a>
   );
 }
@@ -194,19 +195,7 @@ export default function CSQuest() {
           <Icon name="forward" size={18} className="text-slate-500" />
         </button>
       </section>
-      <section className="a-rise mt-4 grid gap-4 sm:grid-cols-2" style={{ animationDelay: ".4s" }} aria-label="Coming soon">
-        {[{ t: "Viva", d: "Oral exam questions and answers." }, { t: "Practical", d: "Practical file programs and record help." }].map((x) => (
-          <div key={x.t} className="card flex-row items-center gap-4 p-5 opacity-80" aria-disabled="true">
-            <span className="tile"><Icon name="code" size={22} /></span>
-            <span className="flex-1">
-              <span className="block text-lg font-semibold text-white">{x.t}</span>
-              <span className="block text-sm text-slate-400">{x.d}</span>
-            </span>
-            <span className="chip">Coming soon</span>
-          </div>
-        ))}
-      </section>
-      <footer className="mt-14 flex flex-col items-center gap-3"><ComingSoon /><Instagram /></footer>
+      <footer className="mt-14 flex flex-col items-center gap-3"><ComingSoon /><Link href="/" className="text-sm text-slate-400 underline decoration-white/20 underline-offset-2 hover:text-cyan-300">Switch subject</Link><Instagram /></footer>
     </main>
     </>
   );

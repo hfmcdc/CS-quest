@@ -1,7 +1,7 @@
 export const IG_HANDLE = "mr.mallu_gg";
 export const IG_URL = "https://www.instagram.com/mr.mallu_gg/";
 
-/** Small beta notice shown at the top of every screen. */
+/** Small beta notice shown at the top of every subject. */
 export default function BetaBanner() {
   return (
     <div role="note" className="px-4 py-2 text-center text-xs text-slate-500">
