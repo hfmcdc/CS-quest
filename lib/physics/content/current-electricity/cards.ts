@@ -1,0 +1,46 @@
+import { card, ids } from "../../builders";
+import type { FlashcardsContent } from "../../types";
+
+const id = ids("c03");
+
+export const content: FlashcardsContent = {
+  cards: [
+    card(id("f"), "Current", "Definition of electric current", "I = \\dfrac{dQ}{dt}",
+      [["I", "current", "A (= C s⁻¹)"], ["Q", "charge crossing a section", "C"], ["t", "time", "s"]], "For a steady current, I = Q/t."),
+    card(id("f"), "Drift velocity", "Drift velocity of electrons in a field E", "v_d = \\dfrac{eE}{m}\\,\\tau",
+      [["v_d", "drift speed", "m s⁻¹"], ["e", "electron charge", "C"], ["E", "electric field", "V m⁻¹"], ["m", "electron mass", "kg"], ["τ", "relaxation time (average time between collisions)", "s"]]),
+    card(id("f"), "Current and drift velocity", "Current in terms of drift velocity", "I = n\\,e\\,A\\,v_d",
+      [["n", "free electrons per unit volume", "m⁻³"], ["e", "electron charge", "C"], ["A", "cross-sectional area", "m²"], ["v_d", "drift speed", "m s⁻¹"]]),
+    card(id("f"), "Mobility", "Mobility of charge carriers", "\\mu = \\dfrac{v_d}{E} = \\dfrac{e\\tau}{m}",
+      [["μ", "mobility", "m² V⁻¹ s⁻¹"], ["v_d", "drift speed", "m s⁻¹"], ["E", "electric field", "V m⁻¹"]]),
+    card(id("f"), "Ohm's law", "Ohm's law", "V = IR",
+      [["V", "potential difference", "V"], ["I", "current", "A"], ["R", "resistance", "Ω (= V A⁻¹)"]], "Valid for ohmic conductors at constant temperature."),
+    card(id("f"), "Resistance of a conductor", "Resistance in terms of dimensions", "R = \\rho\\,\\dfrac{l}{A}",
+      [["R", "resistance", "Ω"], ["ρ", "resistivity of the material", "Ω m"], ["l", "length", "m"], ["A", "cross-sectional area", "m²"]]),
+    card(id("f"), "Resistivity", "Resistivity and conductivity", "\\rho = \\dfrac{m}{n e^2 \\tau},\\qquad \\sigma = \\dfrac{1}{\\rho}",
+      [["ρ", "resistivity", "Ω m"], ["σ", "conductivity", "S m⁻¹ (Ω⁻¹ m⁻¹)"], ["τ", "relaxation time", "s"]],
+      "Also \\(\\vec J = \\sigma\\vec E\\), the microscopic form of Ohm's law."),
+    card(id("f"), "Temperature dependence", "Variation of resistance with temperature", "R_T = R_0\\left[1 + \\alpha\\,(T - T_0)\\right]",
+      [["R_T", "resistance at temperature T", "Ω"], ["R₀", "resistance at reference temperature T₀", "Ω"], ["α", "temperature coefficient of resistance", "K⁻¹ (or °C⁻¹)"]],
+      "α is positive for metals and negative for semiconductors."),
+    card(id("f"), "Electrical power", "Power dissipated in a resistor", "P = VI = I^2 R = \\dfrac{V^2}{R}",
+      [["P", "power", "W"], ["V", "potential difference", "V"], ["I", "current", "A"], ["R", "resistance", "Ω"]]),
+    card(id("f"), "Heat produced", "Electrical energy converted to heat in time t", "H = I^2 R\\,t = VIt",
+      [["H", "energy / heat", "J"], ["t", "time", "s"]]),
+    card(id("f"), "Cell: internal resistance", "Current from a cell of emf ε and internal resistance r", "I = \\dfrac{\\varepsilon}{R + r},\\qquad V = \\varepsilon - Ir",
+      [["ε", "emf of the cell", "V"], ["r", "internal resistance", "Ω"], ["R", "external resistance", "Ω"], ["V", "terminal potential difference", "V"]]),
+    card(id("f"), "Resistors in series", "Equivalent resistance in series", "R_s = R_1 + R_2 + \\cdots",
+      [["R_s", "equivalent resistance", "Ω"]], "The same current flows through each resistor."),
+    card(id("f"), "Resistors in parallel", "Equivalent resistance in parallel", "\\dfrac{1}{R_p} = \\dfrac{1}{R_1} + \\dfrac{1}{R_2} + \\cdots",
+      [["R_p", "equivalent resistance", "Ω"]], "The same potential difference is across each resistor."),
+    card(id("f"), "Combination of cells", "n identical cells (emf ε, internal resistance r) in series and in parallel", "\\text{series: } \\varepsilon_{eq} = n\\varepsilon,\\ r_{eq} = nr;\\qquad \\text{parallel: } \\varepsilon_{eq} = \\varepsilon,\\ r_{eq} = \\dfrac{r}{n}",
+      [["n", "number of cells"]]),
+    card(id("f"), "Kirchhoff's junction rule", "Kirchhoff's first (junction) rule", "\\sum I_{\\text{in}} = \\sum I_{\\text{out}}",
+      [["I", "current at a junction", "A"]], "Based on conservation of charge."),
+    card(id("f"), "Kirchhoff's loop rule", "Kirchhoff's second (loop) rule", "\\sum \\Delta V = 0\\ \\text{(around any closed loop)}",
+      [["ΔV", "potential change across each element in the loop", "V"]], "Based on conservation of energy."),
+    card(id("f"), "Wheatstone bridge", "Balance condition of a Wheatstone bridge", "\\dfrac{P}{Q} = \\dfrac{R}{S}",
+      [["P, Q", "resistances of two arms in series"], ["R, S", "resistances of the other two arms, in the same order", "Ω"]],
+      "No current flows through the galvanometer when the bridge is balanced."),
+  ],
+};

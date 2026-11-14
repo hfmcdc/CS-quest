@@ -1,101 +1,204 @@
 /**
- * Verifies the Physics question bank. Run:  npx tsx scripts/verify-physics.ts
- * Exits with code 1 on any failure.
+ * Verifies the Physics question banks and answer engines.   npm run verify:physics   (add --write to refresh lib/physics/counts.generated.ts)
+ *
+ * What it checks for every chapter:
+ *  - registry: 14 chapters in order, weightage groups add to 70, labels never invent per-chapter marks
+ *  - content: all four features exist and meet minimum sizes; unique ids; MCQ answers in range; distinct options
+ *  - every string with maths parses with the same LaTeX parser the app uses (an unknown command fails here)
+ *  - equation-identification options contain equations only (no names or words)
+ *  - every numerical: the stated relations reproduce the independent calc() value; the model answer is accepted;
+ *    a wrong answer is rejected; the model equation (and a rearrangement) is accepted; a perturbed one is rejected
  */
-import { readFileSync } from "node:fs";
-import { content } from "../lib/physics/chapters/moving-charges";
-import { checkAnswer, checkEquation, solveFor, missingSymbols, parseEquation } from "../lib/physics/checker";
-import type { PhysNumerical } from "../lib/physics/types";
+import { writeFileSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { PHYS_CHAPTERS, WEIGHT_GROUPS, loadPhysContent, weightLabel, weightNote } from "../lib/physics/chapters";
+import { checkAnswer, parseQuantity } from "../lib/physics/engine/answer";
+import { checkEquation, evalModel, modelHoldsItself } from "../lib/physics/engine/equation";
+import { parseUnit, sameDim } from "../lib/physics/engine/units";
+import { parseRich, parseTex } from "../lib/physics/tex";
+import type { PhysNumQ } from "../lib/physics/types";
 
 let failures = 0;
-let checks = 0;
-const fail = (m: string) => { failures++; console.error("FAIL:", m); };
-const ok = (c: boolean, m: string) => { checks++; if (!c) fail(m); };
+const fail = (where: string, msg: string) => { failures++; console.error(`  ✗ ${where}: ${msg}`); };
+const ok = (cond: unknown, where: string, msg: string) => { if (!cond) fail(where, msg); };
 
-const all: [string, PhysNumerical][] = [
-  ...content.numericals.map((n) => ["practice", n] as [string, PhysNumerical]),
-  ...(["board", "hots", "jee"] as const).flatMap((l) => content.advanced[l].map((n) => [l, n] as [string, PhysNumerical])),
-];
+const MIN = { cards: 10, mcq: 6, written: 2, numerical: 6, equations: 6, advancedPerLevel: 2 };
 
-// ---- 1. unique ids
-const ids = [...content.cards.map((c) => c.id), ...content.concepts.map((c) => c.id), ...content.equations.map((c) => c.id), ...all.map(([, n]) => n.id)];
-ok(new Set(ids).size === ids.length, "duplicate ids: " + ids.filter((x, i) => ids.indexOf(x) !== i).join(","));
+function checkRich(where: string, s: string | undefined) {
+  if (s === undefined) return;
+  try { parseRich(s); } catch (e) { fail(where, (e as Error).message); }
+}
+function checkTex(where: string, s: string) {
+  try { parseTex(s); } catch (e) { fail(where, (e as Error).message); }
+}
 
-// ---- 2. numericals
-const rel = (a: number, b: number) => Math.abs(a - b) / Math.abs(b);
-for (const [lvl, n] of all) {
-  const tag = `${lvl}/${n.id}`;
-  const names = n.vars;
-  // formulas parse
-  for (const f of n.formulas) { try { parseEquation(f, names); checks++; } catch (e) { fail(`${tag}: formula "${f}" does not parse: ${(e as Error).message}`); } }
-  // independent recomputation of the answer from the accepted equation
-  const v1 = solveFor(n.formulas[0], n.target, n.given, names);
-  const miss = missingSymbols(n.formulas[0], names, n.given, n.target);
-  ok(miss.length === 0, `${tag}: given is missing ${miss.join(",")}`);
-  if (v1 === null) fail(`${tag}: could not solve ${n.target}`);
-  else if (n.ratio) {
-    const v2 = solveFor(n.formulas[0], n.target, n.ratio.given2, names);
-    ok(v2 !== null && rel((n.ratio.scale ?? 1) * v1 / v2!, n.answer) < 1e-9, `${tag}: ratio answer ${n.answer} != ${(n.ratio.scale ?? 1) * v1 / (v2 ?? NaN)}`);
-  } else ok(rel(v1, n.answer) < 1e-9, `${tag}: answer ${n.answer} != re-solved ${v1}`);
-  // every other accepted equation gives the same number whenever it can be evaluated from `given`
-  if (!n.ratio) n.formulas.slice(1).forEach((f) => {
-    if (missingSymbols(f, names, n.given, n.target).length) return;
-    const v = solveFor(f, n.target, n.given, names);
-    ok(v !== null && rel(v, n.answer) < 1e-9, `${tag}: alternative "${f}" gives ${v}, expected ${n.answer}`);
-  });
-  // the checker accepts every canonical equation and rejects deliberate mistakes
-  for (const f of n.formulas) ok(checkEquation(f, n.formulas, names).status === "correct", `${tag}: canonical "${f}" rejected`);
-  const [lhs, rhs] = n.formulas[0].split("=");
-  ok(checkEquation(`${lhs} = 2*(${rhs})`, n.formulas, names).status === "incorrect", `${tag}: factor-2 error accepted`);
-  ok(checkEquation(`${lhs} = (${rhs}) + 1`, n.formulas, names).status !== "correct", `${tag}: +1 error accepted`);
-  ok(checkEquation(`${lhs} = ${lhs}`, n.formulas, names).status !== "correct", `${tag}: identity accepted`);
-  // answer checking
-  const tol = n.tol ?? 0.03;
-  const unitDisp = n.unit;
-  const s = (x: number) => `${x.toExponential(6)} ${unitDisp}`.trim();
-  ok(checkAnswer(s(n.answer), n.answer, n.unit, tol, n.traps).status === "correct", `${tag}: exact answer rejected`);
-  ok(checkAnswer(s(n.answer * 1.02), n.answer, n.unit, tol, n.traps).status === "correct", `${tag}: 2% off should pass`);
-  ok(checkAnswer(s(n.answer * 1.2), n.answer, n.unit, tol, n.traps).status === "incorrect", `${tag}: 20% off accepted`);
-  ok(checkAnswer(s(n.answer * 10), n.answer, n.unit, tol, n.traps).status === "incorrect", `${tag}: x10 accepted`);
-  if (n.unit !== "") {
-    ok(checkAnswer(n.answer.toExponential(6), n.answer, n.unit, tol).status === "incorrect", `${tag}: missing unit accepted`);
-    ok(checkAnswer(`${n.answer.toExponential(6)} kg`, n.answer, n.unit, tol).status === "incorrect" || n.unit === "kg", `${tag}: wrong unit accepted`);
+/** Walk any content object and validate every string that may carry maths. */
+function walkStrings(where: string, v: unknown, key = "") {
+  if (typeof v === "string") { if (key === "eq" || key === "eqShow") checkTex(`${where}.${key}`, v); else checkRich(`${where}.${key}`, v); return; }
+  if (Array.isArray(v)) { v.forEach((x) => walkStrings(where, x, key)); return; }
+  if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) { if (k === "eq" && typeof x === "object") continue; walkStrings(where, x, k); }
+}
+
+function verifyNumerical(q: PhysNumQ, where: string) {
+  const w = `${where} ${q.id}`;
+  ok(q.text.length > 20, w, "question text too short");
+  ok(q.hint.length > 8, w, "missing hint");
+  ok(q.steps.length >= 2, w, "needs at least two solution steps");
+  ok(q.eqShow.length > 3, w, "missing model equation");
+  ok(Object.keys(q.sym).length >= 1, w, "needs symbol descriptions");
+  checkTex(`${w}.eqShow`, q.eqShow);
+  if (!modelHoldsItself(q.eq)) { fail(w, "relation system is not evaluable at sample points (check ranges)"); return; }
+
+  // 1. stated relations reproduce the independently computed answer
+  const vals = { ...q.eq.actual } as Record<string, number>;
+  delete vals[q.eq.target];
+  let viaRels = NaN;
+  try { viaRels = evalModel(q.eq, vals); } catch (e) { fail(w, `relations cannot be evaluated from the givens: ${(e as Error).message}`); }
+  if (!(Math.abs(viaRels - q.ans.value) <= 0.003 * Math.abs(q.ans.value))) fail(w, `relations give ${viaRels} but calc() gives ${q.ans.value}`);
+
+  // 2. the model answer is accepted, in its own unit and in SI base units
+  const u = q.ans.unit ? parseUnit(q.ans.unit) : null;
+  const scale = u ? u.scale : 1;
+  if (u) ok(sameDim(u.dim, q.ans.dim), w, "answer unit dimension mismatch");
+  const own = `${q.ans.value / scale} ${q.ans.unit}`.trim();
+  const r1 = checkAnswer(own, q.ans);
+  ok(r1.status === "correct", w, `model answer "${own}" not accepted: ${r1.status} ${r1.message}`);
+  if (q.ans.unit) {
+    const r2 = checkAnswer(`${(q.ans.value / scale).toExponential(6)} ${q.ans.unit}`, q.ans);
+    ok(r2.status === "correct", w, `sci-notation answer not accepted: ${r2.message}`);
   }
-  for (const t of n.traps ?? []) ok(Math.abs(t.value - n.answer) / n.answer > 2 * tol, `${tag}: trap value too close to true answer`);
-  ok(n.hints.length >= 2, `${tag}: needs two hints`);
-  ok(n.steps.length >= 2, `${tag}: needs worked steps`);
-  ok(!/NaN|undefined|Infinity/.test(JSON.stringify(n)), `${tag}: NaN/undefined leaked into text`);
+  // the exact text shown to students as the model answer must also be accepted when typed back (e.g. "10^-4 N m")
+  const shown = q.ansShow.replace(/\$/g, "").replace(/\\ /g, " ").replace(/\\,/g, " ").replace(/\\times10\^\{(-?\d+)\}/g, "e$1").replace(/\\text\{([^}]*)\}/g, "$1").replace(/\\mu/g, "µ").replace(/\\Omega/g, "Ω").replace(/\^\{(-?\d+)\}/g, "^$1").replace(/\^\\circ/g, "°");
+  const rShown = checkAnswer(shown, q.ans);
+  ok(rShown.status === "correct", w, `the displayed model answer "${shown}" is not accepted when typed back: ${rShown.message}`);
+  // 3. a clearly wrong answer is rejected
+  const wrong = checkAnswer(`${(q.ans.value / scale) * 1.25} ${q.ans.unit}`.trim(), q.ans);
+  ok(wrong.status === "wrong", w, `+25% answer was not rejected (${wrong.status})`);
+  if (q.ans.unit) ok(parseQuantity(own) !== null, w, "own answer not parseable");
+
+  // 4. equations: each model relation is accepted; a perturbed relation is rejected; rearranged form is accepted
+  for (const [subject, rhs] of q.eq.rels) {
+    if (subject === q.eq.target) {
+      const good = checkEquation(`${subject} = ${rhs}`, q.eq);
+      ok(good.status === "correct", w, `model relation "${subject} = ${rhs}" rejected: ${good.message}`);
+      const bad = checkEquation(`${subject} = (${rhs}) * 1.5`, q.eq);
+      ok(bad.status === "incorrect", w, `perturbed relation accepted (${bad.status})`);
+      const trivial = checkEquation(`${subject} = ${subject}`, q.eq);
+      ok(trivial.status === "incorrect", w, `trivial identity accepted (${trivial.status})`);
+    }
+  }
+  const targetRel = q.eq.rels.find((r) => r[0] === q.eq.target) ?? q.eq.rels[q.eq.rels.length - 1];
+  const only = checkEquation(`${targetRel[1]}`, q.eq);
+  ok(only.status === "correct", w, `bare expression form rejected: ${only.message}`);
+  const sub = checkEquation(`${q.eq.target}`, q.eq);
+  ok(sub.status !== "correct", w, "bare target symbol accepted");
 }
 
-// ---- 3. multiple choice integrity
-for (const q of content.concepts) {
-  if (q.kind === "mcq") { ok(q.options.length === 4 && q.answer >= 0 && q.answer < 4, `${q.id}: bad options`); ok(new Set(q.options).size === 4, `${q.id}: duplicate options`); }
-  else ok(q.model.length > 0 && q.points.length >= 3, `${q.id}: written answer needs model and key points`);
-}
-for (const q of content.equations) {
-  ok(q.options.length === 4 && q.answer >= 0 && q.answer < 4 && new Set(q.options).size === 4, `${q.id}: bad options`);
-  // equation options must be equations only: no words, no names
-  for (const o of q.options) ok(!/[a-z]{4,}/.test(o.replace(/\\[A-Za-z]+/g, "").replace(/\\text\{[^}]*\}/g, "")) && !o.includes("$"), `${q.id}: option contains words: ${o}`);
-  // the text must not give the answer away through an option copy
-  ok(!q.options.some((o) => q.text.includes(o)), `${q.id}: question text contains an option`);
-}
+(async () => {
+  console.log("Registry");
+  ok(PHYS_CHAPTERS.length === 14, "registry", `expected 14 chapters, found ${PHYS_CHAPTERS.length}`);
+  PHYS_CHAPTERS.forEach((c, i) => ok(c.number === i + 1, "registry", `chapter ${c.slug} number ${c.number} != ${i + 1}`));
+  ok(new Set(PHYS_CHAPTERS.map((c) => c.slug)).size === 14, "registry", "duplicate slugs");
+  ok(WEIGHT_GROUPS.reduce((a, g) => a + g.marks, 0) === 70, "weightage", "groups do not add to 70");
+  const covered = WEIGHT_GROUPS.flatMap((g) => g.chapters).sort((a, b) => a - b).join(",");
+  ok(covered === "1,2,3,4,5,6,7,8,9,10,11,12,13,14", "weightage", `chapters not covered exactly once: ${covered}`);
+  for (const c of PHYS_CHAPTERS) {
+    const label = weightLabel(c.number);
+    if (c.number === 14) ok(label === "7 marks · Unit IX", "weightage", `chapter 14 label "${label}"`);
+    else ok(/^Part of (16|17|18|12)-mark unit group$/.test(label), "weightage", `chapter ${c.number} label "${label}"`);
+    ok(!/^\d+ marks/.test(label) || c.number === 14, "weightage", "a chapter 1-13 label must never state a bare per-chapter mark count");
+    ok(weightNote(c.number).length > 20, "weightage", "missing note");
+  }
+  ok(weightLabel(1) === "Part of 16-mark unit group" && weightLabel(3) === "Part of 16-mark unit group", "weightage", "chapters 1-3 should say 16");
+  ok(weightLabel(4) === "Part of 17-mark unit group" && weightLabel(7) === "Part of 17-mark unit group", "weightage", "chapters 4-7 should say 17");
+  ok(weightLabel(8) === "Part of 18-mark unit group" && weightLabel(10) === "Part of 18-mark unit group", "weightage", "chapters 8-10 should say 18");
+  ok(weightLabel(11) === "Part of 12-mark unit group" && weightLabel(13) === "Part of 12-mark unit group", "weightage", "chapters 11-13 should say 12");
 
-// ---- 4. every TeX command used is supported by the renderer
-const src = readFileSync(new URL("../components/maths/MathText.tsx", import.meta.url), "utf8");
-const symKeys = [...(/const SYMBOLS[^=]*=\s*\{([\s\S]*?)\n\};/.exec(src)?.[1] ?? "").matchAll(/([A-Za-z]+):\s*"/g)].map((m) => m[1]);
-const funcs = (/const FUNCS = new Set\(\[([^\]]*)\]/.exec(src)?.[1] ?? "").match(/[a-z]+/g) ?? [];
-const handled = ["frac", "dfrac", "tfrac", "sqrt", "vec", "overrightarrow", "hat", "overline", "text", "mathrm", "operatorname", "mathbf", "boldsymbol", "bf", "left", "right", "displaystyle", "big", "Big", "bigg", "Bigg", "limits", "quad", "qquad", "int"];
-const known = new Set([...symKeys, ...funcs, ...handled]);
-const texAll = JSON.stringify(content).replace(/\\\\/g, "\\");
-const used = new Set([...texAll.matchAll(/\\([A-Za-z]+)/g)].map((m) => m[1]));
-const unknown = [...used].filter((u) => !known.has(u));
-ok(unknown.length === 0, `unsupported TeX commands: ${unknown.join(", ")}`);
+  const counts: Record<string, { cards: number; concept: number; numerical: number; equations: number; advanced: number }> = {};
+  const seen = new Set<string>();
+  const rows: string[] = [];
 
-// ---- 5. dollar signs balanced in every Rich string
-const richBad: string[] = [];
-JSON.parse(JSON.stringify(content), (_k, v) => { if (typeof v === "string" && v.replace(/\\\$/g, "").split("$").length % 2 === 0) richBad.push(v.slice(0, 60)); return v; });
-ok(richBad.length === 0, `unbalanced $ in: ${richBad.join(" | ")}`);
+  for (const ch of PHYS_CHAPTERS) {
+    if (process.env.PHYS_ONLY && !process.env.PHYS_ONLY.split(",").includes(ch.slug)) continue;
+    console.log(`Chapter ${ch.number}: ${ch.title}`);
+    const where = `ch${ch.number}`;
+    let fc, pr, eq, ad;
+    try {
+      [fc, pr, eq, ad] = await Promise.all([loadPhysContent(ch.slug, "flashcards"), loadPhysContent(ch.slug, "practice"), loadPhysContent(ch.slug, "equations"), loadPhysContent(ch.slug, "advanced")]);
+    } catch (e) { fail(where, `content failed to load: ${(e as Error).message}`); continue; }
 
-console.log(`\nChecks run: ${checks}. Failures: ${failures}.`);
-console.log(`Cards ${content.cards.length}; concepts ${content.concepts.length} (MCQ ${content.concepts.filter((c) => c.kind === "mcq").length}, written ${content.concepts.filter((c) => c.kind === "written").length}); practice numericals ${content.numericals.length}; equation MCQs ${content.equations.length}; advanced board ${content.advanced.board.length}, HOTS ${content.advanced.hots.length}, JEE ${content.advanced.jee.length}.`);
-process.exit(failures ? 1 : 0);
+    const uniq = (id: string) => { ok(!seen.has(id), where, `duplicate id ${id}`); seen.add(id); };
+
+    // flashcards
+    ok(fc.cards.length >= MIN.cards, where, `only ${fc.cards.length} flashcards (min ${MIN.cards})`);
+    for (const c of fc.cards) {
+      uniq(c.id);
+      ok(c.front && c.eq && c.symbols.length >= 1, `${where} ${c.id}`, "incomplete card");
+      c.symbols.forEach((s) => ok(s.s && s.m, `${where} ${c.id}`, "symbol needs a name and a meaning"));
+      walkStrings(`${where} ${c.id}`, c);
+    }
+
+    // conceptual
+    const mcqs = pr.concept.filter((q) => q.kind === "mcq");
+    const writ = pr.concept.filter((q) => q.kind === "written");
+    ok(mcqs.length >= MIN.mcq, where, `only ${mcqs.length} conceptual MCQs (min ${MIN.mcq})`);
+    ok(writ.length >= MIN.written, where, `only ${writ.length} written questions (min ${MIN.written})`);
+    for (const q of pr.concept) {
+      uniq(q.id);
+      walkStrings(`${where} ${q.id}`, q);
+      if (q.kind === "mcq") {
+        ok(q.options.length === 4, `${where} ${q.id}`, "MCQ needs 4 options");
+        ok(q.answer >= 0 && q.answer < q.options.length, `${where} ${q.id}`, "answer index out of range");
+        ok(new Set(q.options).size === q.options.length, `${where} ${q.id}`, "duplicate options");
+        ok(q.why.length > 20, `${where} ${q.id}`, "needs an explanation");
+      } else {
+        ok(q.points.length >= 2 && q.model.length > 30, `${where} ${q.id}`, "written answer needs a model answer and key points");
+      }
+    }
+
+    // numericals
+    ok(pr.numerical.length >= MIN.numerical, where, `only ${pr.numerical.length} practice numericals (min ${MIN.numerical})`);
+    for (const lv of [1, 2, 3]) ok(pr.numerical.some((q) => q.level === lv), where, `no practice numerical at level ${lv}`);
+    for (const q of pr.numerical) { uniq(q.id); walkStrings(`${where} ${q.id}`, { text: q.text, hint: q.hint, steps: q.steps, ansShow: q.ansShow }); verifyNumerical(q, `${where} practice`); }
+
+    // equation identification
+    ok(eq.questions.length >= MIN.equations, where, `only ${eq.questions.length} equation questions (min ${MIN.equations})`);
+    for (const q of eq.questions) {
+      uniq(q.id);
+      const w = `${where} ${q.id}`;
+      ok(q.options.length === 4 && new Set(q.options).size === 4, w, "needs 4 distinct options");
+      ok(q.answer >= 0 && q.answer < 4, w, "answer index out of range");
+      checkRich(`${w}.q`, q.q); checkRich(`${w}.why`, q.why);
+      q.options.forEach((o, i) => {
+        checkTex(`${w}.option${i}`, o);
+        const stripped = o.replace(/\\text\{[^}]*\}/g, "").replace(/\\[A-Za-z]+/g, "");
+        ok(/=/.test(o), w, `option ${i} is not an equation`);
+        ok(!/[A-Za-z]{4,}/.test(stripped), w, `option ${i} contains a word: "${o}"`);
+      });
+      ok(q.why.length > 30, w, "needs an explanation");
+    }
+
+    // advanced
+    const lv = [0, 0, 0, 0];
+    for (const q of ad.problems) { uniq(q.id); lv[q.level]++; walkStrings(`${where} ${q.id}`, { text: q.text, hint: q.hint, steps: q.steps, ansShow: q.ansShow }); verifyNumerical(q, `${where} advanced`); }
+    for (const l of [1, 2, 3]) ok(lv[l] >= MIN.advancedPerLevel, where, `advanced level ${l} has ${lv[l]} problems (min ${MIN.advancedPerLevel})`);
+
+    counts[ch.slug] = { cards: fc.cards.length, concept: pr.concept.length, numerical: pr.numerical.length, equations: eq.questions.length, advanced: ad.problems.length };
+    rows.push(`  ${String(ch.number).padStart(2)}  ${ch.short.padEnd(24)} cards ${String(fc.cards.length).padStart(2)} | concept ${String(pr.concept.length).padStart(2)} | numerical ${String(pr.numerical.length).padStart(2)} | equations ${String(eq.questions.length).padStart(2)} | advanced ${String(ad.problems.length).padStart(2)} (B${lv[1]} H${lv[2]} J${lv[3]})`);
+  }
+
+  console.log("\nCoverage\n" + rows.join("\n"));
+
+  // generated counts (so the chapter hub can show sizes without loading any question bank)
+  const file = join(__dirname, "..", "lib", "physics", "counts.generated.ts");
+  const body = `// Generated by \`npm run verify:physics -- --write\`. Do not edit by hand.\nexport const PHYS_COUNTS: Record<string, { cards: number; concept: number; numerical: number; equations: number; advanced: number }> = ${JSON.stringify(counts, null, 2)};\n`;
+  if (process.argv.includes("--write")) { writeFileSync(file, body); console.log("\nWrote counts.generated.ts"); }
+  else {
+    let current = "";
+    try { current = readFileSync(file, "utf8"); } catch { /* missing */ }
+    if (current !== body) fail("counts", "lib/physics/counts.generated.ts is out of date. Run: npm run verify:physics -- --write");
+  }
+
+  if (failures) { console.error(`\n${failures} problem(s) found.`); process.exit(1); }
+  console.log("\nAll Physics checks passed.");
+})();

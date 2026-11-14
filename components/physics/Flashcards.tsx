@@ -1,105 +1,91 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { PhysCard } from "@/lib/physics/types";
-import { readNav, writeNav } from "@/lib/navState";
-import { Rich, Tex } from "@/components/maths/MathText";
+import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import Icon from "@/components/Icon";
+import { readNav, writeNav } from "@/lib/navState";
 import { playSound } from "@/lib/fx";
-import { chipCls, shuffle } from "./shared";
+import { range, shuffled } from "@/lib/physics/shuffle";
+import type { PhysCard } from "@/lib/physics/types";
+import Rich, { Tex } from "./PhysMath";
+import { LoadError, SegProgress, Skeleton, type SegState } from "./shared";
+import { usePhysContent } from "./usePhysContent";
 
-interface Deck { ids: string[]; idx: number; tag: string }
+/** Feature 1 — Formula flashcards: tap to flip, previous / next / shuffle, with the equation, symbols and SI units on the back. */
+export default function Flashcards({ slug }: { slug: string }) {
+  const { data, error, retry } = usePhysContent(slug, "flashcards");
+  if (error) return <LoadError onRetry={retry} />;
+  if (!data) return <Skeleton />;
+  return <Deck key={slug} cards={data.cards} slug={slug} />;
+}
 
-/** Tap-to-flip formula cards: front = name or question, back = equation, symbols and SI units. */
-export default function Flashcards({ chapterKey, cards }: { chapterKey: string; cards: PhysCard[] }) {
-  const navKey = `phys:cards:${chapterKey}`;
-  const tags = useMemo(() => Array.from(new Set(cards.map((c) => c.tag))), [cards]);
-  const byId = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
-  const build = (tag: string, mix: boolean): Deck => {
-    const ids = cards.filter((c) => tag === "all" || c.tag === tag).map((c) => c.id);
-    return { ids: mix ? shuffle(ids) : ids, idx: 0, tag };
-  };
-  const [d, setD] = useState<Deck>(() => readNav<Deck | null>(navKey, null) ?? build("all", false));
+interface Saved { order: number[]; i: number }
+
+function Deck({ cards, slug }: { cards: PhysCard[]; slug: string }) {
+  const key = `phys:${slug}:flash`;
+  const [saved] = useState<Saved>(() => {
+    const s = readNav<Saved | null>(key, null);
+    return s && s.order.length === cards.length ? s : { order: range(cards.length), i: 0 };
+  });
+  const [order, setOrder] = useState(saved.order);
+  const [i, setI] = useState(saved.i);
   const [flipped, setFlipped] = useState(false);
-  const [seen, setSeen] = useState<Set<string>>(() => new Set());
-  const ref = useRef(d); ref.current = d;
-  useEffect(() => () => writeNav(navKey, ref.current), [navKey]);
+  const [seen, setSeen] = useState<Set<number>>(() => new Set([saved.i]));
 
-  const total = d.ids.length;
-  const card = byId.get(d.ids[d.idx]);
+  useEffect(() => { writeNav<Saved>(key, { order, i }); }, [key, order, i]);
 
-  const go = (n: number) => { setFlipped(false); setD((c) => ({ ...c, idx: Math.min(c.ids.length - 1, Math.max(0, c.idx + n)) })); };
-  const reveal = () => { setFlipped((f) => !f); if (card) setSeen((s) => new Set(s).add(card.id)); playSound("tap"); };
-  const reset = (tag: string, mix: boolean) => { setFlipped(false); setD(build(tag, mix)); };
+  const go = useCallback((n: number) => {
+    const next = (n + cards.length) % cards.length;
+    setFlipped(false);
+    setI(next);
+    setSeen((s) => new Set(s).add(next));
+    playSound("tap");
+  }, [cards.length]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLElement && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
-      if (e.key === "ArrowRight") go(1); else if (e.key === "ArrowLeft") go(-1);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const shuffle = () => { setOrder(shuffled(range(cards.length))); setI(0); setFlipped(false); setSeen(new Set([0])); playSound("tap"); };
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); go(i + 1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); go(i - 1); }
+  };
 
-  if (!card) return null;
-  const seenInDeck = d.ids.filter((id) => seen.has(id)).length;
+  const card = cards[order[i]];
+  const states: SegState[] = order.map((_, idx) => (seen.has(idx) && idx !== i ? "seen" : ""));
 
   return (
-    <div>
-      <section className="card mb-5 space-y-3 p-4" aria-label="Deck options">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Topic">
-          <button onClick={() => reset("all", false)} aria-pressed={d.tag === "all"} className={chipCls(d.tag === "all")}>All</button>
-          {tags.map((t) => <button key={t} onClick={() => reset(t, false)} aria-pressed={d.tag === t} className={chipCls(d.tag === t)}>{t}</button>)}
-        </div>
-        <p className="text-xs text-slate-500">{total} cards · tap a card to reveal the formula · arrow keys also work</p>
-      </section>
+    <div onKeyDown={onKey}>
+      <SegProgress states={states} current={i} label={`Card ${i + 1} of ${cards.length}`} />
 
-      <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
-        <span>Card {d.idx + 1} of {total}</span><span>{seenInDeck} revealed</span>
-      </div>
-      <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-slate-800" role="progressbar" aria-label="Deck position" aria-valuemin={1} aria-valuemax={total} aria-valuenow={d.idx + 1}>
-        <div className="h-full rounded-full bg-[rgb(var(--ac))] transition-all duration-500" style={{ width: `${((d.idx + 1) / total) * 100}%` }} />
-      </div>
-
-      <div key={card.id} className="a-flip phys-flip">
-        <div
-          role="button" tabIndex={0} onClick={reveal}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); reveal(); } }}
-          aria-label={flipped ? "Showing the formula. Press to flip back to the question" : "Showing the question. Press to reveal the formula"}
-          className={`phys-flip-inner cursor-pointer text-left ${flipped ? "is-flipped" : ""}`}
-        >
-          {/* front */}
-          <div aria-hidden={flipped} className="phys-face card flex min-h-[18rem] flex-col p-6 sm:p-8">
-            <div className="mb-4 flex flex-wrap gap-2 text-xs"><span className="chip chip-ac">{card.tag}</span><span className="chip">Question</span></div>
-            <div className="flex min-w-0 flex-1 items-center justify-center text-center text-lg font-medium leading-relaxed"><Rich text={card.front} /></div>
-            <p className="mt-4 text-center text-xs text-slate-500">Tap to reveal</p>
+      <div className={`ph-flip ${flipped ? "on" : ""}`} data-qid={card.id}>
+        <button type="button" className="ph-flip-btn" aria-pressed={flipped} aria-label={flipped ? "Showing the answer. Tap to see the question." : "Tap to reveal the formula"} onClick={() => setFlipped((f) => !f)}>
+          <div className="ph-flip-inner">
+            <div className="card ph-face ph-front" aria-hidden={flipped}>
+              <span className="chip chip-ac">{card.tag}</span>
+              <div className="ph-qtext"><Rich text={card.front} /></div>
+              <span className="ph-tap"><Icon name="spark" size={14} />Tap to reveal</span>
+            </div>
+            <div className="card ph-face ph-back" aria-hidden={!flipped}>
+              <span className="chip chip-ac" style={{ alignSelf: "flex-start" }}>{card.tag}</span>
+              <div className="ph-eq"><Tex src={card.eq} display /></div>
+              <ul className="ph-symtab" aria-label="Symbols and units">
+                {card.symbols.map((s, k) => (
+                  <li key={k}>
+                    <span className="s">{s.s}</span>
+                    <span>{s.m}</span>
+                    {s.u && <span className="u">SI unit: {s.u}</span>}
+                  </li>
+                ))}
+              </ul>
+              {card.note && <p className="ph-note">{card.note}</p>}
+            </div>
           </div>
-          {/* back */}
-          <div aria-hidden={!flipped} className="phys-face phys-face-back card flex min-h-[18rem] flex-col !border-violet-400/50 !bg-violet-400/5 p-5 sm:p-8">
-            <div className="mb-2 flex flex-wrap gap-2 text-xs"><span className="chip chip-ac">{card.tag}</span><span className="chip">Formula</span></div>
-            <div className="rounded-xl border border-white/10 bg-black/20 px-2 py-3 text-lg"><Tex display>{card.eq}</Tex></div>
-            <ul className="mt-3 space-y-1.5 text-sm" aria-label="Symbols and SI units">
-              {card.symbols.map((s, i) => (
-                <li key={i} className="grid grid-cols-[3.2rem_1fr] items-baseline gap-x-2 sm:grid-cols-[4.5rem_1fr]">
-                  <span className="text-right text-base"><Tex>{s.sym}</Tex></span>
-                  <span className="min-w-0 text-slate-300"><Rich text={s.meaning} /> <span className="whitespace-nowrap text-slate-500">· <Tex>{s.unit}</Tex></span></span>
-                </li>
-              ))}
-            </ul>
-            {card.note && <p className="mt-3 border-t border-white/10 pt-3 text-sm leading-relaxed text-slate-400"><Rich text={card.note} /></p>}
-            <p className="mt-3 text-center text-xs text-slate-500">Tap to flip back</p>
-          </div>
-        </div>
+        </button>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-2">
-          <button onClick={() => go(-1)} disabled={d.idx === 0} className="btn-ghost disabled:opacity-40"><Icon name="back" size={16} />Previous</button>
-          <button onClick={() => go(1)} disabled={d.idx === total - 1} className="btn-primary disabled:opacity-40">Next<Icon name="forward" size={16} /></button>
-        </div>
-        <button onClick={() => reset(d.tag, true)} className="btn-ghost"><Icon name="spark" size={16} />Shuffle</button>
+      <div className="ph-deck-nav">
+        <button type="button" className="btn-ghost prev" onClick={() => go(i - 1)}><Icon name="back" size={16} />Previous</button>
+        <button type="button" className="btn-primary next" onClick={() => go(i + 1)}>Next<Icon name="forward" size={16} /></button>
+        <button type="button" className="btn-ghost shuf" onClick={shuffle}>Shuffle</button>
       </div>
-      {d.idx === total - 1 && <p className="a-fade mt-4 text-center text-sm text-slate-400">That is the last card. Use Shuffle to go again in a new order.</p>}
+      <p className="ph-tips" style={{ textAlign: "center", marginTop: ".9rem" }}>Tap the card to flip it. On a keyboard, use ← and → to move between cards.</p>
     </div>
   );
 }

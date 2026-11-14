@@ -15,7 +15,7 @@ export default function SubjectPicker() {
 
       <div className="stagger grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {SUBJECTS.map((s) => (
-          <Link key={s.href} href={s.href} prefetch={false} className={`card card-link ${s.theme} min-h-56 gap-4 p-6`}>
+          <Link key={s.href} href={s.href} prefetch={false} className={`card card-link fx-spot ${s.theme} min-h-56 gap-4 p-6`}>
             <span className="tile h-12 w-12"><Icon name={s.icon} size={24} /></span>
             <span className="text-xl font-semibold text-white">{s.title}</span>
             <span className="text-sm leading-relaxed text-slate-400">{s.note}</span>

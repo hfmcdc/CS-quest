@@ -1,0 +1,78 @@
+import { C, ids, nq } from "../../builders";
+import type { AdvancedContent } from "../../types";
+
+const id = ids("c12");
+
+export const content: AdvancedContent = {
+  problems: [
+    nq({
+      id: id("a"), tag: "Balmer series", level: 1,
+      g: { ni: "4", nf: "2" },
+      q: "Find the wavelength of the line of the Balmer series produced by the transition from n = {ni} to n = {nf}.",
+      sym: { lam: "wavelength (λ)", ni: "initial level (n_i)", nf: "final level (n_f)" },
+      rels: [["lam", "1/(Rinf*(1/nf^2-1/ni^2))"]], consts: ["Rinf"], aka: { ni: ["n_i"], nf: ["n_f"], Rinf: ["R"] }, ranges: { ni: [3, 5], nf: [1, 2] },
+      calc: (s) => 1 / (C.Rinf * (1 / (s.nf * s.nf) - 1 / (s.ni * s.ni))), unit: "nm",
+      show: "\\dfrac{1}{\\lambda} = R\\left(\\dfrac{1}{n_f^2} - \\dfrac{1}{n_i^2}\\right)",
+      hint: "Use the Rydberg formula with n_f = 2 and n_i = 4.",
+      steps: ["$\\dfrac{1}{\\lambda} = R\\left(\\dfrac14 - \\dfrac1{16}\\right) = \\dfrac{3R}{16}$.", "$\\lambda = \\dfrac{16}{3R} = \\dfrac{16}{3({c.Rinf})} = {ans}$ (the blue-green H$\\beta$ line)."],
+    }),
+    nq({
+      id: id("a"), tag: "Ionisation from an excited state", level: 1,
+      g: { E1: "13.6 eV", n: "2" },
+      q: "The ionisation energy of hydrogen from its ground state is {E1}. How much energy is needed to ionise a hydrogen atom that is in the n = {n} state?",
+      sym: { E: "energy required", E1: "ground-state ionisation energy", n: "level number" },
+      rels: [["E", "E1/n^2"]], ranges: { n: [1, 4] },
+      calc: (s) => s.E1 / (s.n * s.n), unit: "eV",
+      show: "E_{ion} = 0 - E_n = \\dfrac{13.6}{n^2}\\ \\text{eV}",
+      hint: "Ionisation takes the electron to E = 0.",
+      steps: ["$E_2 = -\\dfrac{13.6}{4} = -3.4\\ \\text{eV}$.", "The electron must be raised to $E = 0$, so the energy needed is $0 - E_2 = {ans}$."],
+    }),
+    nq({
+      id: id("a"), tag: "Distance of closest approach", level: 2,
+      g: { K: "5 MeV", Z: "79" },
+      q: "An α particle of kinetic energy {K} is fired head-on at a gold nucleus (atomic number {Z}). Find the distance of closest approach.",
+      sym: { r0: "distance of closest approach (r₀)", K: "kinetic energy of the α particle", Z: "atomic number" },
+      rels: [["r0", "2*k*Z*e^2/K"]], consts: ["k", "e"], aka: { r0: ["r_0", "d"] }, ranges: { K: [0.5, 2], Z: [10, 80] },
+      calc: (s) => 2 * C.k * s.Z * C.e * C.e / s.K, unit: "fm",
+      show: "K = \\dfrac{1}{4\\pi\\varepsilon_0}\\dfrac{(2e)(Ze)}{r_0} \\;\\Rightarrow\\; r_0 = \\dfrac{2kZe^2}{K}",
+      hint: "At the closest approach all the kinetic energy has changed into the electrostatic potential energy of the α particle (charge 2e) and the nucleus (charge Ze).",
+      steps: ["Energy conservation: $K = \\dfrac{k(2e)(Ze)}{r_0}$, so $r_0 = \\dfrac{2kZe^2}{K}$.", "$K = 5\\ \\text{MeV} = 8\\times10^{-13}\\ \\text{J}$.", "$r_0 = \\dfrac{2({c.k})(79)({c.e})^2}{8.0\\times10^{-13}} = {ans}$, comparable to the size of the nucleus."],
+    }),
+    nq({
+      id: id("a"), tag: "Orbital frequency", level: 2,
+      g: { v: "2.19 × 10^6 m/s", r: "0.529 Å" },
+      q: "In the ground state of hydrogen the electron moves at {v} in an orbit of radius {r}. Find the frequency of revolution of the electron.",
+      sym: { f: "frequency of revolution", v: "orbital speed", r: "orbit radius" },
+      rels: [["f", "v/(2*pi*r)"]],
+      calc: (s) => s.v / (2 * Math.PI * s.r), unit: "Hz",
+      show: "\\nu = \\dfrac{v}{2\\pi r}",
+      hint: "Frequency = speed ÷ circumference.",
+      steps: ["The electron covers a circumference $2\\pi r$ per revolution, so $\\nu = \\dfrac{v}{2\\pi r}$.", "$\\nu = \\dfrac{{v.v}}{2\\pi({v.r})} = {ans}$, about $6.6\\times10^{15}$ revolutions per second."],
+    }),
+    nq({
+      id: id("a"), tag: "Hydrogen-like ion", level: 3,
+      g: { E1: "13.6 eV", Z: "2", ni: "2", nf: "1" },
+      q: "A singly ionised helium atom ($\\text{He}^+$, atomic number {Z}) behaves like a hydrogen atom, with energy levels $E_n = -Z^2\\times({E1})/n^2$. Find the energy of the photon emitted in the transition from n = {ni} to n = {nf}.",
+      sym: { E: "photon energy", E1: "hydrogen ionisation energy", Z: "atomic number", ni: "initial level (n_i)", nf: "final level (n_f)" },
+      rels: [["E", "E1*Z^2*(1/nf^2-1/ni^2)"]], aka: { ni: ["n_i"], nf: ["n_f"] }, ranges: { ni: [3, 5], nf: [1, 2], Z: [1, 3] },
+      calc: (s) => s.E1 * s.Z * s.Z * (1 / (s.nf * s.nf) - 1 / (s.ni * s.ni)), unit: "eV",
+      show: "h\\nu = 13.6\\,Z^2\\left(\\dfrac{1}{n_f^2} - \\dfrac{1}{n_i^2}\\right)\\ \\text{eV}",
+      hint: "The levels are Z² times those of hydrogen.",
+      steps: ["$E_2 = -\\dfrac{(4)(13.6)}{4} = -13.6\\ \\text{eV}$ and $E_1 = -(4)(13.6) = -54.4\\ \\text{eV}$.", "$h\\nu = E_2 - E_1 = 13.6\\times4\\left(1 - \\dfrac14\\right) = {ans}$."],
+    }),
+    nq({
+      id: id("a"), tag: "Shortest wavelength from a level", level: 3,
+      g: { E1: "13.6 eV", ni: "4", nf: "1" },
+      q: "Hydrogen atoms are excited to the n = {ni} level (ionisation energy of hydrogen {E1}). Find the shortest wavelength that can be emitted as they return to lower levels.",
+      sym: { lam: "shortest wavelength (λ)", E: "largest photon energy", E1: "ionisation energy", ni: "highest level (n_i)", nf: "lowest level (n_f)" },
+      rels: [["E", "E1*(1/nf^2-1/ni^2)"], ["lam", "h*c/E"]], consts: ["h", "c"], aka: { ni: ["n_i"], nf: ["n_f"] }, ranges: { ni: [3, 5], nf: [1, 2], E1: [1e-18, 3e-18] },
+      mustInclude: ["lam", "E"],
+      calc: (s) => C.h * C.c / (s.E1 * (1 / (s.nf * s.nf) - 1 / (s.ni * s.ni))),
+      mid: (s) => ({ E: s.E1 * (1 / (s.nf * s.nf) - 1 / (s.ni * s.ni)) / 1.602176634e-19 }),
+      unit: "nm",
+      show: "E = 13.6\\left(1 - \\dfrac{1}{16}\\right)\\ \\text{eV},\\qquad \\lambda = \\dfrac{hc}{E}",
+      hint: "The shortest wavelength is the most energetic transition, from n = 4 directly to n = 1.",
+      steps: ["Largest photon energy: $E_4 \\to E_1 = 13.6\\left(1 - \\dfrac{1}{16}\\right) = {m.E}\\ \\text{eV}$.", "$\\lambda = \\dfrac{hc}{E} = \\dfrac{1240\\ \\text{eV nm}}{12.75\\ \\text{eV}} = {ans}$."],
+    }),
+  ],
+};

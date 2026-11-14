@@ -5,13 +5,15 @@ import { usePathname } from "next/navigation";
 import Icon, { type IconName } from "@/components/Icon";
 import Wordmark from "@/components/Wordmark";
 import SoundToggle from "@/components/SoundToggle";
+import CardSpotlight from "@/components/physics/CardSpotlight";
+import "@/app/physics.css"; // Physics styles (all selectors are namespaced, nothing here affects other subjects)
 
 const TABS: { href: string; label: string; icon: IconName; theme: string }[] = [
   { href: "/", label: "Home", icon: "home", theme: "theme-cs" },
   { href: "/computer", label: "Computer", icon: "code", theme: "theme-cs" },
   { href: "/maths", label: "Maths", icon: "sigma", theme: "theme-maths" },
   { href: "/chemistry", label: "Chemistry", icon: "flask", theme: "theme-chem" },
-  { href: "/physics", label: "Physics", icon: "magnet", theme: "theme-phys" },
+  { href: "/physics", label: "Physics", icon: "atom", theme: "theme-phys" },
 ];
 
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(href + "/"));
@@ -22,6 +24,7 @@ export default function AppNav() {
   const path = usePathname() || "/";
   return (
     <>
+      <CardSpotlight />
       <header className="nav-bar">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
           <Link href="/" prefetch={false} aria-label="Quest MC home" className="text-lg text-cyan-200"><Wordmark /></Link>

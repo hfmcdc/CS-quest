@@ -1,0 +1,47 @@
+import { card, ids } from "../../builders";
+import type { FlashcardsContent } from "../../types";
+
+const id = ids("c01");
+
+export const content: FlashcardsContent = {
+  cards: [
+    card(id("f"), "Charge", "Quantisation of charge", "q = n e,\\qquad n = 0, \\pm1, \\pm2, \\ldots",
+      [["q", "total charge of a body", "C"], ["n", "integer number of electrons transferred"], ["e", "elementary charge, 1.6 × 10⁻¹⁹ C", "C"]],
+      "Charge is conserved and comes in whole multiples of e."),
+    card(id("f"), "Coulomb's law", "Coulomb's law: force between two point charges at rest in vacuum", "F = \\dfrac{1}{4\\pi\\varepsilon_0}\\,\\dfrac{q_1 q_2}{r^2} = \\dfrac{k\\,q_1 q_2}{r^2}",
+      [["F", "magnitude of electrostatic force", "N"], ["q₁, q₂", "point charges", "C"], ["r", "distance between the charges", "m"], ["k", "1/(4πε₀) ≈ 9 × 10⁹", "N m² C⁻²"], ["ε₀", "permittivity of free space, 8.85 × 10⁻¹² ", "C² N⁻¹ m⁻²"]],
+      "Like charges repel, unlike charges attract. The force acts along the line joining the charges."),
+    card(id("f"), "Superposition", "Principle of superposition for forces on a charge", "\\vec F_1 = \\vec F_{12} + \\vec F_{13} + \\cdots + \\vec F_{1n}",
+      [["F₁", "net force on charge q₁", "N"], ["F₁ⱼ", "force on q₁ due to charge qⱼ alone", "N"]],
+      "Add the individual forces as vectors; each pair force is unaffected by the other charges."),
+    card(id("f"), "Electric field", "Definition of electric field at a point", "\\vec E = \\dfrac{\\vec F}{q_0}",
+      [["E", "electric field", "N C⁻¹ (or V m⁻¹)"], ["F", "force on the test charge", "N"], ["q₀", "small positive test charge", "C"]],
+      "Direction is that of the force on a positive test charge."),
+    card(id("f"), "Field of a point charge", "Electric field at distance r from a point charge q", "E = \\dfrac{1}{4\\pi\\varepsilon_0}\\,\\dfrac{q}{r^2} = \\dfrac{k q}{r^2}",
+      [["E", "field magnitude", "N C⁻¹"], ["q", "source charge", "C"], ["r", "distance from the charge", "m"]],
+      "Directed away from +q and towards −q."),
+    card(id("f"), "Dipole moment", "Electric dipole moment", "\\vec p = q\\,(2\\vec a)",
+      [["p", "dipole moment, directed from −q to +q", "C m"], ["q", "magnitude of each charge", "C"], ["2a", "separation between the charges", "m"]]),
+    card(id("f"), "Dipole field (axial)", "Field of a short dipole on its axis (r ≫ a)", "E = \\dfrac{1}{4\\pi\\varepsilon_0}\\,\\dfrac{2p}{r^3}",
+      [["E", "field magnitude, along p", "N C⁻¹"], ["p", "dipole moment", "C m"], ["r", "distance from the centre of the dipole", "m"]]),
+    card(id("f"), "Dipole field (equatorial)", "Field of a short dipole on its equatorial plane (r ≫ a)", "E = \\dfrac{1}{4\\pi\\varepsilon_0}\\,\\dfrac{p}{r^3}",
+      [["E", "field magnitude, opposite to p", "N C⁻¹"], ["p", "dipole moment", "C m"], ["r", "distance from the centre of the dipole", "m"]],
+      "At the same distance the axial field is twice the equatorial field."),
+    card(id("f"), "Torque on a dipole", "Torque on a dipole in a uniform electric field", "\\vec\\tau = \\vec p \\times \\vec E,\\qquad \\tau = pE\\sin\\theta",
+      [["τ", "torque", "N m"], ["p", "dipole moment", "C m"], ["E", "uniform field", "N C⁻¹"], ["θ", "angle between p and E", "rad"]],
+      "The net force on a dipole in a uniform field is zero."),
+    card(id("f"), "Electric flux", "Electric flux through a small area", "\\Delta\\phi = \\vec E\\cdot\\Delta\\vec S = E\\,\\Delta S\\cos\\theta",
+      [["φ", "electric flux", "N m² C⁻¹"], ["E", "electric field", "N C⁻¹"], ["ΔS", "area element", "m²"], ["θ", "angle between E and the area vector", "rad"]]),
+    card(id("f"), "Gauss's theorem", "Gauss's theorem for a closed surface", "\\phi = \\oint \\vec E\\cdot d\\vec S = \\dfrac{q_{\\text{enc}}}{\\varepsilon_0}",
+      [["φ", "net flux through the closed surface", "N m² C⁻¹"], ["q_enc", "net charge enclosed", "C"], ["ε₀", "permittivity of free space", "C² N⁻¹ m⁻²"]],
+      "Flux depends only on the enclosed charge, not on the shape of the surface."),
+    card(id("f"), "Infinite line charge", "Field of an infinitely long straight uniformly charged wire", "E = \\dfrac{\\lambda}{2\\pi\\varepsilon_0\\, r}",
+      [["E", "field, perpendicular to the wire", "N C⁻¹"], ["λ", "linear charge density", "C m⁻¹"], ["r", "perpendicular distance from the wire", "m"]]),
+    card(id("f"), "Infinite plane sheet", "Field of an infinite thin plane sheet of uniform surface charge", "E = \\dfrac{\\sigma}{2\\varepsilon_0}",
+      [["E", "field, perpendicular to the sheet", "N C⁻¹"], ["σ", "surface charge density", "C m⁻²"]],
+      "Independent of the distance from the sheet."),
+    card(id("f"), "Thin spherical shell", "Field of a uniformly charged thin spherical shell", "E = \\dfrac{1}{4\\pi\\varepsilon_0}\\,\\dfrac{q}{r^2}\\ (r \\ge R),\\qquad E = 0\\ (r < R)",
+      [["q", "total charge on the shell", "C"], ["R", "radius of the shell", "m"], ["r", "distance from the centre", "m"]],
+      "Outside, it behaves as if all the charge were at the centre."),
+  ],
+};

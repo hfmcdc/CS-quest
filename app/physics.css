@@ -1,0 +1,255 @@
+/*
+ * Physics subject styles. Everything is namespaced (.ph-*, .pm-*, .fx-*, .theme-phys) so nothing here can affect the other
+ * subjects. It builds on the existing tokens (--ac, --line, --ease) and global classes (.card, .btn-primary, .btn-ghost, .chip,
+ * .tile, fieldset-label option states), and is loaded once from components/AppNav.tsx.
+ *
+ * Effects are adapted from EasyUI ideas (spotlight card, neon edge, animated pill tabs, drawn tick, stepper) in plain CSS:
+ * no JavaScript animation library. The global prefers-reduced-motion rule in globals.css disables them all.
+ */
+
+.theme-phys { --ac: 147 160 255 }
+/* Keep Physics distinct but on-theme while the seasonal Halloween palette is active (selector is ours, the seasonal CSS is untouched). */
+html[data-theme="halloween"] .theme-phys { --ac: 244 114 182 }
+
+/* ============================================================ layout */
+.ph-wrap, .ph-wide { margin-inline: auto; padding: 1.5rem 1rem 3rem; width: 100%; box-sizing: border-box }
+.ph-wrap { max-width: 46rem }
+.ph-wide { max-width: 64rem }
+@media (min-width: 640px) { .ph-wrap, .ph-wide { padding-top: 2.5rem } }
+.ph-wrap *, .ph-wide * { box-sizing: border-box }
+.ph-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: 1.5rem; flex-wrap: wrap }
+.ph-h1 { margin: 0; font-size: 1.75rem; line-height: 1.15; font-weight: 600; color: #fff; letter-spacing: -.02em }
+@media (min-width: 640px) { .ph-h1 { font-size: 2.1rem } }
+.ph-eyebrow { margin: 0 0 .35rem; font-size: .8rem; color: #8b93ad; letter-spacing: .02em }
+.ph-lead { margin: .75rem 0 0; color: #9aa3bd; line-height: 1.6; max-width: 36rem; font-size: .95rem }
+.ph-muted { color: #8b93ad }
+.ph-sec { margin: 2.25rem 0 .9rem; display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; flex-wrap: wrap }
+.ph-sec h2 { margin: 0; font-size: .95rem; font-weight: 600; color: #e3e7f6 }
+.ph-sec p { margin: 0; font-size: .78rem; color: #7d86a3 }
+
+/* ============================================================ spotlight card (cursor-follow glow, pointer devices only) */
+.fx-spot { isolation: isolate; overflow: hidden }
+.fx-spot::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit; opacity: 0;
+  background: radial-gradient(18rem circle at var(--mx, 50%) var(--my, 0%), rgb(var(--ac) / .16), transparent 62%);
+  transition: opacity .35s var(--ease);
+}
+@media (hover: hover) { .fx-spot:hover::before { opacity: 1 } }
+
+/* neon edge: a slow light travelling round the border, on hover / keyboard focus only */
+@property --ph-edge { syntax: "<angle>"; initial-value: 0deg; inherits: false }
+.fx-edge::after {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none; opacity: 0; z-index: 1;
+  background: conic-gradient(from var(--ph-edge), transparent 0 62%, rgb(var(--ac) / .95) 80%, transparent 96%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  transition: opacity .3s var(--ease);
+}
+@media (hover: hover) { .fx-edge:hover::after { opacity: 1; animation: ph-spin 3.2s linear infinite } }
+.fx-edge:focus-visible::after { opacity: 1; animation: ph-spin 3.2s linear infinite }
+@keyframes ph-spin { to { --ph-edge: 360deg } }
+
+/* ============================================================ chapter cards and groups */
+.ph-group { margin-top: 2.25rem }
+.ph-group:first-of-type { margin-top: 0 }
+.ph-grouphead { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; margin: 0 0 .85rem; padding-left: .15rem }
+.ph-grouphead h2 { margin: 0; font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgb(var(--ac) / .95) }
+.ph-grouphead p { margin: 0; font-size: .78rem; color: #7d86a3 }
+.ph-grid { display: grid; gap: .9rem; grid-template-columns: 1fr }
+@media (min-width: 768px) { .ph-grid { grid-template-columns: 1fr 1fr } }
+.ph-ch { display: flex; flex-direction: column; gap: .75rem; padding: 1.25rem; text-decoration: none; min-height: 11rem }
+.ph-ch-head { display: flex; align-items: flex-start; gap: .85rem }
+.ph-num {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 2.4rem; height: 2.4rem; border-radius: .8rem;
+  font-weight: 600; font-size: .95rem; color: rgb(var(--ac)); background: rgb(var(--ac) / .1); border: 1px solid rgb(var(--ac) / .22);
+  font-variant-numeric: tabular-nums;
+}
+.ph-ch h3 { margin: 0; font-size: 1.02rem; line-height: 1.3; font-weight: 600; color: #fff }
+.ph-ch p { margin: 0; font-size: .85rem; line-height: 1.55; color: #98a1bb }
+.ph-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding-top: .25rem }
+.ph-go { display: inline-flex; align-items: center; gap: .4rem; font-size: .85rem; font-weight: 500; color: rgb(var(--ac)) }
+.ph-weight { display: inline-flex; align-items: center; gap: .4rem; font-size: .72rem; color: #8b93ad; letter-spacing: .01em }
+.ph-weight::before { content: ""; width: .4rem; height: .4rem; border-radius: 9999px; background: rgb(var(--ac) / .7) }
+
+/* ============================================================ chapter hub */
+.ph-notice { margin-top: 1.1rem; padding: .7rem .9rem; border: 1px solid var(--line); border-radius: .85rem; background: rgba(255, 255, 255, .025); font-size: .8rem; line-height: 1.5; color: #98a1bb }
+.ph-notice b { color: #e3e7f6; font-weight: 600 }
+.ph-topics { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0 0; padding: 0; list-style: none }
+.ph-features { display: grid; gap: .9rem; grid-template-columns: 1fr; margin-top: 1.75rem }
+@media (min-width: 640px) { .ph-features { grid-template-columns: 1fr 1fr } }
+.ph-feat { display: flex; flex-direction: column; gap: .65rem; padding: 1.25rem; text-decoration: none; min-height: 10.5rem }
+.ph-feat h3 { margin: 0; font-size: 1.05rem; font-weight: 600; color: #fff }
+.ph-feat p { margin: 0; font-size: .85rem; line-height: 1.55; color: #98a1bb }
+.ph-feat .ph-count { margin-top: auto; font-size: .76rem; color: #7d86a3 }
+
+/* ============================================================ progress */
+.ph-prog { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.1rem }
+.ph-prog small { font-size: .78rem; color: #8b93ad; white-space: nowrap; font-variant-numeric: tabular-nums }
+.ph-seg { display: flex; flex: 1; gap: 3px; min-width: 0; height: 5px }
+.ph-seg i { flex: 1; min-width: 2px; border-radius: 9999px; background: rgba(255, 255, 255, .1); transition: background-color .4s var(--ease), box-shadow .4s }
+.ph-seg i.cur { background: rgb(var(--ac) / .55) }
+.ph-seg i.ok { background: rgba(52, 211, 153, .9) }
+.ph-seg i.bad { background: rgba(251, 113, 133, .85) }
+.ph-seg i.part { background: rgba(252, 211, 77, .85) }
+.ph-seg i.seen { background: rgb(var(--ac) / .85) }
+
+/* ============================================================ pill tabs (animated sliding indicator) */
+.ph-pills { position: relative; display: grid; grid-template-columns: repeat(var(--n, 2), 1fr); padding: 4px; border: 1px solid var(--line); border-radius: 1rem; background: rgba(255, 255, 255, .03) }
+.ph-pills button { position: relative; z-index: 1; min-height: 2.6rem; border: 0; background: none; color: #98a1bb; font-size: .85rem; font-weight: 500; border-radius: .75rem; padding: .4rem .5rem; cursor: pointer }
+.ph-pills button[aria-pressed="true"], .ph-pills button[aria-selected="true"] { color: #fff }
+.ph-pills button:active { transform: none }
+.ph-thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / var(--n, 2)); border-radius: .75rem; transform: translateX(calc(var(--i, 0) * 100%));
+  background: linear-gradient(180deg, rgb(var(--ac) / .22), rgb(var(--ac) / .1)); border: 1px solid rgb(var(--ac) / .4); box-shadow: 0 6px 18px -10px rgb(var(--ac) / .6); transition: transform .35s var(--ease) }
+.ph-pillnote { margin: .6rem .2rem 0; font-size: .78rem; color: #7d86a3; line-height: 1.5 }
+.ph-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0 }
+.ph-chipbtn { display: inline-flex; align-items: center; min-height: 2.1rem; padding: .25rem .8rem; border-radius: 9999px; border: 1px solid var(--line); background: rgba(255, 255, 255, .03); color: #aeb5cd; font-size: .78rem; cursor: pointer }
+.ph-chipbtn[aria-pressed="true"] { border-color: rgb(var(--ac) / .5); background: rgb(var(--ac) / .12); color: #fff }
+
+/* ============================================================ question card */
+.ph-q { padding: 1.25rem }
+@media (min-width: 640px) { .ph-q { padding: 1.75rem } }
+.ph-qmeta { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; margin-bottom: .9rem }
+.ph-qtext { font-size: 1.02rem; line-height: 1.75; color: #eef0fa; overflow-wrap: anywhere }
+.ph-qtext + .ph-qtext { margin-top: .5rem }
+.ph-opts { display: grid; gap: .6rem; margin: 1.1rem 0 0; padding: 0; border: 0 }
+.ph-opts label { display: flex; align-items: flex-start; gap: .75rem; padding: .8rem .95rem; border: 1px solid var(--line); border-radius: .95rem; cursor: pointer; line-height: 1.6; font-size: .95rem; color: #dfe3f4; overflow-wrap: anywhere }
+.ph-opts label > .ph-key { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 1.5rem; height: 1.5rem; border-radius: .5rem; font-size: .72rem; color: #8b93ad; background: rgba(255, 255, 255, .06); margin-top: .1rem }
+.ph-opts input { position: absolute; opacity: 0; pointer-events: none }
+.ph-opts.eq label { align-items: center; justify-content: space-between; min-height: 3.6rem }
+.ph-opts.eq .ph-optbody { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: .15rem 0 }
+.ph-optbody { flex: 1; min-width: 0 }
+.ph-opts label.opt-correct::after, .ph-opts label.opt-wrong::after { flex-shrink: 0; font-size: .78rem; font-weight: 600 }
+.ph-opts label.opt-correct::after { content: "Correct"; color: #6ee7b7 }
+.ph-opts label.opt-wrong::after { content: "Not this one"; color: #fda4af }
+.ph-opts input:focus-visible + .ph-key { outline: 2px solid rgb(var(--ac)); outline-offset: 2px }
+
+.ph-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-top: 1.25rem }
+.ph-actions .grow { flex: 1 }
+.ph-link { background: none; border: 0; padding: .35rem .15rem; color: rgb(var(--ac)); font-size: .85rem; cursor: pointer; text-decoration: underline; text-decoration-color: rgb(var(--ac) / .35); text-underline-offset: 3px }
+.ph-link:hover { text-decoration-color: rgb(var(--ac)) }
+
+/* ============================================================ feedback blocks */
+.ph-fb { display: flex; gap: .75rem; margin-top: 1.1rem; padding: .9rem 1rem; border-radius: .95rem; border: 1px solid var(--line); font-size: .9rem; line-height: 1.65; background: rgba(255, 255, 255, .03); animation: rise .35s var(--ease) both }
+.ph-fb > div { min-width: 0; flex: 1; overflow-wrap: anywhere }
+.ph-fb strong { display: block; margin-bottom: .15rem; color: #fff; font-weight: 600 }
+.ph-fb.ok { border-color: rgba(52, 211, 153, .45); background: rgba(52, 211, 153, .08) }
+.ph-fb.bad { border-color: rgba(251, 113, 133, .45); background: rgba(251, 113, 133, .08) }
+.ph-fb.warn { border-color: rgba(252, 211, 77, .4); background: rgba(252, 211, 77, .07) }
+.ph-fb.hint { border-color: rgb(var(--ac) / .35); background: rgb(var(--ac) / .07) }
+.ph-ico { flex-shrink: 0; width: 1.35rem; height: 1.35rem; margin-top: .1rem }
+.ph-ico.ok { color: #6ee7b7 } .ph-ico.bad { color: #fda4af } .ph-ico.warn { color: #fcd34d } .ph-ico.hint { color: rgb(var(--ac)) }
+.ph-tick path { stroke-dasharray: 26; stroke-dashoffset: 26; animation: ph-draw .5s .08s var(--ease) forwards }
+@keyframes ph-draw { to { stroke-dashoffset: 0 } }
+
+/* ============================================================ numerical answer form */
+.ph-field { margin-top: 1.1rem }
+.ph-label { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; margin-bottom: .4rem; font-size: .8rem; font-weight: 600; color: #cfd5ea; letter-spacing: .01em }
+.ph-label span { font-weight: 400; color: #7d86a3; font-size: .74rem }
+.ph-input {
+  width: 100%; min-height: 3rem; padding: .7rem .9rem; border-radius: .9rem; border: 1px solid var(--line); background: rgba(5, 6, 14, .55); color: #f3f5ff;
+  font-size: 1rem; font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace; outline: none; appearance: none;
+  transition: border-color .2s, box-shadow .2s, background-color .2s;
+}
+.ph-input::placeholder { color: #5f6884 }
+.ph-input:focus { border-color: rgb(var(--ac) / .7); box-shadow: 0 0 0 3px rgb(var(--ac) / .15) }
+.ph-input:disabled { opacity: .6 }
+.ph-input.is-ok { border-color: rgba(52, 211, 153, .6) } .ph-input.is-bad { border-color: rgba(251, 113, 133, .6) }
+.ph-input.is-warn { border-color: rgba(252, 211, 77, .55) }
+textarea.ph-input { min-height: 6.5rem; resize: vertical; font-family: inherit; font-size: .95rem; line-height: 1.6 }
+.ph-symrow { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .55rem }
+.ph-sym { display: inline-flex; align-items: center; gap: .35rem; min-height: 1.9rem; padding: .1rem .6rem; border-radius: .6rem; border: 1px solid var(--line); background: rgba(255, 255, 255, .035); color: #c7cde2; font-size: .75rem; cursor: pointer }
+.ph-sym b { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 600; color: rgb(var(--ac)); font-size: .78rem }
+.ph-sym:hover { border-color: rgb(var(--ac) / .5); color: #fff }
+.ph-tips { margin: .6rem 0 0; font-size: .74rem; color: #7d86a3; line-height: 1.5 }
+.ph-res { display: grid; gap: .55rem; margin-top: 1.1rem }
+.ph-res .ph-fb { margin-top: 0 }
+
+/* worked solution */
+.ph-sol { margin-top: 1.1rem; border: 1px solid var(--line); border-radius: 1rem; background: rgba(255, 255, 255, .025); overflow: hidden }
+.ph-sol > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; cursor: pointer; font-size: .9rem; font-weight: 600; color: #fff }
+.ph-sol > summary::-webkit-details-marker { display: none }
+.ph-sol > summary svg { transition: transform .3s var(--ease); color: #8b93ad }
+.ph-sol[open] > summary svg { transform: rotate(180deg) }
+.ph-sol-body { padding: 0 1rem 1rem }
+.ph-model { margin: 0 0 .9rem; padding: .7rem .9rem; border-radius: .85rem; background: rgb(var(--ac) / .07); border: 1px solid rgb(var(--ac) / .25) }
+.ph-model small { display: block; margin-bottom: .2rem; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: rgb(var(--ac) / .9) }
+.ph-steps { margin: 0; padding: 0; list-style: none; counter-reset: st; display: grid; gap: .7rem }
+.ph-steps li { counter-increment: st; position: relative; padding-left: 2.1rem; line-height: 1.8; font-size: .92rem; color: #dfe3f4; overflow-wrap: anywhere; animation: rise .4s var(--ease) both }
+.ph-steps li::before { content: counter(st); position: absolute; left: 0; top: .22rem; width: 1.45rem; height: 1.45rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 600; color: rgb(var(--ac)); background: rgb(var(--ac) / .12); border: 1px solid rgb(var(--ac) / .3) }
+.ph-steps li:nth-child(2) { animation-delay: .06s } .ph-steps li:nth-child(3) { animation-delay: .12s } .ph-steps li:nth-child(4) { animation-delay: .18s } .ph-steps li:nth-child(n+5) { animation-delay: .24s }
+.ph-pts { margin: .75rem 0 0; padding: 0; list-style: none; display: grid; gap: .5rem }
+.ph-pts label { display: flex; align-items: flex-start; gap: .6rem; padding: .6rem .8rem; border: 1px solid var(--line); border-radius: .8rem; font-size: .88rem; line-height: 1.55; cursor: pointer; background: rgba(255, 255, 255, .02) }
+.ph-pts input { margin-top: .25rem; flex-shrink: 0 }
+
+/* ============================================================ flashcards */
+.ph-flip { perspective: 1400px }
+.ph-flip-btn { display: block; width: 100%; padding: 0; border: 0; background: none; text-align: left; color: inherit; cursor: pointer; font: inherit; -webkit-tap-highlight-color: transparent }
+.ph-flip-btn:active { transform: scale(.992) }
+.ph-flip-inner { display: grid; position: relative; transform-style: preserve-3d; transition: transform .6s var(--ease); min-height: 21rem }
+.ph-flip.on .ph-flip-inner { transform: rotateY(180deg) }
+.ph-face { grid-area: 1 / 1; display: flex; flex-direction: column; padding: 1.4rem; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; min-width: 0 }
+@media (min-width: 640px) { .ph-face { padding: 2rem } }
+.ph-front { justify-content: center; align-items: center; text-align: center; gap: 1.1rem }
+.ph-front .ph-qtext { font-size: 1.25rem; line-height: 1.55; font-weight: 500; color: #fff }
+@media (min-width: 640px) { .ph-front .ph-qtext { font-size: 1.45rem } }
+.ph-back { transform: rotateY(180deg); gap: 1rem; justify-content: flex-start }
+.ph-tap { font-size: .75rem; color: #7d86a3; display: inline-flex; align-items: center; gap: .4rem }
+.ph-eq { padding: .9rem .6rem; border-radius: .95rem; background: rgb(var(--ac) / .07); border: 1px solid rgb(var(--ac) / .25); font-size: 1.1rem; color: #fff }
+.ph-symtab { display: grid; gap: .1rem; margin: 0; padding: 0; list-style: none }
+.ph-symtab li { display: grid; grid-template-columns: 3.4rem 1fr; gap: .1rem .75rem; align-items: baseline; padding: .45rem .1rem; border-top: 1px solid rgba(255, 255, 255, .06); font-size: .88rem; line-height: 1.5; color: #c7cde2 }
+.ph-symtab li:first-child { border-top: 0 }
+.ph-symtab .s { font-family: "Cambria Math", "STIX Two Math", Cambria, "Times New Roman", serif; font-style: italic; font-size: 1.02rem; color: #fff; overflow-wrap: anywhere }
+.ph-symtab .u { grid-column: 2; font-size: .78rem; color: rgb(var(--ac) / .95) }
+.ph-note { margin: 0; font-size: .82rem; line-height: 1.6; color: #98a1bb; padding-left: .8rem; border-left: 2px solid rgb(var(--ac) / .4) }
+.ph-deck-nav { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: 1rem }
+.ph-deck-nav .prev { order: 1 } .ph-deck-nav .next { order: 2 } .ph-deck-nav .shuf { order: 3; grid-column: 1 / -1 }
+@media (min-width: 520px) { .ph-deck-nav { grid-template-columns: 1fr auto 1fr } .ph-deck-nav .shuf { order: 2; grid-column: auto } .ph-deck-nav .next { order: 3 } }
+
+/* ============================================================ misc */
+.ph-skel { height: 14rem; border-radius: 1.25rem; border: 1px solid var(--line);
+  background: linear-gradient(100deg, rgba(255, 255, 255, .03) 30%, rgba(255, 255, 255, .07) 50%, rgba(255, 255, 255, .03) 70%); background-size: 220% 100%; animation: ph-shim 1.4s linear infinite }
+@keyframes ph-shim { from { background-position: 120% 0 } to { background-position: -120% 0 } }
+.ph-end { text-align: center; padding: 2rem 1.25rem }
+.ph-end h2 { margin: 0 0 .4rem; font-size: 1.4rem; color: #fff }
+.ph-score { display: inline-flex; align-items: baseline; gap: .3rem; margin: .8rem 0 1.2rem; font-variant-numeric: tabular-nums }
+.ph-score b { font-size: 2.6rem; font-weight: 600; color: rgb(var(--ac)); line-height: 1 }
+.ph-score span { color: #8b93ad }
+.ph-empty { padding: 2rem 1rem; text-align: center; color: #98a1bb; font-size: .92rem }
+
+/* ============================================================ maths renderer (.pm) */
+.pm { font-family: "Cambria Math", "STIX Two Math", "Latin Modern Math", Cambria, "Times New Roman", serif; font-size: 1.08em; line-height: 1.55; font-feature-settings: "lnum" }
+.pm-i { font-style: italic }
+.pm-rm { font-style: normal }
+.pm-b { font-style: normal; font-weight: 700 }
+.pm-fn { font-style: normal; margin-right: .12em }
+.pm-op { margin: 0 .26em }
+.pm-op.pm-un { margin-left: .02em; margin-right: .06em }
+.pm-sp { display: inline-block; height: 1px }
+.pm-big { font-size: 1.3em; line-height: 1; margin-right: .1em; vertical-align: -.08em }
+.pm-frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 .14em; text-align: center; line-height: 1.3; white-space: nowrap }
+.pm-num { padding: 0 .22em .1em; border-bottom: 1px solid currentColor }
+.pm-den { padding: .1em .22em 0 }
+.pm-frac .pm-frac { font-size: .88em }
+.pm-sqrt { display: inline-flex; align-items: stretch; white-space: nowrap }
+.pm-idx { font-size: .6em; margin-right: -.2em; align-self: flex-start }
+.pm-rad { font-size: 1.18em; line-height: 1.05; margin-right: -.02em }
+.pm-rad-body { border-top: 1px solid currentColor; padding: .08em .14em 0 .08em; margin-top: .12em }
+.pm sup, .pm sub { font-size: .72em; line-height: 0; position: relative; vertical-align: baseline }
+.pm sup { top: -.5em } .pm sub { top: .28em }
+.pm-scr { white-space: nowrap }
+.pm-stack { display: inline-flex; flex-direction: column; vertical-align: middle; line-height: 1; margin-left: .02em }
+.pm-stack sup, .pm-stack sub { top: 0 }
+.pm-acc { position: relative; display: inline-block }
+.pm-acc::before { position: absolute; left: 0; right: 0; top: -.58em; text-align: center; font-size: .72em; font-style: normal; line-height: 1 }
+.pm-vec::before { content: "\2192" }
+.pm-hat::before { content: "^"; top: -.42em }
+.pm-dot::before { content: "\02D9"; top: -.5em }
+.pm-ddot::before { content: "\00A8"; top: -.45em }
+.pm-bar { border-top: 1px solid currentColor; padding-top: .04em }
+.pm-block { display: block; text-align: center; overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: .4rem .25rem; font-size: 1.2em; white-space: nowrap; -webkit-overflow-scrolling: touch }
+.pm-err { color: #fda4af; font-family: ui-monospace, Menlo, monospace; font-size: .85em }
+
+/* result colours must win over the generic "selected" option style */
+.ph-opts label.opt-wrong { border-color: rgba(251, 113, 133, .65); background: rgba(251, 113, 133, .09) }
+.ph-opts label.opt-correct { border-color: rgba(52, 211, 153, .7); background: rgba(52, 211, 153, .1) }

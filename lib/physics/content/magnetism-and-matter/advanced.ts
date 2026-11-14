@@ -1,0 +1,76 @@
+import { C, ids, nq } from "../../builders";
+import type { AdvancedContent } from "../../types";
+
+const id = ids("c05");
+
+export const content: AdvancedContent = {
+  problems: [
+    nq({
+      id: id("a"), tag: "Equatorial field of a magnet", level: 1,
+      g: { m: "1 A m^2", r: "10 cm" },
+      q: "A short bar magnet of magnetic moment {m} is placed in a horizontal plane. Find the magnetic field produced by it at a point on its equatorial line, {r} from the centre.",
+      sym: { B: "magnetic field", m: "magnetic moment", r: "distance" },
+      rels: [["B", "mu0*m/(4*pi*r^3)"]], consts: ["mu0"],
+      calc: (s) => C.mu0 / (4 * Math.PI) * s.m / (s.r ** 3), unit: "µT",
+      show: "B = \\dfrac{\\mu_0}{4\\pi}\\,\\dfrac{m}{r^3}",
+      hint: "The equatorial field is half the axial field at the same distance.",
+      steps: ["Equatorial field of a short dipole: $B = \\dfrac{\\mu_0}{4\\pi}\\dfrac{m}{r^3}$.", "$B = \\dfrac{(10^{-7})({v.m})}{({v.r})^3} = {ans}$, directed opposite to $\\vec m$."],
+    }),
+    nq({
+      id: id("a"), tag: "Earth's field components", level: 1,
+      g: { BH: "3.2 × 10^-5 T", delta: "30°" },
+      q: "At a place the horizontal component of the Earth's magnetic field is {BH} and the angle of dip is {delta}. Find the vertical component.",
+      sym: { BV: "vertical component (B_V)", BH: "horizontal component (B_H)", delta: "angle of dip (δ)" },
+      rels: [["BV", "BH*tan(delta)"]], aka: { BV: ["B_V"], BH: ["B_H"] },
+      calc: (s) => s.BH * Math.tan(s.delta), unit: "µT",
+      show: "\\tan\\delta = \\dfrac{B_V}{B_H}",
+      hint: "tan δ is the ratio of the vertical to the horizontal component.",
+      steps: ["$\\tan\\delta = \\dfrac{B_V}{B_H} \\Rightarrow B_V = B_H\\tan\\delta$.", "$B_V = ({v.BH})\\tan30^\\circ = {ans}$."],
+    }),
+    nq({
+      id: id("a"), tag: "Work done in rotating a magnet", level: 2,
+      g: { m: "2 A m^2", B: "0.4 T", theta1: "30°", theta2: "90°" },
+      q: "A bar magnet of magnetic moment {m} is in a uniform field of {B}. How much work is done by an external agent in turning it slowly from an angle of {theta1} to {theta2} with the field?",
+      sym: { W: "work done", m: "magnetic moment", B: "magnetic field", theta1: "initial angle (θ₁)", theta2: "final angle (θ₂)" },
+      rels: [["W", "m*B*(cos(theta1)-cos(theta2))"]], ranges: { theta1: [0.2, 1], theta2: [1.1, 2.5] },
+      calc: (s) => s.m * s.B * (Math.cos(s.theta1) - Math.cos(s.theta2)), unit: "J",
+      show: "W = \\int_{\\theta_1}^{\\theta_2} mB\\sin\\theta\\,d\\theta = mB(\\cos\\theta_1 - \\cos\\theta_2)",
+      hint: "Work against the torque: integrate τ dθ between the two angles.",
+      steps: ["Torque to be overcome: $\\tau = mB\\sin\\theta$. $W = \\int_{\\theta_1}^{\\theta_2}mB\\sin\\theta\\,d\\theta = mB(\\cos\\theta_1 - \\cos\\theta_2)$.", "$W = ({v.m})({v.B})(\\cos30^\\circ - \\cos90^\\circ) = ({v.m})({v.B})(0.866) = {ans}$."],
+    }),
+    nq({
+      id: id("a"), tag: "Oscillation of a magnet", level: 2,
+      g: { m: "0.5 A m^2", I: "2 × 10^-6 kg m^2", B: "0.4 T" },
+      q: "A small bar magnet of magnetic moment {m} and moment of inertia {I} about its centre oscillates freely, through small angles, in a uniform field of {B}. Find its time period.",
+      sym: { T: "time period", I: "moment of inertia", m: "magnetic moment", B: "magnetic field" },
+      rels: [["T", "2*pi*sqrt(I/(m*B))"]],
+      calc: (s) => 2 * Math.PI * Math.sqrt(s.I / (s.m * s.B)), unit: "ms",
+      show: "I\\ddot\\theta = -mB\\theta \\;\\Rightarrow\\; T = 2\\pi\\sqrt{\\dfrac{I}{mB}}",
+      hint: "For small θ the restoring torque is −mBθ, so the motion is simple harmonic.",
+      steps: ["Restoring torque $\\tau = -mB\\sin\\theta \\approx -mB\\theta$, so $I\\alpha = -mB\\theta$ and $\\omega = \\sqrt{mB/I}$.", "$T = \\dfrac{2\\pi}{\\omega} = 2\\pi\\sqrt{\\dfrac{I}{mB}} = 2\\pi\\sqrt{\\dfrac{{v.I}}{({v.m})({v.B})}} = {ans}$."],
+    }),
+    nq({
+      id: id("a"), tag: "Neutral point of a magnet", level: 3,
+      g: { m: "1 A m^2", BH: "3.2 × 10^-5 T" },
+      q: "A short bar magnet of moment {m} is placed on a table with its north pole pointing towards geographic north. The horizontal component of the Earth's field is {BH}. Find the distance from the magnet's centre, along its equatorial line, at which the net horizontal magnetic field is zero.",
+      sym: { r: "distance of the neutral point", m: "magnetic moment", BH: "horizontal field of the Earth (B_H)" },
+      rels: [["r", "(mu0*m/(4*pi*BH))^(1/3)"]], consts: ["mu0"], aka: { BH: ["B_H"] }, ranges: { m: [0.5, 2], BH: [1, 4] },
+      calc: (s) => Math.cbrt(C.mu0 / (4 * Math.PI) * s.m / s.BH), unit: "cm",
+      show: "\\dfrac{\\mu_0}{4\\pi}\\dfrac{m}{r^3} = B_H",
+      hint: "With the N pole pointing north, the magnet's equatorial field points south, opposite to the Earth's field. They cancel where the two magnitudes are equal.",
+      steps: ["The moment $\\vec m$ points north, and the equatorial field of a dipole is opposite to $\\vec m$, so it points south and opposes $B_H$, which points north.", "Neutral point: $\\dfrac{\\mu_0}{4\\pi}\\dfrac{m}{r^3} = B_H \\Rightarrow r = \\left(\\dfrac{\\mu_0 m}{4\\pi B_H}\\right)^{1/3}$.", "$r = \\left(\\dfrac{(10^{-7})({v.m})}{{v.BH}}\\right)^{1/3} = {ans}$."],
+    }),
+    nq({
+      id: id("a"), tag: "Susceptibility and permeability", level: 3,
+      g: { H: "2000 A/m", M: "1.5 × 10^6 A/m" },
+      q: "A magnetising field of {H} produces a magnetisation of {M} in an iron specimen. Find the relative permeability of the specimen.",
+      sym: { mur: "relative permeability (μ_r)", chi: "susceptibility", M: "magnetisation", H: "magnetising field" },
+      rels: [["chi", "M/H"], ["mur", "1+chi"]], aka: { mur: ["mu_r"] },
+      calc: (s) => 1 + s.M / s.H, unit: "",
+      mid: (s) => ({ chi: s.M / s.H }),
+      show: "\\chi = \\dfrac{M}{H},\\qquad \\mu_r = 1 + \\chi",
+      hint: "Find the susceptibility first, then add 1.",
+      steps: ["$\\chi = \\dfrac{M}{H} = \\dfrac{{v.M}}{{v.H}} = {m.chi}$.", "$\\mu_r = 1 + \\chi = {ans}$."],
+    }),
+  ],
+};
