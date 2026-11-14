@@ -1,4 +1,6 @@
-export type MathTopicId = "itf" | "vectors" | "geometry3d" | "maxmin" | "integrals";
+export type MathTopicId =
+  | "rel" | "itf" | "mat" | "det" | "cont" | "derivapps" | "maxmin" | "integrals" | "intadv"
+  | "areaint" | "de" | "vectors" | "geometry3d" | "planes" | "lpp" | "prob";
 export type Level = 1 | 2 | 3;
 export type QKind = "direct" | "short" | "steps" | "application" | "exam";
 
@@ -64,6 +66,8 @@ export interface MathTopicMeta {
   desc: string;
   icon: string;
   chapter: string;
+  /** true for the five chapters in the Second Mid-Term portion */
+  midterm?: boolean;
 }
 
 export interface RevisionItem {
@@ -85,4 +89,21 @@ export interface WorkedExample {
   problem: string;
   steps: WorkedStep[];
   answer: string;
+}
+
+export interface MathCard {
+  id: string;
+  topic: MathTopicId;
+  tag: string;
+  front: string;
+  back: string;
+}
+
+/** Everything a chapter contributes: practice bank, notes, worked examples and flashcards. */
+export interface ChapterContent {
+  id: MathTopicId;
+  questions: MathQuestion[];
+  revision: RevisionSection[];
+  examples: WorkedExample[];
+  cards: MathCard[];
 }

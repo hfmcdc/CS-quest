@@ -1,0 +1,14 @@
+import type { ChapterContent } from "../types";
+import { rel } from "./rel";
+import { mat } from "./mat";
+import { det } from "./det";
+import { cont } from "./cont";
+import { derivapps } from "./derivapps";
+import { intadv } from "./intadv";
+import { areaint } from "./areaint";
+import { de } from "./de";
+import { planes } from "./planes";
+import { lpp } from "./lpp";
+import { prob } from "./prob";
+
+export const CHAPTERS: ChapterContent[] = [rel, mat, det, cont, derivapps, intadv, areaint, de, planes, lpp, prob];

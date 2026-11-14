@@ -1,8 +1,9 @@
 import type { MathTopicId, WorkedExample } from "./types";
+import { CHAPTERS } from "./chapters";
 
 const t = String.raw;
 
-export const EXAMPLES: Record<MathTopicId, WorkedExample[]> = {
+const BASE_EXAMPLES: Partial<Record<MathTopicId, WorkedExample[]>> = {
   itf: [
     {
       title: "Principal value of a negative argument",
@@ -175,3 +176,5 @@ export const EXAMPLES: Record<MathTopicId, WorkedExample[]> = {
     },
   ],
 };
+
+export const EXAMPLES = { ...BASE_EXAMPLES, ...Object.fromEntries(CHAPTERS.map((c) => [c.id, c.examples])) } as Record<MathTopicId, WorkedExample[]>;

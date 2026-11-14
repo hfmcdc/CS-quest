@@ -1,14 +1,9 @@
 import type { MathTopicId } from "./types";
+import { CHAPTERS } from "./chapters";
 import { piTex } from "./generators";
 
-/** Formula and principal-value flashcards. front/back are rich text ($inline$, $$display$$). */
-export interface MathCard {
-  id: string;
-  topic: MathTopicId;
-  tag: string;
-  front: string;
-  back: string;
-}
+export type { MathCard } from "./types";
+import type { MathCard } from "./types";
 
 const t = String.raw;
 const mk = (topic: MathTopicId, prefix: string) => {
@@ -87,7 +82,7 @@ const g3 = mk("geometry3d", "GF");
 const mm = mk("maxmin", "MF");
 const ig = mk("integrals", "NF");
 
-export const MATH_CARDS: MathCard[] = [
+const BASE_CARDS: MathCard[] = [
   ...pvCards,
 
   // ---- inverse trigonometric functions
@@ -193,5 +188,7 @@ export const MATH_CARDS: MathCard[] = [
   ig("Exercise 7.4 method", t`How do you integrate $\frac{px+q}{ax^2+bx+c}$ or $\frac{px+q}{\sqrt{ax^2+bx+c}}$?`, t`Write $px+q=A\,\frac{d}{dx}(ax^2+bx+c)+B$. The $A$ part gives $\ln|\cdot|$ (or a square root); the $B$ part is done by completing the square.`),
   ig("Common mistake", t`Two things students forget in indefinite integrals`, t`The constant $+C$, and the factor $\frac{1}{a}$ when the argument is $ax+b$.`),
 ];
+
+export const MATH_CARDS: MathCard[] = [...BASE_CARDS, ...CHAPTERS.flatMap((c) => c.cards)];
 
 export const MATH_CARD_BY_ID: Record<string, MathCard> = Object.fromEntries(MATH_CARDS.map((c) => [c.id, c]));

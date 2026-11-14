@@ -32,7 +32,7 @@ export const SUBJECTS: SubjectMeta[] = [
     icon: "sigma",
     theme: "theme-maths",
     title: "Maths",
-    note: "Revision notes, worked examples, adaptive practice and challenges.",
+    note: "Full CBSE Class XII coverage with revision notes, worked examples, practice and challenges.",
     cta: "Start practice",
     glyphClass: "text-emerald-300",
     hoverClass: "hover:border-emerald-300/60",

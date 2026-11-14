@@ -1,8 +1,9 @@
 import type { MathTopicId, RevisionSection } from "./types";
+import { CHAPTERS } from "./chapters";
 
 const t = String.raw;
 
-export const REVISION: Record<MathTopicId, RevisionSection[]> = {
+const BASE_REVISION: Partial<Record<MathTopicId, RevisionSection[]>> = {
   // ------------------------------------------------------------------ Inverse trigonometric functions
   itf: [
     {
@@ -314,3 +315,5 @@ export const REVISION: Record<MathTopicId, RevisionSection[]> = {
     },
   ],
 };
+
+export const REVISION = { ...BASE_REVISION, ...Object.fromEntries(CHAPTERS.map((c) => [c.id, c.revision])) } as Record<MathTopicId, RevisionSection[]>;

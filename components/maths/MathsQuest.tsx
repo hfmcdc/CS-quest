@@ -16,6 +16,7 @@ import BetaBanner from "@/components/BetaBanner";
 import { BackLink, PageHeader } from "@/components/ui";
 
 type ModeId = "revision" | "learn" | "practice" | "challenge";
+type Scope = "all" | "midterm";
 type Screen = { name: "home" } | { name: "topic"; topic: MathTopicId; mode: ModeId } | { name: "cards"; topic: MathTopicId | "all" };
 
 const MODES: { id: ModeId; label: string; icon: IconName; blurb: string }[] = [
@@ -30,6 +31,8 @@ const cardCount = (id: MathTopicId) => MATH_CARDS.filter((c) => c.topic === id).
 export default function MathsQuest({ onExit }: { onExit: () => void }) {
   const [screen, setScreen] = useState<Screen>(() => readNav<Screen>("maths:screen", { name: "home" }));
   useEffect(() => { writeNav("maths:screen", screen); }, [screen]);
+  const [scope, setScope] = useState<Scope>(() => readNav<Scope>("maths:scope", "all"));
+  useEffect(() => { writeNav("maths:scope", scope); }, [scope]);
 
   if (screen.name === "cards") {
     return <><BetaBanner /><MathFlashcards key={screen.topic} initial={screen.topic} onBack={() => setScreen({ name: "home" })} onMain={onExit} /></>;
@@ -44,16 +47,20 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
           <BackLink onClick={onExit}>Home</BackLink>
           <button type="button" onClick={() => setScreen({ name: "cards", topic: "all" })} className="btn-ghost !border-[rgb(var(--ac)/.4)] !text-[rgb(var(--ac))]"><Icon name="cards" size={16} />Formula flashcards</button>
         </div>
-        <PageHeader title="Maths" icon={<Icon name="sigma" size={24} />}>Second Mid-Term practice for CBSE Class XII. Pick a chapter, revise, learn the method, then practise.</PageHeader>
+        <PageHeader title="Maths" icon={<Icon name="sigma" size={24} />}>All {MATH_TOPICS.length} parts of the CBSE Class XII syllabus. Pick a chapter, revise, learn the method, then practise.</PageHeader>
+        <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Chapters to show">
+          <button type="button" onClick={() => setScope("all")} aria-pressed={scope === "all"} className={`chip min-h-[2.4rem] px-4 text-sm ${scope === "all" ? "chip-ac" : ""}`}>All chapters ({MATH_TOPICS.length})</button>
+          <button type="button" onClick={() => setScope("midterm")} aria-pressed={scope === "midterm"} className={`chip min-h-[2.4rem] px-4 text-sm ${scope === "midterm" ? "chip-ac" : ""}`}>Second Mid-Term ({MATH_TOPICS.filter((x) => x.midterm).length})</button>
+        </div>
         <section className="stagger grid gap-4 md:grid-cols-2" aria-label="Maths topics">
-          {MATH_TOPICS.map((t) => {
+          {MATH_TOPICS.filter((x) => scope === "all" || x.midterm).map((t) => {
             const c = topicCounts(t.id);
             return (
               <article key={t.id} className="card flex flex-col gap-4 p-6">
                 <div className="flex items-center gap-3">
                   <span className="tile text-2xl" aria-hidden="true">{t.icon}</span>
                   <div className="min-w-0">
-                    <p className="text-sm text-slate-500">{t.chapter}</p>
+                    <p className="text-sm text-slate-500">{t.chapter}{t.midterm && <span className="chip ml-2 !px-2 !py-0 text-[0.65rem]">Mid-Term</span>}</p>
                     <h2 className="text-lg font-semibold leading-snug text-white">{t.title}</h2>
                   </div>
                 </div>
@@ -73,7 +80,7 @@ export default function MathsQuest({ onExit }: { onExit: () => void }) {
           })}
         </section>
         <p className="mt-10 text-center text-xs text-slate-500">
-          Coverage follows standard NCERT/CBSE Class XII topics for the chapters above. Questions are written for practice and are not copied from the textbook exercises. Nothing is saved.
+          Coverage follows the standard NCERT/CBSE Class XII syllabus, chapter by chapter. Questions are written for practice and are not copied from the textbook exercises. Nothing is saved.
         </p>
       </main>
       </>

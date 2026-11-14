@@ -4,7 +4,10 @@ import type { ReactNode } from "react";
  * A small dependency-free renderer for the LaTeX subset used by Maths Quest.
  * Text may mix plain words with $inline$ and $$display$$ math, and **bold**.
  * Supported: \frac \sqrt \vec \hat \overline \text \left \right, ^ _ , Greek letters,
- * \int, trig/log function names, relations and arrows. Unknown commands are shown literally.
+ * \int, trig/log function names, relations and arrows, set notation (\mathbb, \cup, \cap, \subset ...),
+ * \binom, \bar, \pmod, and the environments matrix / pmatrix / bmatrix / vmatrix / cases / array
+ * (\begin{..}...\end{..} with & between cells, \\ between rows, | in the array column spec, \hline).
+ * \comp is a function-composition circle (\circ stays the degree sign). Unknown commands are shown literally.
  */
 
 const SYMBOLS: Record<string, string> = {
@@ -14,9 +17,17 @@ const SYMBOLS: Record<string, string> = {
   parallel: "∥", perp: "⊥", ldots: "…", cdots: "⋯", notin: "∉", in: "∈", angle: "∠", therefore: "∴", because: "∵", prime: "′", sum: "Σ",
   // additions for Physics (additive: these previously rendered as a literal "\\name")
   tau: "τ", nu: "ν", Omega: "Ω", Delta: "Δ", oint: "∮", propto: "∝", sigma: "σ", rho: "ρ", epsilon: "ε",
+  // additions for the full Class XII syllabus (relations, matrices, probability, calculus)
+  comp: "∘", cup: "∪", cap: "∩", subset: "⊂", subseteq: "⊆", supset: "⊃", emptyset: "∅", varnothing: "∅", setminus: "∖",
+  forall: "∀", exists: "∃", equiv: "≡", implies: "⟹", iff: "⟺", sim: "∼", cong: "≅", mid: "|", dots: "…",
+  partial: "∂", lfloor: "⌊", rfloor: "⌋", lceil: "⌈", rceil: "⌉", ast: "∗", wedge: "∧", vee: "∨", neg: "¬",
+  varepsilon: "ε", eta: "η", kappa: "κ", xi: "ξ", psi: "ψ", zeta: "ζ", Sigma: "Σ", Pi: "Π", Phi: "Φ", Lambda: "Λ", Theta: "Θ",
+  rightleftharpoons: "⇌", longrightarrow: "⟶", leftarrow: "←", uparrow: "↑", downarrow: "↓", nearrow: "↗", searrow: "↘",
+  star: "★", bullet: "•", nmid: "∤", oplus: "⊕", otimes: "⊗", prod: "∏", sqcup: "⊔", triangle: "△", square: "□", Box: "□",
 };
-const FUNCS = new Set(["sin", "cos", "tan", "cot", "sec", "csc", "cosec", "log", "ln", "exp", "max", "min", "lim"]);
-const BINARY = new Set(["+", "-", "=", "<", ">", "≤", "≥", "≠", "×", "±", "→", "⇒", "⇔", "≈", "∥", "⊥", "∈", "∉"]);
+const BLACKBOARD: Record<string, string> = { R: "ℝ", N: "ℕ", Z: "ℤ", Q: "ℚ", C: "ℂ" };
+const FUNCS = new Set(["sin", "cos", "tan", "cot", "sec", "csc", "cosec", "log", "ln", "exp", "max", "min", "lim", "det", "arcsin", "arccos", "arctan", "gcd", "sinh", "cosh", "tanh", "sup", "inf", "Pr"]);
+const BINARY = new Set(["+", "-", "=", "<", ">", "≤", "≥", "≠", "×", "±", "→", "⇒", "⇔", "≈", "∥", "⊥", "∈", "∉", "∘", "∪", "∩", "⊂", "⊆", "⊃", "∖", "≡", "⟹", "⟺", "∼", "≅", "∧", "∨", "⊕", "⊗"]);
 
 interface Ctx {
   s: string;
@@ -147,6 +158,61 @@ function parseCommand(c: Ctx): { node: ReactNode; kind: Kind } {
       if (ch === "\\") { out = c.s[c.i] ?? ""; c.i++; if (out === "|") out = "‖"; }
       return { node: <span key={nk(c)}>{out}</span>, kind: name === "left" ? "open" : "atom" };
     }
+    case "bar": {
+      const a = parseArg(c);
+      return { kind: "atom", node: <span key={nk(c)} className="border-t border-current">{a}</span> };
+    }
+    case "mathbb": {
+      skipSpaces(c);
+      let letter = "";
+      if (c.s[c.i] === "{") {
+        const close = c.s.indexOf("}", c.i);
+        letter = c.s.slice(c.i + 1, close);
+        c.i = close + 1;
+      } else letter = c.s[c.i++] ?? "";
+      return { kind: "atom", node: <span key={nk(c)}>{BLACKBOARD[letter] ?? letter}</span> };
+    }
+    case "pmod": {
+      const a = parseArg(c);
+      return { kind: "atom", node: <span key={nk(c)}>{"\u00a0(mod "}{a}{")"}</span> };
+    }
+    case "binom": case "dbinom": case "tbinom": {
+      const a = parseArg(c);
+      const b = parseArg(c);
+      return {
+        kind: "atom",
+        node: (
+          <span key={nk(c)} className="mx-[0.12em] inline-flex items-center align-middle">
+            <span className="text-[1.7em] font-extralight leading-none">(</span>
+            <span className="inline-flex flex-col items-center text-[0.85em] leading-[1.2]"><span>{a}</span><span>{b}</span></span>
+            <span className="text-[1.7em] font-extralight leading-none">)</span>
+          </span>
+        ),
+      };
+    }
+    case "begin": {
+      skipSpaces(c);
+      let env = "";
+      if (c.s[c.i] === "{") {
+        const close = c.s.indexOf("}", c.i);
+        env = c.s.slice(c.i + 1, close);
+        c.i = close + 1;
+      }
+      const tag = `\\end{${env}}`;
+      const stop = c.s.indexOf(tag, c.i);
+      if (stop < 0) {
+        c.report?.(`Missing \\end{${env}}`);
+        return { node: null, kind: "atom" };
+      }
+      let body = c.s.slice(c.i, stop);
+      c.i = stop + tag.length;
+      let spec = "";
+      if (env === "array") {
+        const m = /^\s*\{([^}]*)\}/.exec(body);
+        if (m) { spec = m[1]; body = body.slice(m[0].length); }
+      }
+      return { kind: "atom", node: renderEnv(c, env, body, spec) };
+    }
     case "displaystyle": case "big": case "Big": case "bigg": case "Bigg": case "limits":
       return { node: null, kind: "op" };
     case "quad": return { node: <span key={nk(c)} className="inline-block w-[1em]" />, kind: "op" };
@@ -162,6 +228,56 @@ function parseCommand(c: Ctx): { node: ReactNode; kind: Kind } {
       c.report?.(`Unknown command \\${name}`);
       return { node: <span key={nk(c)}>{"\\" + name}</span>, kind: "atom" };
   }
+}
+
+/** Matrices, determinants, piecewise definitions and simple tables: \\begin{env} ... \\end{env}. */
+function renderEnv(c: Ctx, env: string, body: string, spec: string): ReactNode {
+  const known = ["matrix", "pmatrix", "bmatrix", "vmatrix", "Vmatrix", "cases", "array"];
+  if (!known.includes(env)) c.report?.(`Unknown environment ${env}`);
+  const rowSrc = body.split(/\\\\/).map((r) => r.trim()).filter((r) => r !== "" && r !== "\\hline");
+  const rows = rowSrc.map((r) => {
+    let top = false;
+    let text = r;
+    while (text.startsWith("\\hline")) { top = true; text = text.slice(6).trim(); }
+    const cells = text.split("&").map((cell) => {
+      const sub: Ctx = { s: cell.trim(), i: 0, key: 0, report: c.report };
+      return <>{parseSeq(sub, false)}</>;
+    });
+    return { top, cells };
+  });
+  const ncols = Math.max(1, ...rows.map((r) => r.cells.length));
+  // array column spec such as "c|ccc": a bar puts a rule on the left of the next column
+  const bars = new Set<number>();
+  if (spec) {
+    let col = 0;
+    for (const ch of spec) {
+      if (ch === "|") bars.add(col);
+      else if (/[lcr]/.test(ch)) col++;
+    }
+  }
+  const left = env === "cases" || env === "pmatrix" || env === "bmatrix" || env === "vmatrix" || env === "Vmatrix";
+  const right = env === "pmatrix" || env === "bmatrix" || env === "vmatrix" || env === "Vmatrix";
+  const leftCls = env === "bmatrix" ? "border-y border-l" : env === "pmatrix" || env === "cases" ? "border-l rounded-l-[0.7em]" : env === "Vmatrix" ? "border-x" : "border-l";
+  const rightCls = env === "bmatrix" ? "border-y border-r" : env === "pmatrix" ? "border-r rounded-r-[0.7em]" : env === "Vmatrix" ? "border-x" : "border-r";
+  const align = env === "cases" ? "justify-self-start" : "justify-self-center";
+  return (
+    <span key={nk(c)} className="mx-[0.2em] inline-flex items-stretch align-middle">
+      {left && <span aria-hidden="true" className={`w-[0.3em] self-stretch border-current ${leftCls}`} />}
+      <span className="inline-grid gap-x-[1em] gap-y-[0.25em] px-[0.3em] py-[0.15em] text-[0.95em]" style={{ gridTemplateColumns: `repeat(${ncols}, auto)` }}>
+        {rows.flatMap((r, ri) =>
+          Array.from({ length: ncols }, (_, ci) => (
+            <span
+              key={`${ri}-${ci}`}
+              className={`${align} whitespace-nowrap ${r.top ? "border-t border-current pt-[0.15em]" : ""} ${bars.has(ci) ? "border-l border-current pl-[0.5em]" : ""}`}
+            >
+              {r.cells[ci] ?? null}
+            </span>
+          )),
+        )}
+      </span>
+      {right && <span aria-hidden="true" className={`w-[0.3em] self-stretch border-current ${rightCls}`} />}
+    </span>
+  );
 }
 
 function withScripts(c: Ctx, atom: ReactNode): ReactNode {
@@ -278,6 +394,15 @@ export function speak(tex: string): string {
     .replace(/\^(\w)/g, " to the power $1 ")
     .replace(/_(\w)/g, " sub $1 ")
     .replace(/\\(?:left|right|displaystyle|quad|qquad|big|Big)\b/g, " ")
+    .replace(/\\begin\{(?:p|b|v|V)?matrix\}/g, " matrix ")
+    .replace(/\\begin\{cases\}/g, " cases ")
+    .replace(/\\begin\{array\}\s*\{[^}]*\}/g, " table ")
+    .replace(/\\end\{[A-Za-z]+\}/g, " ")
+    .replace(/\\hline/g, " ")
+    .replace(/\\\\/g, " ; next row ")
+    .replace(/&/g, " , ")
+    .replace(/\\binom\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, " $1 choose $2 ")
+    .replace(/\\mathbb\s*\{([A-Z])\}/g, " $1 ")
     .replace(/\\int/g, " integral of ")
     .replace(/\\([A-Za-z]+)/g, (_m, n: string) => (SYMBOLS[n] ? " " + n + " " : " " + n + " "))
     .replace(/[{}]/g, " ")
