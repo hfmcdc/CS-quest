@@ -9,6 +9,7 @@ import ChemPractice from "@/components/chemistry/ChemPractice";
 import ChemFlashcards from "@/components/chemistry/ChemFlashcards";
 import ChemConcept from "@/components/chemistry/ChemConcept";
 import ChemNumerical from "@/components/chemistry/ChemNumerical";
+import ChemReactions from "@/components/chemistry/ChemReactions";
 import ModeTabs from "@/components/ModeTabs";
 import BetaBanner from "@/components/BetaBanner";
 import { BackLink } from "@/components/ui";
@@ -20,6 +21,8 @@ const ALL_MODES: Record<ChemFeature, { label: string; icon: IconName; blurb: str
   cards: { label: "Flashcards", icon: "cards", blurb: "Flip cards for formulas, definitions and reactions" },
   concept: { label: "Concept", icon: "bulb", blurb: "Short-answer questions with a hint and one retry" },
   numerical: { label: "Numericals", icon: "sigma", blurb: "Pick the equation, then calculate with units" },
+  equations: { label: "Equations", icon: "sigma", blurb: "Complete the equation: type the product or reagent" },
+  reactions: { label: "Reactions", icon: "compass", blurb: "Named reactions and conversions, one decision at a time" },
   practice: { label: "MCQ", icon: "target", blurb: "Adaptive multiple choice with a hint and one retry" },
   predict: { label: "Predict", icon: "flask", blurb: "Predict what happens, with step-by-step reasoning" },
   challenge: { label: "Challenge", icon: "flame", blurb: "Harder conceptual and assertion–reason questions" },
@@ -36,7 +39,7 @@ function Skeleton() {
 export default function ChapterScreen({ slug }: { slug: string }) {
   const meta = chemChapter(slug)!;
   const modeKey = `chem:mode:${slug}`;
-  const MODES = meta.features.map((id) => ({ id, ...ALL_MODES[id] }));
+  const MODES = meta.features.map((id) => ({ id, ...ALL_MODES[id], ...(id === "predict" && meta.branch === "organic" ? { label: "Identify product", blurb: "Predict the major product, with step-by-step reasoning" } : {}) }));
   const [mode, setModeState] = useState<Mode>(() => { const m = readNav<Mode>(modeKey, meta.features[0]); return meta.features.includes(m) ? m : meta.features[0]; });
   // Synchronous cache hit means no spinner when returning to a chapter that was already opened or prefetched.
   const [content, setContent] = useState<ChemChapterContent | undefined>(() => cachedChemContent(slug));
@@ -77,6 +80,8 @@ export default function ChapterScreen({ slug }: { slug: string }) {
         {content && mode === "practice" && <ChemPractice chapterKey={slug} bank={content.questions} title={meta.short} />}
         {content && mode === "concept" && content.concept && <ChemConcept chapterKey={slug} bank={content.concept} title={meta.short} />}
         {content && mode === "numerical" && content.numerical && <ChemNumerical chapterKey={slug} bank={content.numerical} title={meta.short} />}
+        {content && mode === "equations" && content.equations && <ChemConcept chapterKey={slug} bank={content.equations} title={meta.short} variant="equations" />}
+        {content && mode === "reactions" && content.reactions && <ChemReactions chapterKey={slug} bank={content.reactions} title={meta.short} />}
         {content && mode === "predict" && content.predict && <ChemPractice chapterKey={slug} bank={content.predict} title={meta.short} predict />}
       </div>
     </main>

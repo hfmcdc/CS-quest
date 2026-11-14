@@ -33,6 +33,32 @@ export const CHEM_CHAPTERS: ChemChapterMeta[] = [
     features: ["revise", "cards", "practice", "challenge"],
     load: () => import("./chapters/d-and-f-block").then((m) => m.content),
   },
+  {
+    slug: "haloalkanes-and-haloarenes",
+    number: 6,
+    title: "Haloalkanes and Haloarenes",
+    short: "Haloalkanes",
+    icon: "🧪",
+    desc: "Classification, nature of the C–X bond, preparation, nucleophilic substitution and elimination, reactions of haloarenes, and polyhalogen compounds.",
+    topics: ["C–X bond", "Preparation", "SN1 and SN2", "Elimination", "Haloarenes", "Polyhalogen compounds"],
+    branch: "organic",
+    marks: 6,
+    features: ["revise", "cards", "concept", "equations", "reactions", "practice", "predict", "challenge"],
+    load: () => import("./chapters/haloalkanes-and-haloarenes").then((m) => m.content),
+  },
+  {
+    slug: "aldehydes-ketones-and-carboxylic-acids",
+    number: 8,
+    title: "Aldehydes, Ketones and Carboxylic Acids",
+    short: "Carbonyls",
+    icon: "⚗",
+    desc: "Preparation and reactions of aldehydes, ketones and carboxylic acids: nucleophilic addition, named reactions, acidity and chemical tests.",
+    topics: ["Nomenclature", "Preparation", "Nucleophilic addition", "Named reactions", "Acidity", "Chemical tests"],
+    branch: "organic",
+    marks: 8,
+    features: ["revise", "cards", "concept", "equations", "reactions", "practice", "predict", "challenge"],
+    load: () => import("./chapters/aldehydes-ketones-and-carboxylic-acids").then((m) => m.content),
+  },
 ];
 
 export function chemChapter(slug: string): ChemChapterMeta | undefined {

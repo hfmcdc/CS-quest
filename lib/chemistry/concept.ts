@@ -7,6 +7,7 @@ export function normaliseText(s: string): string {
     .replace(/[−–—]/g, "-")
     .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]/g, (c) => SUPER[c] ?? c)
     .replace(/[₀-₉]/g, (c) => String(c.charCodeAt(0) - 0x2080))
+    .replace(/(?<=[a-zα-ω])-(?=[a-zα-ω])/g, " ")
     .replace(/[\^{}$\\]/g, "")
     .replace(/[,;:()"'`!?]/g, " ")
     .replace(/\s+/g, " ")

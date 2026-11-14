@@ -3,7 +3,7 @@ import type { AnsSpec } from "../physics/types";
 export type ChemLevel = 1 | 2 | 3;
 
 /** Learning modes a chapter can offer. A chapter lists only the modes it really has content for. */
-export type ChemFeature = "revise" | "cards" | "concept" | "numerical" | "practice" | "predict" | "challenge";
+export type ChemFeature = "revise" | "cards" | "concept" | "numerical" | "equations" | "reactions" | "practice" | "predict" | "challenge";
 export type ChemBranch = "physical" | "inorganic" | "organic";
 
 export interface ChemQuestion {
@@ -19,6 +19,8 @@ export interface ChemQuestion {
   challenge?: boolean;
   /** Optional worked reasoning, shown after the attempt (used by "Predict the outcome"). */
   steps?: string[];
+  /** Plain-ASCII equation(s), e.g. "CH3COOH + NaHCO3 -> CH3COONa + CO2 + H2O". Used only by verify:chemistry to check atom balance. */
+  balance?: string[];
 }
 
 /** Feature 2: typed short answer, matched against groups of acceptable phrasings. */
@@ -31,6 +33,24 @@ export interface ChemConceptQ {
   groups: string[][];
   model: string;
   hint: string;
+  balance?: string[];
+}
+
+/** Feature 4: a reaction or conversion worked through one decision at a time (reagent, conditions, product, next step). */
+export interface ChemReactionStage { ask: string; options: string[]; answer: number; why: string; hint: string }
+export interface ChemReactionQ {
+  id: string;
+  tag: string;
+  level: ChemLevel;
+  /** Reaction or conversion title, e.g. "Rosenmund reduction". */
+  title: string;
+  /** The starting point shown to the student, e.g. "CH₃COCl → CH₃CHO". */
+  prompt: string;
+  stages: ChemReactionStage[];
+  /** The full equation or scheme revealed at the end. */
+  equation: string;
+  note?: string;
+  balance?: string[];
 }
 
 /** Feature 3: pick the right equation, then give a number with its unit. */
@@ -73,6 +93,10 @@ export interface ChemChapterContent {
   challenge: ChemQuestion[];
   concept?: ChemConceptQ[];
   numerical?: ChemNumQ[];
+  /** Equation-based practice (typed products/reagents) for chapters where numericals do not apply. */
+  equations?: ChemConceptQ[];
+  /** Named reactions and conversions (organic chapters). */
+  reactions?: ChemReactionQ[];
   /** Adapted "Identify the Product" for physical/inorganic chapters: predict the outcome. */
   predict?: ChemQuestion[];
 }

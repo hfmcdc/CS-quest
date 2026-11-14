@@ -14,8 +14,8 @@ const shuffle = <T,>(a: T[]) => { const r = [...a]; for (let i = r.length - 1; i
 const fresh = (bank: ChemConceptQ[]): CState => ({ order: shuffle(bank.map((b) => b.id)), i: 0, input: "", phase: "ask", ok: null, self: false, hint: false, note: "" });
 
 /** Typed short-answer practice. Answers are matched against accepted phrasings (keyword groups), not by an AI evaluator. */
-export default function ChemConcept({ chapterKey, bank, title }: { chapterKey: string; bank: ChemConceptQ[]; title: string }) {
-  const navKey = `chem:concept:${chapterKey}`;
+export default function ChemConcept({ chapterKey, bank, title, variant = "concept" }: { chapterKey: string; bank: ChemConceptQ[]; title: string; variant?: "concept" | "equations" }) {
+  const navKey = `chem:${variant}:${chapterKey}`;
   const [s, setS] = useState<CState>(() => readNav<CState | null>(navKey, null) ?? fresh(bank));
   const ref = useRef(s);
   ref.current = s;
@@ -42,7 +42,7 @@ export default function ChemConcept({ chapterKey, bank, title }: { chapterKey: s
         <div className="mb-4 flex flex-wrap gap-2"><span className="chip chip-ac">{title} · {q.tag}</span><span className="chip">{LEVELS[q.level - 1]}</span></div>
         <p className="mb-4 whitespace-pre-line text-lg font-medium leading-relaxed text-white">{q.q}</p>
         <label className="sr-only" htmlFor="concept-answer">Your answer</label>
-        <textarea id="concept-answer" value={s.input} disabled={done} onChange={(e) => upd({ input: e.target.value })} rows={4} placeholder="Write your answer in your own words…"
+        <textarea id="concept-answer" value={s.input} disabled={done} onChange={(e) => upd({ input: e.target.value })} rows={variant === "equations" ? 2 : 4} placeholder={variant === "equations" ? "Type the product, e.g. CH3CH2Cl or chloroethane" : "Write your answer in your own words…"}
           className="w-full rounded-xl border border-white/10 bg-black/30 p-3 text-base leading-relaxed text-slate-100 placeholder:text-slate-500" />
         {!done && (
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -69,7 +69,7 @@ export default function ChemConcept({ chapterKey, bank, title }: { chapterKey: s
         </div>
         {done && <button onClick={next} className="btn-primary mt-5">Next question<Icon name="forward" size={18} /></button>}
       </article>
-      <p className="mt-6 text-center text-xs text-slate-500">Typed answers are matched against accepted wordings. Nothing is saved after a refresh.</p>
+      <p className="mt-6 text-center text-xs text-slate-500">{variant === "equations" ? "Formulas and names are matched against accepted spellings (CH3CH2OH, C2H5OH, ethanol). Nothing is saved after a refresh." : "Typed answers are matched against accepted wordings. Nothing is saved after a refresh."}</p>
     </div>
   );
 }

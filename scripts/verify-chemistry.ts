@@ -28,6 +28,58 @@ const EXPECT: Record<string, number> = {
   "kn-n9": (LN10 / 10) * Math.log10(100 / 80) / 60,
 };
 
+
+/** Atom-balance check for plain-ASCII equations such as "CH3COOH + NaHCO3 -> CH3COONa + CO2 + H2O". */
+function countAtoms(formula: string): Record<string, number> | null {
+  const f = formula.replace(/=/g, "");
+  let pos = 0;
+  const parse = (): Record<string, number> | null => {
+    const out: Record<string, number> = {};
+    while (pos < f.length && f[pos] !== ")") {
+      if (f[pos] === "(") {
+        pos++;
+        const inner = parse();
+        if (!inner || f[pos] !== ")") return null;
+        pos++;
+        const m = /^\d+/.exec(f.slice(pos));
+        const mult = m ? parseInt(m[0], 10) : 1;
+        if (m) pos += m[0].length;
+        for (const [k, v] of Object.entries(inner)) out[k] = (out[k] ?? 0) + v * mult;
+      } else {
+        const m = /^([A-Z][a-z]?)(\d*)/.exec(f.slice(pos));
+        if (!m) return null;
+        pos += m[0].length;
+        out[m[1]] = (out[m[1]] ?? 0) + (m[2] ? parseInt(m[2], 10) : 1);
+      }
+    }
+    return out;
+  };
+  const r = parse();
+  return r && pos === f.length ? r : null;
+}
+function side(expr: string): Record<string, number> | null {
+  const total: Record<string, number> = {};
+  for (const raw of expr.split(" + ")) {
+    const t = raw.trim();
+    const m = /^(\d+)(.*)$/.exec(t);
+    const coef = m ? parseInt(m[1], 10) : 1;
+    const atoms = countAtoms(m ? m[2] : t);
+    if (!atoms) return null;
+    for (const [k, v] of Object.entries(atoms)) total[k] = (total[k] ?? 0) + v * coef;
+  }
+  return total;
+}
+function checkBalance(id: string, eqs: string[] | undefined) {
+  for (const e of eqs ?? []) {
+    const [l, r] = e.split("->");
+    const L = r === undefined ? null : side(l), R = r === undefined ? null : side(r);
+    if (!L || !R) { bad(`${id}: cannot parse equation "${e}"`); continue; }
+    const el = new Set([...Object.keys(L), ...Object.keys(R)]);
+    const off = [...el].filter((k) => (L[k] ?? 0) !== (R[k] ?? 0)).map((k) => `${k} ${L[k] ?? 0}≠${R[k] ?? 0}`);
+    if (off.length) bad(`${id}: not balanced (${off.join(", ")}) in "${e}"`);
+  }
+}
+
 function checkMcq(list: ChemQuestion[], label: string, ids: Set<string>) {
   for (const x of list) {
     if (ids.has(x.id)) bad(`${label}: duplicate id ${x.id}`); ids.add(x.id);
@@ -35,6 +87,9 @@ function checkMcq(list: ChemQuestion[], label: string, ids: Set<string>) {
     if (new Set(x.options).size !== x.options.length) bad(`${x.id}: duplicate options`);
     if (x.options.length !== 4) bad(`${x.id}: expected 4 options`);
     if (!x.why.trim() || !x.hint.trim()) bad(`${x.id}: missing explanation or hint`);
+    if (label === "predict" && !(x.steps && x.steps.length >= 2)) bad(`${x.id}: predict items need step-by-step reasoning`);
+    if (label === "challenge" && !x.challenge) bad(`${x.id}: challenge item is not flagged`);
+    checkBalance(x.id, x.balance);
   }
 }
 
@@ -43,7 +98,7 @@ function checkChapter(slug: string, c: ChemChapterContent, features: string[]) {
   const ids = new Set<string>();
   checkMcq(c.questions, "practice", ids); checkMcq(c.challenge, "challenge", ids); checkMcq(c.predict ?? [], "predict", ids);
   for (const k of c.cards) { if (ids.has(k.id)) bad(`duplicate id ${k.id}`); ids.add(k.id); if (!k.front || !k.back) bad(`${k.id}: empty card`); }
-  const has: Record<string, number> = { revise: c.sections.length, cards: c.cards.length, concept: c.concept?.length ?? 0, numerical: c.numerical?.length ?? 0, practice: c.questions.length, predict: c.predict?.length ?? 0, challenge: c.challenge.length };
+  const has: Record<string, number> = { revise: c.sections.length, cards: c.cards.length, concept: c.concept?.length ?? 0, numerical: c.numerical?.length ?? 0, practice: c.questions.length, predict: c.predict?.length ?? 0, challenge: c.challenge.length, equations: c.equations?.length ?? 0, reactions: c.reactions?.length ?? 0 };
   for (const f of features) if (!has[f]) bad(`feature "${f}" is declared but has no content`);
   for (const [f, n] of Object.entries(has)) if (n && !features.includes(f)) bad(`content for "${f}" exists but the feature is not declared`);
 
@@ -54,6 +109,23 @@ function checkChapter(slug: string, c: ChemChapterContent, features: string[]) {
     if (matchConcept("I do not know", s.groups).status === "correct") bad(`${s.id}: matcher accepts an empty answer`);
   }
 
+  for (const s of c.equations ?? []) {
+    if (ids.has(s.id)) bad(`duplicate id ${s.id}`); ids.add(s.id);
+    if (matchConcept(s.model, s.groups).status !== "correct") bad(`${s.id}: the model answer does not satisfy its own matcher`);
+    if (matchConcept("I do not know", s.groups).status === "correct") bad(`${s.id}: matcher accepts an empty answer`);
+    checkBalance(s.id, s.balance);
+  }
+  for (const r of c.reactions ?? []) {
+    if (ids.has(r.id)) bad(`duplicate id ${r.id}`); ids.add(r.id);
+    if (!r.stages.length) bad(`${r.id}: no stages`);
+    r.stages.forEach((g, k) => {
+      if (g.options.length !== 4) bad(`${r.id} step ${k + 1}: expected 4 options`);
+      if (new Set(g.options).size !== g.options.length) bad(`${r.id} step ${k + 1}: duplicate options`);
+      if (!g.options[g.answer]) bad(`${r.id} step ${k + 1}: answer index out of range`);
+      if (!g.why.trim() || !g.hint.trim()) bad(`${r.id} step ${k + 1}: missing explanation or hint`);
+    });
+    checkBalance(r.id, r.balance);
+  }
   for (const n of c.numerical ?? []) {
     if (ids.has(n.id)) bad(`duplicate id ${n.id}`); ids.add(n.id);
     if (n.formulaOptions.length !== 4 || !n.formulaOptions[n.formulaAnswer]) bad(`${n.id}: formula options`);
@@ -62,19 +134,10 @@ function checkChapter(slug: string, c: ChemChapterContent, features: string[]) {
     if (exp === undefined) bad(`${n.id}: no independent expected value`);
     else if (!near(n.ans.value, exp, 0.01)) bad(`${n.id}: stored ${n.ans.value} vs recomputed ${exp}`);
     else console.log(`  ✓ ${n.id}  ${exp.toPrecision(4)}`);
-    // the answer written in the preferred unit must be accepted
-    if (n.ans.unit) {
-      const sc = normaliseUnit(n.ans.unit).scale;
-      void sc;
-    }
   }
 }
 
 console.log("Chemistry content checks");
-for (const meta of CHEM_CHAPTERS) {
-  // eslint-disable-next-line no-await-in-loop
-  (async () => {})();
-}
 (async () => {
   for (const meta of CHEM_CHAPTERS) checkChapter(meta.slug, await meta.load(), meta.features);
 
