@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Logo from "@/components/Logo";
 import Wordmark from "@/components/Wordmark";
 
 const DURATION = 4500;
@@ -130,7 +131,7 @@ export default function FirstVisitSplash() {
       <div className="splash-center">
         <div className="splash-ring" aria-hidden="true">
           <span className="splash-orbit" />
-          <svg viewBox="0 0 120 120" width="120" height="120">
+          <svg className="splash-progress" viewBox="0 0 120 120" width="120" height="120">
             <defs>
               <linearGradient id="splash-grad" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0" stopColor="#22d3ee" /><stop offset="1" stopColor="#a78bfa" />
@@ -139,9 +140,10 @@ export default function FirstVisitSplash() {
             <circle className="trk" cx="60" cy="60" r={R} />
             <circle ref={ring} className="prg" cx="60" cy="60" r={R} strokeDasharray={C} strokeDashoffset={C} />
           </svg>
-          <Wordmark className="splash-mark" />
+          <Logo size={68} />
         </div>
 
+        <Wordmark className="splash-mark" />
         <p className="splash-tag"><span className="t-normal">CBSE Class XII practice</span><span className="t-spooky">Summoning your questions…</span></p>
         <p className="splash-pct mono" aria-hidden="true"><span ref={pct}>0</span>%</p>
       </div>

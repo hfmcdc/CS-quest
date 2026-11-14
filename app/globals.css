@@ -156,12 +156,12 @@ html[data-splash="exit"] #splash { opacity: 0; transform: scale(1.05); filter: b
 html[data-splash="exit"] main { animation: rise .8s var(--ease) both }
 .splash-center { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 0 1.5rem; text-align: center }
 .splash-ring { position: relative; width: 7.5rem; height: 7.5rem; display: grid; place-items: center }
-.splash-ring svg { position: absolute; inset: 0; transform: rotate(-90deg) }
-.splash-ring circle { fill: none; stroke-width: 3; stroke-linecap: round }
+.splash-ring .splash-progress { position: absolute; inset: 0; transform: rotate(-90deg) }
+.splash-progress circle { fill: none; stroke-width: 3; stroke-linecap: round }
 .splash-ring .trk { stroke: rgba(255, 255, 255, .08) }
 .splash-ring .prg { stroke: url(#splash-grad); filter: drop-shadow(0 0 6px rgba(34, 211, 238, .55)) }
 .splash-orbit { position: absolute; inset: -.6rem; border-radius: 9999px; border: 1px dashed rgba(255, 255, 255, .07); animation: spin 14s linear infinite }
-.splash-mark { font-size: 1rem; font-weight: 700; color: #e8fbff; text-shadow: 0 0 22px rgba(34, 211, 238, .5); animation: pop .7s var(--ease) both .1s }
+.splash-mark { font-size: 1.55rem; font-weight: 700; color: #e8fbff; text-shadow: 0 0 22px rgba(34, 211, 238, .5); animation: pop .7s var(--ease) both .1s }
 .splash-tag { color: #8b93b0; font-size: .95rem; opacity: 0; animation: rise .6s var(--ease) 1s forwards }
 .splash-pct { color: #646c8a; font-size: .8rem; font-variant-numeric: tabular-nums; min-width: 3ch }
 .splash-skip { position: absolute; bottom: max(1.5rem, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); padding: .6rem 1.1rem;
