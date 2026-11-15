@@ -356,8 +356,8 @@ for (const g of GENERATORS) {
 }
 
 // ---------------------------------------------------------------- 6. scope guard for the Second Mid-Term chapters
-// The five mid-term chapters deliberately stay inside their portion (e.g. integrals only up to Exercise 7.4, no planes).
-// Later chapters (Integrals II, Applications of Integrals, Planes, ...) are separate topics and are not restricted.
+// The five mid-term chapters deliberately stay inside their portion (e.g. integrals only up to Exercise 7.4, no planes - which are not in the syllabus).
+// Later chapters (Integrals II, Applications of Integrals, ...) are separate topics and are not restricted.
 const banned = [/(?<!in)definite integral/i, /partial fraction/i, /integration by parts/i, /\bplane\b/i, /\\int_/, /area under/i, /rolle/i, /mean value/i, /rate of change/i, /tangent and normal/i, /approximation/i, /triple product/i];
 const midterm = new Set<string>(MIDTERM_TOPIC_IDS);
 const everything: string[] = [];
@@ -371,7 +371,7 @@ for (const text of everything) for (const re of banned) ok(!re.test(text), `out-
 
 // ---------------------------------------------------------------- 8. full-syllabus coverage
 {
-  ok(MATH_TOPICS.length === 16, `expected 16 topics, found ${MATH_TOPICS.length}`);
+  ok(MATH_TOPICS.length === 15, `expected 15 topics, found ${MATH_TOPICS.length}`);
   ok(new Set(MATH_TOPICS.map((t) => t.id)).size === MATH_TOPICS.length, "duplicate topic ids");
   for (const topic of MATH_TOPICS) {
     const own = QUESTIONS.filter((q) => q.topic === topic.id);
