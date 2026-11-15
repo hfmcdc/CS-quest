@@ -356,7 +356,7 @@ for (const g of GENERATORS) {
 }
 
 // ---------------------------------------------------------------- 6. scope guard for the Second Mid-Term chapters
-// The five mid-term chapters deliberately stay inside their portion (e.g. integrals only up to Exercise 7.4, no planes - which are not in the syllabus).
+// The five mid-term chapters deliberately stay inside their portion (e.g. integrals only up to Exercise 7.4).
 // Later chapters (Integrals II, Applications of Integrals, ...) are separate topics and are not restricted.
 const banned = [/(?<!in)definite integral/i, /partial fraction/i, /integration by parts/i, /\bplane\b/i, /\\int_/, /area under/i, /rolle/i, /mean value/i, /rate of change/i, /tangent and normal/i, /approximation/i, /triple product/i];
 const midterm = new Set<string>(MIDTERM_TOPIC_IDS);
