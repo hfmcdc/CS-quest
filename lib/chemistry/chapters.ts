@@ -8,6 +8,19 @@ import type { ChemChapterContent, ChemChapterMeta } from "./types";
  */
 export const CHEM_CHAPTERS: ChemChapterMeta[] = [
   {
+    slug: "solutions",
+    number: 1,
+    title: "Solutions",
+    short: "Solutions",
+    icon: "💧",
+    desc: "Concentration terms, Henry's law, Raoult's law, ideal and non-ideal solutions, colligative properties and the van't Hoff factor.",
+    topics: ["Concentration", "Henry's law", "Raoult's law", "Colligative properties", "van't Hoff factor"],
+    branch: "physical",
+    marks: 7,
+    features: ["revise", "cards", "concept", "numerical", "practice", "predict", "challenge"],
+    load: () => import("./chapters/solutions").then((m) => m.content),
+  },
+  {
     slug: "chemical-kinetics",
     number: 3,
     title: "Chemical Kinetics",
@@ -84,6 +97,19 @@ export const CHEM_CHAPTERS: ChemChapterMeta[] = [
     marks: 6,
     features: ["revise", "cards", "concept", "equations", "reactions", "practice", "predict", "challenge"],
     load: () => import("./chapters/amines").then((m) => m.content),
+  },
+  {
+    slug: "biomolecules",
+    number: 10,
+    title: "Biomolecules",
+    short: "Biomolecules",
+    icon: "🧬",
+    desc: "Carbohydrates, proteins, enzymes, vitamins, nucleic acids and the basic ideas about hormones.",
+    topics: ["Carbohydrates", "Glucose", "Proteins", "Enzymes", "Vitamins", "Nucleic acids", "Hormones"],
+    branch: "organic",
+    marks: 7,
+    features: ["revise", "cards", "concept", "equations", "reactions", "practice", "predict", "challenge"],
+    load: () => import("./chapters/biomolecules").then((m) => m.content),
   },
 ];
 

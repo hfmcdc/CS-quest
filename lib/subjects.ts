@@ -44,7 +44,7 @@ export const SUBJECTS: SubjectMeta[] = [
     icon: "flask",
     theme: "theme-chem",
     title: "Chemistry",
-    note: "Kinetics, D- and F-Block, and Organic Chemistry: notes, reactions, numericals and practice.",
+    note: "Solutions, Chemical Kinetics, D- and F-Block, Organic Chemistry and Biomolecules: notes, reactions, numericals and practice.",
     cta: "Start practice",
     glyphClass: "text-amber-300",
     hoverClass: "hover:border-amber-300/60",

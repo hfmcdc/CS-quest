@@ -26,6 +26,19 @@ const EXPECT: Record<string, number> = {
   "kn-n7": Math.pow(10, (60000 / (LN10 * R)) * ((310 - 300) / (300 * 310))),
   "kn-n8": LN10 * R * ((298 * 308) / (308 - 298)) * Math.log10(2),
   "kn-n9": (LN10 / 10) * Math.log10(100 / 80) / 60,
+  // Solutions (SI: mol m^-3, mol kg^-1, Pa, K, kg mol^-1)
+  "sl-n1": (4.0 / 40) / 0.250 * 1000,
+  "sl-n2": (5.0 / (5.0 + 95)) * 100,
+  "sl-n3": (18 / 180) / 0.500,
+  "sl-n4": (46 / 46) / (46 / 46 + 36 / 18),
+  "sl-n5": 1.5e-3 * (3.0 / 1.0) * 1000,
+  "sl-n6": 23.8 * (1 - 0.020) * 133.322368,
+  "sl-n7": (0.40 * 450 + (1 - 0.40) * 700) * 133.322368,
+  "sl-n8": 0.52 * ((1.8 / 180) / 0.100),
+  "sl-n9": (5.12 * 1.0 * 1000 / (1.0 * 25)) / 1000,
+  "sl-n10": ((0.60 / 60) / 0.200) * 0.0821 * 300 * 101325,
+  "sl-n11": 2 * 1.86 * 0.10,
+  "sl-n12": 3.4 / (5.12 * ((2.0 / 60) / 0.025)),
 };
 
 
@@ -153,11 +166,30 @@ console.log("Chemistry content checks");
     ["kn-n8", "52.9 kJ mol^-1", "correct"], ["kn-n8", "52900 J mol^-1", "correct"], ["kn-n8", "52.9 kJ/mol", "correct"], ["kn-n8", "52.9 J mol^-1", "wrong"], ["kn-n8", "52.9", "unit-missing"],
     ["kn-n3", "9", "correct"], ["kn-n3", "6", "wrong"],
   ];
+  const sl = (await CHEM_CHAPTERS.find((m) => m.slug === "solutions")!.load()).numerical!;
+  const sget = (id: string) => sl.find((n) => n.id === id)!.ans;
+  const scases: [string, string, string][] = [
+    ["sl-n1", "0.40 mol/L", "correct"], ["sl-n1", "0.4 M", "correct"], ["sl-n1", "0.4 mol dm^-3", "correct"], ["sl-n1", "400 mol m^-3", "correct"], ["sl-n1", "0.4", "unit-missing"], ["sl-n1", "0.4 mol/kg", "unit-wrong"], ["sl-n1", "1.6 M", "wrong"],
+    ["sl-n2", "5", "correct"], ["sl-n2", "5%", "correct"], ["sl-n2", "5.0 % w/w", "correct"], ["sl-n2", "5.3", "wrong"],
+    ["sl-n3", "0.20 mol kg^-1", "correct"], ["sl-n3", "0.2 m", "unit-wrong"], ["sl-n3", "0.2 mol/kg", "correct"], ["sl-n3", "0.2 mol/L", "unit-wrong"],
+    ["sl-n4", "0.333", "correct"], ["sl-n4", "1/3", "correct"], ["sl-n4", "0.5", "wrong"],
+    ["sl-n6", "23.3 mm Hg", "correct"], ["sl-n6", "23.324 mmHg", "correct"], ["sl-n6", "23.3 torr", "correct"], ["sl-n6", "3110 Pa", "correct"], ["sl-n6", "23.3", "unit-missing"], ["sl-n6", "0.98 mm Hg", "wrong"],
+    ["sl-n7", "600 mm Hg", "correct"], ["sl-n7", "0.789 atm", "correct"], ["sl-n7", "1150 mm Hg", "wrong"],
+    ["sl-n8", "0.052 K", "correct"], ["sl-n8", "0.052", "unit-missing"],
+    ["sl-n9", "204.8 g/mol", "correct"], ["sl-n9", "205 g mol^-1", "correct"], ["sl-n9", "0.205 kg/mol", "correct"], ["sl-n9", "204.8", "unit-missing"],
+    ["sl-n10", "1.23 atm", "correct"], ["sl-n10", "1.25 bar", "correct"], ["sl-n10", "124 kPa", "correct"], ["sl-n10", "1.23", "unit-missing"], ["sl-n10", "12.3 atm", "wrong"],
+    ["sl-n11", "0.372 K", "correct"], ["sl-n11", "0.186 K", "wrong"],
+    ["sl-n12", "0.50", "correct"], ["sl-n12", "0.498", "correct"], ["sl-n12", "2", "wrong"],
+  ];
+  for (const [id, input, want] of scases) {
+    const got = checkChemAnswer(input, sget(id));
+    if (got.status !== want) bad(`${id} "${input}" -> ${got.status} (wanted ${want}): ${got.message}`);
+  }
   for (const [id, input, want] of cases) {
     const got = checkChemAnswer(input, get(id));
     if (got.status !== want) bad(`${id} "${input}" -> ${got.status} (wanted ${want}): ${got.message}`);
   }
-  console.log(`  ${cases.length} spellings checked`);
+  console.log(`  ${cases.length + scases.length} spellings checked`);
 
   console.log("\ntyped-answer matcher: accepted and rejected wordings");
   const bank = new Map<string, import("../lib/chemistry/types").ChemConceptQ>();
@@ -175,6 +207,13 @@ console.log("Chemistry content checks");
     ["ak-s7", "formaldehyde has no alpha hydrogen", true], ["ak-s7", "no", false],
     ["ap-s1", "phenoxide ion is stabilised by resonance", true], ["ap-s1", "phenol has an OH group", false],
     ["am-s1", "alkyl groups have +I effect and increase electron density on N", true], ["am-s1", "they are bigger", false],
+    ["bm-e1", "gluconic acid", true], ["bm-e1", "saccharic acid", false], ["bm-e2", "saccharic acid", true], ["bm-e2", "gluconic acid", false],
+    ["bm-e7", "glucose and fructose", true], ["bm-e7", "glucose", false], ["bm-e9", "galactose and glucose", true], ["bm-e9", "glucose and fructose", false],
+    ["bm-e12", "TACG", true], ["bm-e12", "T-A-C-G", true], ["bm-e12", "UACG", false],
+    ["bm-s10", "A pairs with T by 2 H bonds and G pairs with C by 3 H bonds", true], ["bm-s10", "A with T and G with C", false],
+    ["bm-s9", "DNA has deoxyribose and thymine, RNA has uracil", true], ["bm-s9", "RNA has uracil", false],
+    ["sl-s6", "they depend on the number of solute particles", true], ["sl-s6", "they depend on the nature of the solute", false],
+    ["sl-s2", "partial pressure of a gas is proportional to its mole fraction in solution", true], ["sl-s2", "gas dissolves more at high temperature", false],
   ];
   for (const [id, input, want] of M) {
     const x = bank.get(id);
