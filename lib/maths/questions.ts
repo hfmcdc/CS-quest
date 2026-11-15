@@ -2,7 +2,6 @@ import type { MathQuestion } from "./types";
 import { HELP, anti, expr, manual, mcq, mk, num, tup, vec } from "./qhelpers";
 import type { Extra } from "./qhelpers";
 import { CHAPTERS } from "./chapters";
-import { GEOMETRY3D_EXTRA } from "./chapters/geometry3d-extra";
 
 export { HELP, anti, expr, manual, mcq, mk, num, tup, vec };
 export type { Extra };
@@ -804,6 +803,6 @@ const BASE_QUESTIONS: MathQuestion[] = [
     { challenge: true, input: HELP.anti }),
 ];
 
-export const QUESTIONS: MathQuestion[] = [...BASE_QUESTIONS, ...GEOMETRY3D_EXTRA, ...CHAPTERS.flatMap((c) => c.questions)];
+export const QUESTIONS: MathQuestion[] = [...BASE_QUESTIONS, ...CHAPTERS.flatMap((c) => c.questions)];
 
 export const QUESTION_BY_ID: Record<string, MathQuestion> = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));

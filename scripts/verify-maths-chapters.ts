@@ -81,19 +81,10 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
     numeric("REL-5", new Set(Z.map((a) => ((a % 3) + 3) % 3)).size);
   }
 
-  // REL-6: f(x) = 3 - 4x is one-one (strictly monotone) and onto (invertible on R)
+  numeric("REL-6", (2 * 2 ** 2) + 3);
   {
-    const f = (x: number) => 3 - 4 * x;
-    const inv = (y: number) => (3 - y) / 4;
-    ok([-7, -1, 0, 2.5, 9].every((y) => near(f(inv(y)), y)) && f(1) !== f(2), "REL-6 bijective");
-    mcqIs("REL-6", 0);
-  }
-  // REL-7: x -> x^2 on N is injective but 2 is not a square
-  {
-    const N = Array.from({ length: 200 }, (_, i) => i + 1);
-    const sq = N.map((x) => x * x);
-    ok(new Set(sq).size === N.length && !sq.includes(2), "REL-7 one-one not onto");
-    mcqIs("REL-7", 0);
+    const f = model("REL-7");
+    for (const x of [-4, -1, 0.5, 3]) ok(near(3 * f(x) + 5, x), `REL-7 f(f^-1(${x}))`);
   }
   // REL-8: count injective maps {1,2} -> {a,b,c,d}
   {
@@ -101,30 +92,29 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
     for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) if (i !== j) n++;
     numeric("REL-8", n);
   }
-  // REL-9: perpendicular lines as a relation on directions (angles in degrees): symmetric, not reflexive, not transitive
+  // REL-9: range of x/(1+x^2)
   {
-    const perp = (a: number, b: number) => Math.abs(Math.cos(((a - b) * Math.PI) / 180)) < 1e-12;
-    const dirs = [0, 30, 60, 90, 120, 150];
-    ok(!dirs.every((a) => perp(a, a)), "REL-9 not reflexive");
-    ok(dirs.every((a) => dirs.every((b) => perp(a, b) === perp(b, a))), "REL-9 symmetric");
-    ok(perp(0, 90) && perp(90, 180) && !perp(0, 180), "REL-9 not transitive");
+    let lo = Infinity, hi = -Infinity;
+    for (let x = -50; x <= 50; x += 0.0005) { const y = x / (1 + x * x); lo = Math.min(lo, y); hi = Math.max(hi, y); }
+    ok(near(lo, -0.5, 1e-6) && near(hi, 0.5, 1e-6), "REL-9 range");
     mcqIs("REL-9", 0);
   }
-  // REL-10: R = {(a,b): a <= b^2} on R
   {
-    const r = (a: number, b: number) => a <= b * b;
-    ok(!r(0.5, 0.5) && r(1, 2) && !r(2, 1) && r(3, -2) && r(-2, 1) && !r(3, 1), "REL-10 counter-examples");
-    mcqIs("REL-10", 0);
+    const f = (x: number) => (x + 1) / (x - 1);
+    const m = model("REL-10");
+    for (const x of [2, 3.5, 7, -3, 0.2]) ok(near(f(f(x)), m(x)), `REL-10 at ${x}`);
   }
-  // REL-11: b divisible by a on {1..6}
   {
-    let n = 0;
-    for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) if (b % a === 0) n++;
-    numeric("REL-11", n);
+    const f = (x: number) => x + 2, g = (x: number) => x * x;
+    const x = value("REL-11");
+    ok(near(g(f(x)), f(g(x))), "REL-11 solution satisfies equation");
+    ok(Math.abs(g(f(x + 0.1)) - f(g(x + 0.1))) > 1e-3, "REL-11 solution unique-ish");
   }
-  // REL-C1..C4 by enumeration
+  // REL-C1..C3 by enumeration
   {
-    let equiv = 0, symm = 0, reflx = 0;
+    const pairs: [number, number][] = [];
+    for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) pairs.push([a, b]);
+    let equiv = 0, symm = 0;
     for (let mask = 0; mask < 512; mask++) {
       const has = (a: number, b: number) => (mask >> (a * 3 + b)) & 1;
       let refl = true, sym = true, trans = true;
@@ -136,7 +126,6 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
         }
       }
       if (sym) symm++;
-      if (refl) reflx++;
       if (refl && sym && trans) equiv++;
     }
     numeric("REL-C1", equiv);
@@ -144,7 +133,7 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
     let onto = 0;
     for (let m = 0; m < 16; m++) { const imgs = new Set([0, 1, 2, 3].map((i) => (m >> i) & 1)); if (imgs.size === 2) onto++; }
     numeric("REL-C3", onto);
-    numeric("REL-C4", reflx);
+    mcqIs("REL-C4", 0);
   }
 }
 
@@ -209,24 +198,31 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
     mcqIs("MAT-13", 0);
   }
   {
-    // MAT-C1: A^2 = kA - 2I
-    const A: Mx = [[3, -2], [4, -2]];
-    const k = value("MAT-C1");
-    const A2 = mul(A, A);
-    ok(flat(A2).every((v, i) => near(v, k * flat(A)[i] - (i === 0 || i === 3 ? 2 : 0))), "MAT-C1 A^2 = kA - 2I");
-    // MAT-C2: a_ij = (i+j)^2 / 2
-    sameTuple("MAT-C2", [[1, 2], [3, 4]].map((_, ii) => [1, 2].map((jj) => ((ii + 1 + jj) ** 2) / 2)));
-    // MAT-C3: AB - BA is symmetric when A symmetric and B skew-symmetric
-    const S: Mx = [[1, 2, 3], [2, 4, 5], [3, 5, 6]], K: Mx = [[0, 1, -2], [-1, 0, 3], [2, -3, 0]];
-    const D = mul(S, K).map((r, i) => r.map((v, j) => v - mul(K, S)[i][j]));
-    ok(flat(D).every((v, i) => near(v, flat(tr(D))[i])), "MAT-C3 symmetric");
-    mcqIs("MAT-C3", 0);
+    // MAT-C1: A^2025 for A = [[0,1],[-1,0]]
+    let P: Mx = [[1, 0], [0, 1]];
+    const A: Mx = [[0, 1], [-1, 0]];
+    for (let i = 0; i < 2025; i++) P = mul(P, A);
+    sameTuple("MAT-C1", P);
+    // MAT-C2
+    const th = Math.PI / 6;
+    const R: Mx = [[Math.cos(th), Math.sin(th)], [-Math.sin(th), Math.cos(th)]];
+    const R3 = mul(mul(R, R), R);
+    numeric("MAT-C2", R3[0][1], 1e-9);
+    // MAT-C3: 3x3 symmetric 0/1 matrices
+    let count = 0;
+    for (let m = 0; m < 512; m++) {
+      const g = (i: number, j: number) => (m >> (i * 3 + j)) & 1;
+      let sym = true;
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (g(i, j) !== g(j, i)) sym = false;
+      if (sym) count++;
+    }
+    numeric("MAT-C3", count);
     // MAT-C4: for random symmetric A, B: AB symmetric iff AB = BA  (test a commuting and a non-commuting pair)
     const sym = (X: Mx) => flat(X).every((v, i) => near(v, flat(tr(X))[i]));
     const A1: Mx = [[1, 2], [2, 3]], B1: Mx = [[2, 1], [1, 0]];
     ok(sym(mul(A1, B1)) === flat(mul(A1, B1)).every((v, i) => near(v, flat(mul(B1, A1))[i])), "MAT-C4 non-commuting pair");
-    const A3: Mx = [[1, 2], [2, 1]], B2: Mx = [[3, 4], [4, 3]];
-    ok(sym(mul(A3, B2)) && flat(mul(A3, B2)).every((v, i) => near(v, flat(mul(B2, A3))[i])), "MAT-C4 commuting pair");
+    const A2: Mx = [[1, 2], [2, 1]], B2: Mx = [[3, 4], [4, 3]];
+    ok(sym(mul(A2, B2)) && flat(mul(A2, B2)).every((v, i) => near(v, flat(mul(B2, A2))[i])), "MAT-C4 commuting pair");
     mcqIs("MAT-C4", 0);
   }
 }
@@ -285,17 +281,22 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
     for (const x of [-2.5, 0.7, 4.1, -7]) ok(near(f(x), (x + 6) * (x - 3) ** 2, 1e-9), `DET-C1 factorisation at ${x}`);
     numeric("DET-C1", -6 + 3);
   }
-  // DET-C2: triangle (k,0),(4,0),(0,2) has area 4
+  // DET-C2: A^{-1} = xA + yI
   {
-    const k = value("DET-C2");
-    ok(near(0.5 * Math.abs(d3([[k, 0, 1], [4, 0, 1], [0, 2, 1]])), 4), "DET-C2 area");
-    ok(k > 0 && near(0.5 * Math.abs(d3([[0, 0, 1], [4, 0, 1], [0, 2, 1]])), 4), "DET-C2 other root is 0");
+    const A: Mx = [[1, 2], [3, 4]];
+    const d = d2(A);
+    const inv: Mx = [[A[1][1] / d, -A[0][1] / d], [-A[1][0] / d, A[0][0] / d]];
+    // solve inv = x A + y I using entries (0,1) and (0,0)
+    const x = inv[0][1] / A[0][1];
+    const y = inv[0][0] - x * A[0][0];
+    ok(near(inv[1][0], x * A[1][0]) && near(inv[1][1], x * A[1][1] + y), "DET-C2 representable");
+    numeric("DET-C2", x + y);
   }
-  // DET-C3: |A adj A| = |A|^3 for a concrete 3x3 with det -4
+  // DET-C3: |adj(adj A)| = |A|^((n-1)^2) tested on a diagonal 3x3 with det 3
   {
-    const A: Mx = [[-4, 0, 0], [0, 1, 0], [0, 0, 1]];
+    const A: Mx = [[3, 0, 0], [0, 1, 0], [0, 0, 1]];
     const adj = (m: Mx): Mx => [0, 1, 2].map((i) => [0, 1, 2].map((j) => cof(m, j, i)));
-    numeric("DET-C3", d3(mulM(A, adj(A))));
+    numeric("DET-C3", d3(adj(adj(A))));
   }
   mcqIs("DET-C4", 0);
 }
@@ -328,11 +329,13 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
     const f = (x: number) => x ** 3 + 2 * x * x;
     numeric("CON-10", (f(1 + 1e-4) - 2 * f(1) + f(1 - 1e-4)) / 1e-8, 1e-4);
   }
-  checkDeriv("CON-13", (x) => Math.log(x) ** x, [1.5, 2.2, 3.1, 3.9]);
   checkDeriv("CON-11", (x) => x ** x, [0.6, 1.3, 2.2, 2.9]);
   checkDeriv("CON-12", (x) => Math.log(1 / Math.cos(x) + Math.tan(x)), [-1.2, -0.4, 0.3, 1.1]);
   {
-    numeric("CON-C1", (3 * 5 - 5 - 1) / 5, 1e-9);
+    // CON-13: f(x)=x^3 on [0,2]; slope of chord = 4 = f'(c)
+    const c = value("CON-13");
+    ok(near(3 * c * c, (8 - 0) / 2) && c > 0 && c < 2, "CON-13 MVT point");
+    numeric("CON-C1", Math.sin(3e-7) / 1e-7, 1e-5);
     // CON-C2: scan for corners of |x-1|+|x-2|
     const f = (x: number) => Math.abs(x - 1) + Math.abs(x - 2);
     const h = 1e-4;
@@ -350,17 +353,14 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
       ok(Math.abs((1 - x * x) * d2 - x * d1) < 1e-3, `CON-C3 at ${x}`);
     }
     mcqIs("CON-C3", 0);
-    // CON-C4: y'' - 5y' + 6y = 0 for y = 3e^{2x} + 2e^{3x}
-    const g = (x: number) => 3 * Math.exp(2 * x) + 2 * Math.exp(3 * x);
-    for (const x of [-0.5, 0.2, 0.9]) {
-      const d1 = deriv(g, x, 1e-5), d2 = (g(x + 1e-4) - 2 * g(x) + g(x - 1e-4)) / 1e-8;
-      ok(Math.abs(d2 - 5 * d1 + 6 * g(x)) < 1e-2 * (1 + Math.abs(g(x))), `CON-C4 at ${x}`);
-    }
-    mcqIs("CON-C4", 0);
+    // CON-C4: d2y/dx2 for x = cos t, y = sin t at t = pi/4
+    const dydx = (t: number) => Math.cos(t) / -Math.sin(t);
+    const t0 = Math.PI / 4;
+    numeric("CON-C4", deriv(dydx, t0) / -Math.sin(t0), 1e-6);
   }
 }
 
-// ======================================================================= Applications of Derivatives (rate of change, monotonicity)
+// ======================================================================= Applications of Derivatives (rate, monotonicity, tangents)
 {
   numeric("DAP-1", 2 * Math.PI * 2);
   numeric("DAP-2", 2 * 10 * 3);
@@ -369,24 +369,17 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
     const V = (tt: number) => (4 / 3) * Math.PI * (4 + 0.5 * tt) ** 3;
     numeric("DAP-4", deriv(V, 0, 1e-5) / Math.PI, 1e-6);
   }
-  // DAP-5: cube with edge 2 + 3t
-  numeric("DAP-5", deriv((tt) => (2 + 3 * tt) ** 3, 0, 1e-5), 1e-6);
+  const cubic = (x: number) => x ** 3 - 3 * x + 2;
+  numeric("DAP-5", deriv(cubic, 2), 1e-6);
   {
-    const f = (x: number) => Math.exp(-x);
-    ok([-3, -0.5, 0, 2, 5].every((x) => deriv(f, x) < 0), "DAP-6 decreasing");
-    mcqIs("DAP-6", 0);
-    const g = (x: number) => x ** 3 - 3 * x;
-    ok(deriv(g, -2) > 0 && deriv(g, 0) < 0 && deriv(g, 2) > 0 && Math.abs(deriv(g, 1)) < 1e-6 && Math.abs(deriv(g, -1)) < 1e-6, "DAP-7 signs");
-    mcqIs("DAP-7", 0);
-    mcqIs("DAP-3", 0);
-    const h3 = (x: number) => x * x - 4 * x;
-    ok(deriv(h3, 3) > 0 && deriv(h3, 1) < 0, "DAP-3 sign of f'");
+    const f = (x: number) => x * x;
+    const m = deriv(f, 2);
+    numeric("DAP-6", f(2) - m * 2, 1e-6);
+    numeric("DAP-7", -1 / m, 1e-6);
   }
   {
-    // DAP-8: V(t) increases by 900 per second; r from V = 4/3 pi r^3 at r = 15
-    const V0 = (4 / 3) * Math.PI * 15 ** 3;
-    const r = (tt: number) => Math.cbrt(((V0 + 900 * tt) * 3) / (4 * Math.PI));
-    numeric("DAP-8", deriv(r, 0, 1e-4), 1e-6);
+    const f = (x: number) => x * x - 4 * x + 5;
+    ok(Math.abs(deriv(f, value("DAP-8"))) < 1e-6, "DAP-8 horizontal tangent");
     const g = (x: number) => 2 * x ** 3 - 9 * x * x + 12 * x + 1;
     let lo = NaN, hi = NaN;
     for (let x = -1; x <= 4; x += 0.001) {
@@ -395,19 +388,25 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
       if (d < 0) hi = x;
     }
     numeric("DAP-9", Math.round(hi) - Math.round(lo), 1e-9);
+    mcqIs("DAP-3", 0);
+    const h3 = (x: number) => x * x - 4 * x;
+    ok(deriv(h3, 3) > 0 && deriv(h3, 1) < 0, "DAP-3 sign of f'");
   }
   {
     // DAP-10: x = 3 + 2h (foot sliding at 2 m/s), y = sqrt(25 - x^2)
     const y = (h: number) => Math.sqrt(25 - (3 + 2 * h) ** 2);
     numeric("DAP-10", -deriv(y, 0, 1e-6), 1e-5);
-    // DAP-11: y = x^3 changes 12 times as fast as x
-    ok(near(deriv((x) => x ** 3, value("DAP-11")), 12, 1e-6), "DAP-11 slope 12");
+    // DAP-11: tangent to y = x^3 parallel to slope 3 at positive x
+    const f = (x: number) => x ** 3;
+    ok(near(deriv(f, 1), 3), "DAP-11 slope 3 at x=1");
+    numeric("DAP-11", f(1) - 3 * 1, 1e-9);
     // DAP-12: x^3 + kx increasing for all x iff k >= 0
     const incr = (k: number) => Array.from({ length: 2001 }, (_, i) => -10 + i * 0.01).every((x) => 3 * x * x + k >= -1e-12);
     ok(incr(0) && !incr(-1), "DAP-12 k=0 works, k=-1 fails");
     numeric("DAP-12", 0);
     numeric("DAP-C1", deriv((r) => Math.PI * r * r, 5) * 2 / Math.PI, 1e-6);
-    numeric("DAP-C2", (deriv((r) => 4 * Math.PI * r * r, 10) * 0.5) / Math.PI, 1e-6);
+    const parab = (x: number) => Math.sqrt(3) * x * x;
+    numeric("DAP-C2", (Math.atan(deriv(parab, 0.5)) * 180) / Math.PI, 1e-6);
     let best = 0, bx = 0;
     for (let x = 0.01; x < 10; x += 0.0001) { const v = Math.log(x) / x; if (v > best) { best = v; bx = x; } }
     numeric("DAP-C3", bx, 1e-3);
@@ -448,17 +447,17 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
   area("AIN-3", (x) => 4 * Math.sqrt(Math.max(0, 9 - x * x)), 0, 3);
   area("AIN-4", (x) => x - x * x, 0, 1);
   area("AIN-5", (x) => 2 * 2 * Math.sqrt(x), 0, 4);
-  area("AIN-6", (x) => 2 * Math.sqrt(x), 0, 4);
+  area("AIN-6", Math.sin, 0, Math.PI);
   area("AIN-7", (x) => 4 * 1.5 * Math.sqrt(Math.max(0, 4 - x * x)), 0, 2);
   area("AIN-8", (x) => 4 - x * x, -2, 2);
-  area("AIN-9", (x) => 2 * x - x, 0, 4);
-  area("AIN-10", (x) => 2 * Math.sqrt(Math.max(0, 1 - (x * x) / 9)), 0, 3);
+  area("AIN-9", (x) => 1 / x, 1, Math.E);
+  area("AIN-10", (x) => x * x - x ** 3, 0, 1);
   area("AIN-11", (y) => y + 2 - y * y, -1, 2);
   area("AIN-12", (x) => 2 - Math.abs(x), -2, 2);
   area("AIN-13", (x) => Math.sqrt(Math.max(0, 4 - x * x)) - (2 - x), 0, 2);
   area("AIN-C1", (x) => 2 * 2 * Math.sqrt(x) , 0, 1);
   area("AIN-C2", (x) => Math.abs(x) - x * x, -1, 1);
-  area("AIN-C3", (x) => Math.abs(x + 3), -6, 0);
+  area("AIN-C3", (x) => Math.cos(x) - Math.sin(x), 0, Math.PI / 4);
   area("AIN-C4", (x) => 2 * (x <= 2 ? Math.sqrt(6 * x) : Math.sqrt(Math.max(0, 16 - x * x))), 0, 4);
   // intersection checks
   ok(near(2 ** 2, 2 + 2) && near((-1) ** 2, -1 + 2), "AIN-11 intersections");
@@ -509,23 +508,47 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
   }
 }
 
-// ======================================================================= Three-Dimensional Geometry (extra lines questions)
+// ======================================================================= Planes
 {
   type V = number[];
   const dot = (a: V, b: V) => a.reduce((s, v, i) => s + v * b[i], 0);
-  const cross = (a: V, b: V): V => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const norm = (a: V) => Math.hypot(...a);
-  mcqIs("G3X-1", 0);
+  const prop = (a: V, b: V) => Math.abs(a[0] * b[1] - a[1] * b[0]) < 1e-9 && Math.abs(a[0] * b[2] - a[2] * b[0]) < 1e-9 && Math.abs(a[1] * b[2] - a[2] * b[1]) < 1e-9;
+  const pd = (n: V, d: number, p: V) => Math.abs(dot(n, p) - d) / norm(n);
+  ok(prop(tupleKey("PLN-1"), [2, -3, 6]), "PLN-1");
+  numeric("PLN-2", pd([2, -3, 6], 14, [0, 0, 0]));
   {
-    const k = value("G3X-2");
-    ok(near(dot([-3, 2 * k, 2], [3 * k, 1, -5]), 0, 1e-9), "G3X-2 perpendicular");
-    const d = dot([3, -1, -3], cross([2, 3, 4], [5, 2, 1]));
-    ok(Math.abs(d) < 1e-12, "G3X-3 coplanar");
-    ok(norm(cross([2, 3, 4], [5, 2, 1])) > 0, "G3X-3 not parallel");
-    mcqIs("G3X-3", 0);
-    numeric("G3X-4", norm(cross([1, 2, 2], [1, 0, 0])) / norm([1, 2, 2]), 1e-9);
-    const c = cross([2, -1, 1], [3, -5, 2]);
-    numeric("G3X-5", Math.abs(dot([1, 0, -1], c)) / norm(c), 1e-9);
+    const opts = [[3, 2, 1, 6], [1, 1, 1, 11], [6, 3, 2, 6], [3, 2, 1, 1]];
+    const onPlane = (o: number[]) => [[2, 0, 0], [0, 3, 0], [0, 0, 6]].every((p) => near(o[0] * p[0] + o[1] * p[1] + o[2] * p[2], o[3]));
+    ok(opts.map(onPlane).join() === "true,false,false,false", "PLN-3");
+    mcqIs("PLN-3", 0);
+  }
+  numeric("PLN-4", pd([2, -1, 2], 1, [1, 2, 3]));
+  numeric("PLN-5", Math.abs(dot([2, 1, -2], [3, -6, -2])) / (norm([2, 1, -2]) * norm([3, -6, -2])));
+  numeric("PLN-6", dot([1, 2, 3], [1, 1, 1]));
+  mcqIs("PLN-7", 0);
+  numeric("PLN-8", Math.abs(dot([1, 2, 2], [2, 2, -1])) / (norm([1, 2, 2]) * norm([2, 2, -1])));
+  {
+    const n = tupleKey("PLN-9");
+    // plane through A(1,0,0), B(0,2,0), C(0,0,3): normal must be perpendicular to AB and AC
+    ok(Math.abs(dot(n, [-1, 2, 0])) < 1e-9 && Math.abs(dot(n, [-1, 0, 3])) < 1e-9, "PLN-9 normal");
+    numeric("PLN-10", Math.abs(9 - 3) / norm([2, -1, 2]));
+    const P = tupleKey("PLN-11");
+    const tt = P[0] - 1;
+    ok(near(P[1], 2 + tt) && near(P[2], 3 + 2 * tt) && near(P[0] + P[1] + P[2], 10), "PLN-11 on line and plane");
+    const F = tupleKey("PLN-12");
+    ok(near(F[0] + F[1] + F[2], 6) && prop([F[0] - 1, F[1] - 1, F[2] - 1], [1, 1, 1]), "PLN-12 foot");
+    numeric("PLN-C1", dot([3, -1, 2], [2, 1, -1]));
+    const C = tupleKey("PLN-C2");
+    // plane 3x+2y+z=0: contains the origin, and every point on both planes x+y+z=1 & 2x+3y+4z=5 satisfies it
+    ok(prop(C, [3, 2, 1]), "PLN-C2 normal");
+    for (const z of [-2, 0, 3]) {
+      // solve x+y=1-z, 2x+3y=5-4z
+      const y = 5 - 4 * z - 2 * (1 - z), x = 1 - z - y;
+      ok(Math.abs(3 * x + 2 * y + z) < 1e-9, `PLN-C2 contains the intersection line at z=${z}`);
+    }
+    numeric("PLN-C3", pd([1, 1, 1], 3, [0, 0, 0]));
+    numeric("PLN-C4", (() => { for (let k = -10; k <= 10; k += 0.5) if (dot([1, 2, k], [2, 1, -1]) === 0) return k; return NaN; })());
   }
 }
 
@@ -618,12 +641,15 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
   }
   numeric("PRB-8", 1 / 2 + 1 / 3 - (1 / 2) * (1 / 3));
   {
-    // PRB-9: P(A and B) from the union, then P(A | B)
-    numeric("PRB-9", (0.3 + 0.4 - 0.5) / 0.4);
+    // PRB-9: binomial by enumeration of 16 outcomes
+    let n = 0;
+    for (let m = 0; m < 16; m++) { let h = 0; for (let i = 0; i < 4; i++) h += (m >> i) & 1; if (h === 2) n++; }
+    numeric("PRB-9", n / 16);
     const xs = [0, 1, 2], ps = [0.2, 0.5, 0.3];
     ok(near(ps.reduce((a, b) => a + b, 0), 1), "PRB-10 probabilities sum to 1");
-    numeric("PRB-10", xs.reduce((s, x, i) => s + x * ps[i], 0));
-    numeric("PRB-11", 1 / (1 + 2 + 3 + 4));
+    const mean = xs.reduce((s, x, i) => s + x * ps[i], 0);
+    numeric("PRB-10", mean);
+    numeric("PRB-11", xs.reduce((s, x, i) => s + x * x * ps[i], 0) - mean * mean);
     // PRB-12: at least one six in 4 throws by enumeration of 6^4 outcomes
     let hit = 0;
     for (let m = 0; m < 1296; m++) { let x = m, six = false; for (let i = 0; i < 4; i++) { if (x % 6 === 5) six = true; x = Math.floor(x / 6); } if (six) hit++; }
@@ -631,14 +657,16 @@ function integrate(f: (x: number) => number, a: number, b: number, n = 20000): n
   }
   numeric("PRB-13", (0.01 * 0.99) / (0.01 * 0.99 + 0.99 * 0.05));
   {
-    // PRB-C2: number of sixes in two throws, by enumeration
-    {
-      let sum = 0;
-      for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) sum += (a === 6 ? 1 : 0) + (b === 6 ? 1 : 0);
-      numeric("PRB-C2", sum / 36, 1e-9);
-    }
-    // PRB-C3: independent A, B
-    numeric("PRB-C3", 1 - (0.3 + 0.4 - 0.3 * 0.4), 1e-9);
+    // PRB-C2: B(n,p): np = 4, npq = 3 => n = 16 (check the mean/variance of B(16, 1/4) by summing the pmf)
+    const n = value("PRB-C2"), p = 0.25;
+    const C = (N: number, r: number) => { let v = 1; for (let i = 1; i <= r; i++) v = (v * (N - r + i)) / i; return v; };
+    let mean = 0, m2 = 0;
+    for (let r = 0; r <= n; r++) { const pr = C(n, r) * p ** r * (1 - p) ** (n - r); mean += r * pr; m2 += r * r * pr; }
+    ok(near(mean, 4, 1e-9) && near(m2 - mean * mean, 3, 1e-9), "PRB-C2 B(16,1/4) has mean 4 variance 3");
+    // PRB-C3: at least 3 heads in 5 tosses
+    let k = 0;
+    for (let m = 0; m < 32; m++) { let h = 0; for (let i = 0; i < 5; i++) h += (m >> i) & 1; if (h >= 3) k++; }
+    numeric("PRB-C3", k / 32);
     const pD = 0.5 * 0.01 + 0.3 * 0.02 + 0.2 * 0.03;
     numeric("PRB-C4", (0.5 * 0.01) / pD);
   }

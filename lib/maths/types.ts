@@ -1,6 +1,6 @@
 export type MathTopicId =
   | "rel" | "itf" | "mat" | "det" | "cont" | "derivapps" | "maxmin" | "integrals" | "intadv"
-  | "areaint" | "de" | "vectors" | "geometry3d" | "lpp" | "prob";
+  | "areaint" | "de" | "vectors" | "geometry3d" | "planes" | "lpp" | "prob";
 export type Level = 1 | 2 | 3;
 export type QKind = "direct" | "short" | "steps" | "application" | "exam";
 
