@@ -7,8 +7,7 @@ import { derivapps } from "./derivapps";
 import { intadv } from "./intadv";
 import { areaint } from "./areaint";
 import { de } from "./de";
-import { planes } from "./planes";
 import { lpp } from "./lpp";
 import { prob } from "./prob";
 
-export const CHAPTERS: ChapterContent[] = [rel, mat, det, cont, derivapps, intadv, areaint, de, planes, lpp, prob];
+export const CHAPTERS: ChapterContent[] = [rel, mat, det, cont, derivapps, intadv, areaint, de, lpp, prob];
