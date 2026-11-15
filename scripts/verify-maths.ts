@@ -8,7 +8,7 @@ import { QUESTIONS } from "../lib/maths/questions";
 import { GENERATORS } from "../lib/maths/generators";
 import { REVISION } from "../lib/maths/revision";
 import { EXAMPLES } from "../lib/maths/examples";
-import { MATH_TOPICS, MIDTERM_TOPIC_IDS } from "../lib/maths/topics";
+import { MATH_TOPICS } from "../lib/maths/topics";
 import { MATH_CARDS, PV_ROWS } from "../lib/maths/flashcards";
 import { piTex } from "../lib/maths/generators";
 import { checkAnswer } from "../lib/maths/checker";
@@ -355,23 +355,9 @@ for (const g of GENERATORS) {
   }
 }
 
-// ---------------------------------------------------------------- 6. scope guard for the Second Mid-Term chapters
-// The five mid-term chapters deliberately stay inside their portion (e.g. integrals only up to Exercise 7.4).
-// Later chapters (Integrals II, Applications of Integrals, ...) are separate topics and are not restricted.
-const banned = [/(?<!in)definite integral/i, /partial fraction/i, /integration by parts/i, /\bplane\b/i, /\\int_/, /area under/i, /rolle/i, /mean value/i, /rate of change/i, /tangent and normal/i, /approximation/i, /triple product/i];
-const midterm = new Set<string>(MIDTERM_TOPIC_IDS);
-const everything: string[] = [];
-MATH_CARDS.filter((c) => midterm.has(c.topic)).forEach((c) => everything.push(c.front, c.back));
-QUESTIONS.filter((q) => midterm.has(q.topic)).forEach((q) => everything.push(q.text, q.answer, q.hint, ...q.steps));
-for (const topic of MATH_TOPICS.filter((x) => midterm.has(x.id))) {
-  REVISION[topic.id].forEach((s) => everything.push(s.title, ...s.items.map((i) => i.body)));
-  EXAMPLES[topic.id].forEach((e) => everything.push(e.title, e.problem, e.answer, ...e.steps.flatMap((s) => [s.doit, s.why])));
-}
-for (const text of everything) for (const re of banned) ok(!re.test(text), `out-of-scope phrase ${re} in "${text.slice(0, 60)}"`);
-
 // ---------------------------------------------------------------- 8. full-syllabus coverage
 {
-  ok(MATH_TOPICS.length === 15, `expected 15 topics, found ${MATH_TOPICS.length}`);
+  ok(MATH_TOPICS.length === 14, `expected 14 topics, found ${MATH_TOPICS.length}`);
   ok(new Set(MATH_TOPICS.map((t) => t.id)).size === MATH_TOPICS.length, "duplicate topic ids");
   for (const topic of MATH_TOPICS) {
     const own = QUESTIONS.filter((q) => q.topic === topic.id);

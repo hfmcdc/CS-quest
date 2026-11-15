@@ -173,7 +173,7 @@ export default function CSQuest() {
     <>
     <BetaBanner />
     <main className="theme-cs mx-auto max-w-5xl px-4 py-10 sm:py-14">
-      <PageHeader title="Computer Science" icon={<Icon name="code" size={24} />}>Second Mid-Term practice for CBSE Class XII. Pick an area and start.</PageHeader>
+      <PageHeader title="Computer Science" icon={<Icon name="code" size={24} />}>Practice for CBSE Class XII. Pick an area and start.</PageHeader>
       <section className="stagger grid gap-4 md:grid-cols-3" aria-label="Practice areas">
         {TOPICS.map((t) => (
           <button key={t.id} onClick={() => setScreen(t.id)} className="card card-link group gap-1 p-6 text-left">

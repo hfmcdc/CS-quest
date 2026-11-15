@@ -316,4 +316,4 @@ const BASE_REVISION: Partial<Record<MathTopicId, RevisionSection[]>> = {
   ],
 };
 
-export const REVISION = { ...BASE_REVISION, ...Object.fromEntries(CHAPTERS.map((c) => [c.id, c.revision])) } as Record<MathTopicId, RevisionSection[]>;
+export const REVISION = { ...BASE_REVISION, ...Object.fromEntries(CHAPTERS.map((c) => [c.id, [...(BASE_REVISION[c.id] ?? []), ...c.revision]])) } as Record<MathTopicId, RevisionSection[]>;

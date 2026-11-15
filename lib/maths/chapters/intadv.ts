@@ -2,11 +2,11 @@ import type { ChapterContent } from "../types";
 import { HELP, anti, cardMk, mk, num } from "../qhelpers";
 
 const t = String.raw;
-const q = mk("intadv");
-const c = cardMk("intadv", "IA");
+const q = mk("integrals");
+const c = cardMk("integrals", "IA");
 
-export const intadv: ChapterContent = {
-  id: "intadv",
+export const integrals: ChapterContent = {
+  id: "integrals",
   questions: [
     q("INA-1", "Integration by parts", "direct", 1,
       t`Find $\int xe^x\,dx$.`,
@@ -235,7 +235,7 @@ export const intadv: ChapterContent = {
       ],
     },
     {
-      title: "Key concepts",
+      title: "Key concepts: definite integrals",
       kind: "concepts",
       items: [
         { body: t`In a definite integral by substitution, **change the limits** with the variable (or go back to $x$ before using them).` },
@@ -245,7 +245,7 @@ export const intadv: ChapterContent = {
       ],
     },
     {
-      title: "Common mistakes",
+      title: "Common mistakes: parts, fractions, definite integrals",
       kind: "mistakes",
       items: [
         { body: t`Choosing $u$ badly (for example $u=e^x$ in $\int xe^x\,dx$), which makes the integral harder.` },
@@ -256,7 +256,7 @@ export const intadv: ChapterContent = {
       ],
     },
     {
-      title: "Quick worked example",
+      title: "Quick worked example: integration by parts",
       kind: "example",
       items: [
         { label: "Problem", body: t`Find $\int x\cos x\,dx$.` },

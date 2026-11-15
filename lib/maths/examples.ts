@@ -177,4 +177,4 @@ const BASE_EXAMPLES: Partial<Record<MathTopicId, WorkedExample[]>> = {
   ],
 };
 
-export const EXAMPLES = { ...BASE_EXAMPLES, ...Object.fromEntries(CHAPTERS.map((c) => [c.id, c.examples])) } as Record<MathTopicId, WorkedExample[]>;
+export const EXAMPLES = { ...BASE_EXAMPLES, ...Object.fromEntries(CHAPTERS.map((c) => [c.id, [...(BASE_EXAMPLES[c.id] ?? []), ...c.examples]])) } as Record<MathTopicId, WorkedExample[]>;

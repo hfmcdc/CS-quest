@@ -1,5 +1,5 @@
 export type MathTopicId =
-  | "rel" | "itf" | "mat" | "det" | "cont" | "derivapps" | "maxmin" | "integrals" | "intadv"
+  | "rel" | "itf" | "mat" | "det" | "cont" | "derivapps" | "maxmin" | "integrals"
   | "areaint" | "de" | "vectors" | "geometry3d" | "lpp" | "prob";
 export type Level = 1 | 2 | 3;
 export type QKind = "direct" | "short" | "steps" | "application" | "exam";
@@ -66,8 +66,6 @@ export interface MathTopicMeta {
   desc: string;
   icon: string;
   chapter: string;
-  /** true for the five chapters in the Second Mid-Term portion */
-  midterm?: boolean;
 }
 
 export interface RevisionItem {
